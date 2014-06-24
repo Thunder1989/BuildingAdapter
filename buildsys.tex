@@ -1,0 +1,58 @@
+%\documentclass{sensys-proc}
+%\documentclass{sig-alternate-ipsn13}
+\documentclass{sig-alternate}
+\usepackage{subcaption}
+%\usepackage{epsfig}
+\usepackage{hyperref}
+\usepackage[ruled]{algorithm2e}
+
+\begin{document}
+\conferenceinfo{BuildSys'13,} {November 14--15, 2013, Rome, Italy} 
+\CopyrightYear{2013} 
+\crdata{978-1-4503-2431-1/13/11} 
+\clubpenalty=10000 
+\widowpenalty = 10000
+
+\title{Sensor Type Classification in Buildings Through Time-Series Data
+}
+\numberofauthors{1} 
+\author{
+\alignauthor
+Dezhi Hong$^1$, Jorge Ortiz$^2$, Kamin Whitehouse$^1$, Bong-Jun Ko$^2$\\
+	\affaddr{$^1$Department of Computer Science, University of Virginia, USA}\\
+      	\affaddr{$^2$IBM Research, Yorktown Heights, NY USA}\\
+      	\email{\{hong, whitehouse\}@virginia.edu, \{jjortiz, bko\}@us.ibm.com}
+}
+
+\maketitle
+\begin{abstract}
+TBD
+\end{abstract}
+
+\category{C.3}{Special-Purpose And Application-Based Systems}{Real-time and embedded systems}
+\terms{Performance, Experimentation, Verification}
+\keywords{Building, Sensor Type, Random Forest, Classification}
+
+% \newpage
+\input{intro}
+
+\input{motivation}
+
+\input{method}
+
+\input{evaluation}
+
+\input{discussion}
+
+\input{relatedwork}
+
+\input{conclusion}
+
+%\section{Acknowledgements}
+%Thanks to our shepherd, Kin Cheong Sou, and the anonymous reviewers for helpful comments. Thanks to Albert Goto, for making the first author's stay at UC Berkeley comfortable. Sincere gratitude goes to Kamin and David, for letting this collaboration happen. This work was partly funded by the NSF grants EFRI-1038271 and CPS-1239552.
+\bibliographystyle{abbrv}
+% \small
+\bibliography{buildsys}
+
+%\balancecolumns
+\end{document}
