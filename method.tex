@@ -65,27 +65,30 @@ F = \{min(MED), max(MED), median(MED), var(MED),\\
  min(VAR), max(VAR), median(VAR), var(VAR)\}
 \end{split}
 \end{displaymath}
-And $F$ is the feature vector for each sensor trace in our classification task.
+And $F$ is the feature vector for each sensor trace used in our classification process.
 
 \subsection{Classification}
-After transforming all sensor time series into feature vectors, we leverage ensemble classifieras our solution
-to achieving the type classification task. In general, ensemble classifier outperforms each base-level classifier
-each two assumptions hold~\cite{ensem}: 1) the probability of a correct classification by each individual classsifier
-is greater than 0.5 and 2) the errors in predictions of the base-level classifiers are independent. 
-Random forest~\cite{RF} has been widely used and outperforms a single tree classifier by growing a bunch of
-classification trees. To classify a new coming object as a feature vector, feed the vector down each of the trees
-in the forest. Each tree gives a classification, in other words, the tree ``votes" for that class. The forest chooses
-the class having the most votes over all the trees in the forest. As a quick overview of how each tree is grown in
-the forest, the process goes as follows:
+After transforming all sensor time series into feature vectors, we leverage an ensemble classifier to achieve 
+the type classification task. In general, ensemble learning methods obtain better predictive performance than
+ any of the constituent learning methods~\cite{ensem1,ensem2}, if two assumptions hold~\cite{ensem3}: 1) the 
+ probability of a correct classification by each individual classsifier is greater than 0.5 and 2) the errors
+  in predictions of the base-level classifiers are independent. Random forests~\cite{RF} have been widely used 
+  and outperform a single tree classifier. They are also faster~\cite{cvpr} in training and testing compared to traditional classifiers such as SVM. The notion of randomized trees was first introduced in~\cite{RT} and further well developed in~\cite{RF}.
+
+Random forests grow a bunch of classification trees. To classify a new coming unlabeled object as a feature vector, 
+feed the vector down each of the trees in the forest. Each tree gives a classification, in other words, the 
+tree ``votes" for that class. The forest chooses the class having the most votes over all the trees in the forest. 
+As a quick overview of how each tree is grown in the forest, the process goes as follows:
 \begin{enumerate}
 \item Sample N instances at random with replacement, from the original data set. These samples will be the training set for growing this particular tree.
-\item Specify M feature variables at random out of the total feature vector when growing each node of a tree. And the best split on these M is used to split the node. The value of M is constant during the forest growing.
+\item Specify M feature variables at random out of the total feature vector when growing each node of a tree. And the best split (measured by the information gain) on these M is used to split the node. The value of M is constant during the forest growing.
 \item Each tree is grown to the largest extent possible without pruning.
 \end{enumerate}
-Specifically, we set N equal the number of instances in the original training set, M equal the square root of the
+The randomness of this ensemble learning method originates in the first two steps and specifically, we set N equal the number of instances in the original training set, M equal the square root of the
 number of original features, and the number of the trees in the forest be 50. Usually these parameters are optimized
-through cross-validation and we refer interested readers to~\cite{RF} for further deduction and proof related to
-random forest.
+through cross-validation and we refer interested readers to~\cite{RF} for further deduction and proof of random forest.
+
+All the instances in our data set are labeled with ground truth class and to train a random forest, we split the original set into two subsets, one for building a forest and one for testing the accuracy of the classifier. After the forest is built from training set, we learn the posterior probabilities of each class $c$ at each leaf node $l$ for each tree $t$. The posterior probabilities are computed as follows: suppose that $T$ is the set of all trees, $C$ is the set of all classes and $L$ is the set of all leaves for a given tree $t$. In the training stage the posterior probabilities $P_{t,l}(Y(I) = c))$ for each class $c\in C$ at each leaf $l\in L$, are learned for each tree $t\in T$. These probabilities are calculated as the ratio of the number of instance $I$ of class $c$ that reach $l$ to the total number of images that reach $l$. $Y(I)$ is the class label $c$ for instance $I$. To classify an instance in the testing set, the feature vector of the instance is passed down each tree until reaching a leaf node. All the posterior probabilities are then averaged and the $argmax$ is taken as the class of the instance. 
 
 % \begin{algorithm}[h!]
 %  \SetAlgoLined
@@ -102,8 +105,18 @@ random forest.
 %  \label{alg:emd}
 % \end{algorithm}
 
-\subsection{Identifying Misclassification}
-It is an easy job to identify misclassification when we have groud truth labels, but in many contexts motivating
-our solution the ground truth labels are not available, therefore, the identification of potential misclassification
-would suffer from the absence of ground truth. To identify the potential misclassified instances in our job, we
-leverage the ensemble of classifiers and make use of a probability-based approach.
+\subsection{Quantify the Uncertainty of Classification}
+It is an easy job to identify misclassification when we have groud truth labels, but in many of the cases motivating
+our work the ground truth labels are not available, therefore identifying potential misclassification
+would suffer from the absence of ground truth. However, if we can quantify the uncertainty of classification, that might help identify potential misclassified instances. To quantify the uncertainy of classification in our job, we
+leverage the posterior probabilities learned in random forest.
+
+With learned posterior probabilities for each class at each leaf in each tree, given a new coming instance, we can compute the averaged class probabilities as:
+\begin{displaymath}
+\bar P(Y(I)=c) = \frac{\sum_{t,l} P_{t,l}(Y(I)=c)}{|T|}, t\in T
+\end{displaymath}
+And the random forest will generate a vector for class probability:
+\begin{displaymath}
+\textbf{Pr} = \{\bar P(Y(I)=c)\}, c\in C
+\end{displaymath}
+Suppose we get a probablity vector $Pr_{1} = \{0.9, 0, 0, 0, 0, 0.1\}$ for intance $I_{1}$ and another vector $Pr_{2} = \{0.3, 0.25, 0.1, 0, 0.15, 0.2\}$ for intance $I_{2}$. Both $I_{1}$ and $I_{2}$ will be assigned to the class according to the class probability distribution, but the assignment of $I_{2}$ is less certain compared to that of $I_{1}$ because its predicted class probability has a less ``concentrated'' distribution. As to measure this degree of ``uncertainty'' in classification of one instance, we compute the entropy of its class probability. Based on this entropy metric, we can rank the classfications and pick out the instances for further manual inspection whose entropy is larger than some threshold, and the inspection can help eliminate misclassifications.
