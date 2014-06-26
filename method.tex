@@ -22,17 +22,36 @@
 % \end{figure*}
 
 \section{Methodology}
-We first describe how we design the feature extraction and explain why the feature set works. Then we discuss the classification technique we adopt as well as detail the training and testing process. In the end, we articulate a solution to identifying potential misclassification when no ground truth labels for sensor types are available.
+We first describe how we design the feature extraction and explain why the feature set works. Then we discuss
+the classification technique we adopt as well as detail the training and testing process. In the end, we articulate
+a solution to identifying potential misclassification when no ground truth labels for sensor types are available.
 
 \subsection{Feature Extraction}
-Raw sensor time series usually contain millions of readings which are too general to be informative for classification tasks. We need to distill the information embedded in the sensor readings in the time domain. A signal in the time domain trends the amplitude of a sensor reading and intuitively, different types of sensor would in general occupy distinct amplitude bins as demonstrated in Figure~\cite{}. As to characterize the amplitude distribution of a signal in the time
-domain, we can use percentiles in the readings, such as 25\%, 50\%, 75\% and so forth. Considering that there also exist outlieres in sensor readings, we pick the 50\% (also known as the median number) for use as a discriminator, which is more robust to outliers. However, on another side, sensor readings are subjective to the dynamics in the placed surroudings therefore sensors of different types can collide in a same amplitude bin. For example, during a rainy season, the humidity in an
-office can reach the range of 70~80 which is the same as typical temeprature sensor readings. Therefore, simply relying on reading amplitude might not be able to effetively differentiate different sensors. Figure~\cite{} show some of such examples. To capture these short term ``events'' as features, we also need to include the variance of the signals when formulating a feature vector for the time series.
+Raw sensor time series usually contain millions of readings which are too general to be informative for classification
+tasks. We need to distill the information embedded in the sensor readings in the time domain. A signal in the time domain
+trends the amplitude of a sensor reading and intuitively, different types of sensor would in general occupy distinct
+amplitude bins as demonstrated in Figure~\cite{}. As to characterize the amplitude distribution of a signal in the time
+domain, we can use percentiles in the readings, such as 25\%, 50\%, 75\% and so forth. Considering that there also
+exist outlieres in sensor readings, we pick the 50\% (also known as the median number) for use as a discriminator, which
+is more robust to outliers. However, on another side, sensor readings are subjective to the dynamics in the placed
+surroudings therefore sensors of different types can collide in a same amplitude bin. For example, during a rainy season, the humidity in an
+office can reach the range of 70~80 which is the same as typical temeprature sensor readings. Therefore, simply relying
+on reading amplitude might not be able to effetively differentiate different sensors. Figure~\cite{} show some of such
+examples. To capture these short term ``events'' as features, we also need to include the variance of the signals when
+formulating a feature vector for the time series.
 
-When extracting features from a raw sensor reading, the original trace can span over days, weeks or even months, and the trends can vary a lot even from day to day. Therefore extracting the certain features such as percentiles and variances from the entire sensor readings might make the features less discriminant, compared to doing so in shorter windowed time slices. But computing features over windowed slices might end up producing too many elements for a feature vector and also,
-having too many unnecessary feature variables might deteriorate the performance of classifier. To better summarize the dynamics of sensor traces, we apply feature extraction to every X-minute long window and compute the statistics of the accumulated features from windowed slices as the final features. 
+When extracting features from a raw sensor reading, the original trace can span over days, weeks or even months, and
+the trends can vary a lot even from day to day. Therefore extracting the certain features such as percentiles and
+variances from the entire sensor readings might make the features less discriminant, compared to doing so in shorter
+windowed time slices. But computing features over windowed slices might end up producing too many elements for a
+feature vector and also, having too many unnecessary feature variables might deteriorate the performance of classifier.
+To better summarize the dynamics of sensor traces, we apply feature extraction to every X-minute long window and compute
+the statistics of the accumulated features from windowed slices as the final features. 
 
-As a summary, the feature extraction procedure goes as follows. First, each single sensor signal is segmented into N non-overlapping X-minute long windows (we will discuss the decision of window length X in later section). Second, within each time window, we compute the median and variance of the signal, obtaining a vector of medians and a vector of variances after the window slides over the entire traces: 
+As a summary, the feature extraction procedure goes as follows. First, each single sensor signal is segmented into N
+non-overlapping X-minute long windows (we will discuss the decision of window length X in later section). Second, within
+each time window, we compute the median and variance of the signal, obtaining a vector of medians and a vector of
+variances after the window slides over the entire traces: 
 \begin{displaymath}
 \begin{split}
 MED = \{median^{1}, median^{2}, ..., median^{N}\}\\
@@ -49,13 +68,24 @@ F = \{min(MED), max(MED), median(MED), var(MED),\\
 And $F$ is the feature vector for each sensor trace in our classification task.
 
 \subsection{Classification}
-After transforming all sensor time series into feature vectors, we leverage ensemble classifier as our solution to achieving the type classification task. In general, ensemble classifier outperforms each base-level classifier each two assumptions hold~\cite{ensem}: 1) the probability of a correct classification by each individual classsifier is greater than 0.5 and 2) the errors in predictions of the base-level classifiers are independent. random forest~\cite{RF} outperforms a single tree classifier by growing a bunch of classification trees. To classify a new coming object as a feature vector, feed the vector down each of the trees in the forest. Each tree gives a classification, in other words, the tree ``votes" for that class. The forest chooses the class having the most votes over all the trees in the forest. As a quick overview of how each tree is grown in the forest, the process goes as follows:
+After transforming all sensor time series into feature vectors, we leverage ensemble classifieras our solution
+to achieving the type classification task. In general, ensemble classifier outperforms each base-level classifier
+each two assumptions hold~\cite{ensem}: 1) the probability of a correct classification by each individual classsifier
+is greater than 0.5 and 2) the errors in predictions of the base-level classifiers are independent. 
+Random forest~\cite{RF} has been widely used and outperforms a single tree classifier by growing a bunch of
+classification trees. To classify a new coming object as a feature vector, feed the vector down each of the trees
+in the forest. Each tree gives a classification, in other words, the tree ``votes" for that class. The forest chooses
+the class having the most votes over all the trees in the forest. As a quick overview of how each tree is grown in
+the forest, the process goes as follows:
 \begin{enumerate}
 \item Sample N instances at random with replacement, from the original data set. These samples will be the training set for growing this particular tree.
 \item Specify M feature variables at random out of the total feature vector when growing each node of a tree. And the best split on these M is used to split the node. The value of M is constant during the forest growing.
 \item Each tree is grown to the largest extent possible without pruning.
 \end{enumerate}
-Specifically, we set N equal the number of instances in the original training set, M equal the square root of the number of original features and the number of the trees in the forest be 50. Usually these parameters are optimized through cross-validation and we refer interested readers to~\cite{RF} for further deduction and proof related to random forest.
+Specifically, we set N equal the number of instances in the original training set, M equal the square root of the
+number of original features, and the number of the trees in the forest be 50. Usually these parameters are optimized
+through cross-validation and we refer interested readers to~\cite{RF} for further deduction and proof related to
+random forest.
 
 % \begin{algorithm}[h!]
 %  \SetAlgoLined
@@ -73,4 +103,7 @@ Specifically, we set N equal the number of instances in the original training se
 % \end{algorithm}
 
 \subsection{Identifying Misclassification}
-It is an easy job to identify misclassification when we have groud truth labels, but in many contexts motivating our solution the ground truth labels are not available, therefore, the identification of potential misclassification would suffer from the absence of ground truth. To identify the potential misclassified instances in our job, we leverage the ensemble of classifiers and make use of a probability-based approach.
+It is an easy job to identify misclassification when we have groud truth labels, but in many contexts motivating
+our solution the ground truth labels are not available, therefore, the identification of potential misclassification
+would suffer from the absence of ground truth. To identify the potential misclassified instances in our job, we
+leverage the ensemble of classifiers and make use of a probability-based approach.
