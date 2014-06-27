@@ -88,7 +88,14 @@ The randomness of this ensemble learning method originates in the first two step
 number of original features, and the number of the trees in the forest be 50. Usually these parameters are optimized
 through cross-validation and we refer interested readers to~\cite{RF} for further deduction and proof of random forest.
 
-All the instances in our data set are labeled with ground truth class and to train a random forest, we split the original set into two subsets, one for building a forest and one for testing the accuracy of the classifier. After the forest is built from training set, we learn the posterior probabilities of each class $c$ at each leaf node $l$ for each tree $t$. The posterior probabilities are computed as follows: suppose that $T$ is the set of all trees, $C$ is the set of all classes and $L$ is the set of all leaves for a given tree $t$. In the training stage the posterior probabilities $P_{t,l}(Y(I) = c))$ for each class $c\in C$ at each leaf $l\in L$, are learned for each tree $t\in T$. These probabilities are calculated as the ratio of the number of instance $I$ of class $c$ that reach $l$ to the total number of images that reach $l$. $Y(I)$ is the class label $c$ for instance $I$. To classify an instance in the testing set, the feature vector of the instance is passed down each tree until reaching a leaf node. All the posterior probabilities are then averaged and the $argmax$ is taken as the class of the instance. 
+All the instances in our data set are labeled with ground truth class and to train a random forest, we split the original set into two subsets, one for building 
+a forest and one for testing the accuracy of the classifier. After the forest is built from training set, we learn the posterior probabilities of each class $c$ 
+at each leaf node $l$ for each tree $t$: suppose that $T$ is the set of all trees, $C$ is the set of all classes and $L$ is the set of all leaves for a given 
+tree $t$. In the training stage the posterior probabilities $P_{t,l}(Y(i) = c))$ for each class $c\in C$ at each leaf $l\in L$, are learned for each tree $t\in T$. 
+These probabilities are calculated as the ratio of the number of instance $i$ of class $c$ that reach $l$ to the total number of intances that reach $l$. $Y(i)$ 
+is the class label for instance $i$. To classify an instance in the testing set, the feature vector of an instance is passed down each tree until reaching a leaf 
+node, which gives a probability distribution. All the posterior probabilities accumulated from each tree are then averaged and the $argmax$ is taken as the class 
+of the instance. 
 
 % \begin{algorithm}[h!]
 %  \SetAlgoLined
@@ -108,15 +115,16 @@ All the instances in our data set are labeled with ground truth class and to tra
 \subsection{Quantify the Uncertainty of Classification}
 It is an easy job to identify misclassification when we have groud truth labels, but in many of the cases motivating
 our work the ground truth labels are not available, therefore identifying potential misclassification
-would suffer from the absence of ground truth. However, if we can quantify the uncertainty of classification, that might help identify potential misclassified instances. To quantify the uncertainy of classification in our job, we
-leverage the posterior probabilities learned in random forest.
+would suffer from the absence of ground truth. However, if we can quantify the uncertainty of classification, that might help identify potential misclassified 
+instances. To quantify the uncertainy of classification in our job, we leverage the posterior probabilities learned in random forest.
 
-With learned posterior probabilities for each class at each leaf in each tree, given a new coming instance, we can compute the averaged class probabilities as:
+With the learned posterior probabilities for each class at each leaf in each tree, given a new coming instance, we can compute the averaged probabilities for each class as:
 \begin{displaymath}
-\bar P(Y(I)=c) = \frac{\sum_{t,l} P_{t,l}(Y(I)=c)}{|T|}, t\in T
+    \bar P(Y(i)=c) = \frac{\sum_{t} P_{t,l}(Y(i)=c)}{|T^{'}|}, t\in T^{'}
 \end{displaymath}
-And the random forest will generate a vector for class probability:
+Where $T^{'}$ is the collection of trees in the forest where $P_{t,l}(Y(i)=c)\neq 0$, and $|\cdot|$ denotes the cardinality of a set. Given these averaged 
+probabilities for each class, the random forest will produce a vector of class probability for each new coming instance:
 \begin{displaymath}
-\textbf{Pr} = \{\bar P(Y(I)=c)\}, c\in C
+\textbf{Pr} = \{\bar P(Y(i)=c)\}, c\in C
 \end{displaymath}
 Suppose we get a probablity vector $Pr_{1} = \{0.9, 0, 0, 0, 0, 0.1\}$ for intance $I_{1}$ and another vector $Pr_{2} = \{0.3, 0.25, 0.1, 0, 0.15, 0.2\}$ for intance $I_{2}$. Both $I_{1}$ and $I_{2}$ will be assigned to the class according to the class probability distribution, but the assignment of $I_{2}$ is less certain compared to that of $I_{1}$ because its predicted class probability has a less ``concentrated'' distribution. As to measure this degree of ``uncertainty'' in classification of one instance, we compute the entropy of its class probability. Based on this entropy metric, we can rank the classfications and pick out the instances for further manual inspection whose entropy is larger than some threshold, and the inspection can help eliminate misclassifications.
