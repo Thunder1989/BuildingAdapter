@@ -1,9 +1,7 @@
 \section{Evaluation}
-To demonstrate the effectiveness as well as usefulness of our methodology, we evaluate our technique in two different scenarios: a) intra building, that is, the 
-training and testing data for classification is taken from the same building, and b) inter buildings, where the training and testing instances are from two 
-distinct buildings. Then we analyze how the window size of segment and number of training instances affect the performance of classification. We also discuss how 
-each feature variable contributes to the classification and when to use certain set of features. At last, we show a small application as a case study built based on 
-the generated type information in two buildings, which would be difficult to achieve in the absence of sensor type metadata. 
+To demonstrate the effectiveness and usefulness of our methodology, we evaluate our technique in two different scenarios: a) intra building, that is, the 
+training and testing data for classification is taken from the same building, and b) inter building, where the training and testing instances are from two 
+distinct buildings respectively. We also analyze how the amount of training instances and the window size of segment affect the performance of classification. We also discuss how each feature variable contributes to the classification thus helping determine when to use certain set of features. At last, we show a small application as a case study built based on the generated type information in two buildings, which would be difficult to achieve in the absence of sensor type metadata.
 
 \subsection{Taxonamy}
 In this paper, we consider 6 types of sensors, which are $CO_{2}$, humidity, room temperature, setpoint, air flow volume, other temperature. Specifically, room 
@@ -23,28 +21,39 @@ each buidlings is given in table~\ref{table:spec}.
 \begin{tabular}{c c c}% centered columns (4 columns)
 \hline %inserts single horizontal lines
 Type & SDH & Rice \\ % inserts table 
-%heading
 \hline\hline % inserts double horizontal line
 $CO_{2}$ & 1 & 2 \\ % inserting body of the table
 humidity & 2 & 4 \\
 room temp. & 3 & 2 \\
 setpoint & 4 & 7 \\
-air volume & 5 & 5 \\ % [1ex] adds vertical space
-other temp. & 6 & 5 \\ % [1ex] adds vertical space
-\hline %inserts single line
+air volume & 5 & 5 \\ 
+other temp. & 6 & 5 \\ \hline
 \end{tabular}
 \label{table:spec} % is used to refer this table in the text
 \end{table}
 
+All our learning and classification processes are implemented based on the scikit-learn~\cite{scikit} library, which is an open-source machine learning package implemented mostly in python and provides all the APIs in python.
+
 \subsection{Baseline and Metrics}
 As a baseline to compare our proposed approach against, we adpot a simple feature extraction scheme for each trace $F=\{med, var\}$, where $med$ and $var$ is just the $median$ and $variance$ computed over the entire trace.
 
-For classification, we measure the averaged cross-validation accuracy in two different scenarios (intra- and inter- buildings). For identifying potential 
-misclassifications, we choose the true-positive rate (TPR, also known as recall rate) and false-positive rate (FPR) as metrics to evaluate the performance of 
-our entropy-based aprroach. In our case, a true-positive (TP) is when an instance considered to be misclassified is actually a correct classification while a 
-false-positive (FP) is when an instance considered to be misclassfied is misclassified.
+For classification, we measure the averaged cross-validation accuracy in two different scenarios (intra- and inter- buildings). In the intra-building case, the 
+data from a single building is split into training and testing sets, where the results illustrate how accurate the type information can be inferred using local 
+information. The inter-building experiment performs training and testing across buildings, i.e, train the classifier on the data from building A and test it 
+on building B, and this set of experiments shows how much we can infer the type information of one building based on the knowledge from some other building.
 
-\subsection{Intra Building Performance}
+For identifying potential misclassifications, we choose the true-positive rate (TPR, also known as recall rate), false-positive rate (FPR) and positive predictive 
+value (PPV, also known as precision) as metrics to evaluate the performance of our entropy-based aprroach when making different choices of thresholding. In our 
+case, a true-positive (TP) is when an instance considered to be misclassified is actually a correct classification while a false-positive (FP) is when an instance 
+considered to be misclassfied is misclassified.
+
+\subsection{Classification Accuracy}
+We run the two types of experiments described above, i.e, the intra- and inter- building tests, to examine the effectiveness of feature design and measure how well 
+the classifier performs. We also experiment with different amount of training instances to examine how that affects the classification accuracy, which also gives 
+some insight on how many instances are needed to bootstrap the classification process. The classfication results are summarized in Table~\ref{table:sdh},~\ref{table:rice},~\ref{table:sdh_x},~\ref{table:rice_x}.
+
+\subsubsection{Intra Building Performance}
+From the last column in Table~\ref{table:sdh} and~\ref{table:rice}, we see that both building achieve a high accuracy of 91\% and 92\% on SDH and Rice Hall respectively, for the leave-one-out (LOO) cross validation.
 
 \begin{table*}[ht!]
 \caption{Intra-building Classification Accuracy for SDH}
@@ -65,7 +74,6 @@ Overall & 93.4 (1.3) & 95.6 (0.9) & 97.2 (0.8) & 97.8 (0.2) & 98.2 (0.3) & 98.3\
 \label{table:sdh} % is used to refer this table in the text
 \end{table*}
 
-
 \begin{table*}[ht!]
 \caption{Intra-building Classification Accuracy for Rice Hall}
 \centering % used for centering table
@@ -85,8 +93,7 @@ Overall & 80.4 (3.0) & 85.9 (2.1) & 90.0 (0.6) & 90.9 (0.9) & 91.4 (0.3) & 91.7\
 \label{table:rice} % is used to refer this table in the text
 \end{table*}
 
-
-\subsection{Inter Building Performance}
+\subsubsection{Inter Building Performance}
 
 \begin{table*}[ht!]
 \caption{Inter-building Classification Accuracy for SDH}
@@ -126,12 +133,14 @@ Overall & 73.1 (2.1) & 76.9 (2.3) & 78.3 (2.0) & 79.1 (0.2) & 81.3 (0.7)\\ \hlin
 \label{table:rice_x} % is used to refer this table in the text
 \end{table*}
 
-\subsection{Window Length Sensitivity and Training Bootstrapping}
+\subsubsection{Training Bootstrapping}
+
+\subsection{Window Length Sensitivity}
 
 \subsection{Feature Importance and Selection}
 
 \subsection{Identifying Misclassification}
-\begin{figure*}[ht!]
+\begin{figure*}[ht]
 \centering
 	\begin{subfigure}{0.48\textwidth}
                 \centering
@@ -148,9 +157,8 @@ Overall & 73.1 (2.1) & 76.9 (2.3) & 78.3 (2.0) & 79.1 (0.2) & 81.3 (0.7)\\ \hlin
 \caption{The CDF curves depict the class probability entropy distribution for collection of both correct and wrong classification in intra- and inter- building test cases.}
 \label{fig:cdf}
 \end{figure*}
-\subsection{Case Study}
 
-\begin{figure*}[ht!]
+\begin{figure*}[ht]
 \centering
 	\begin{subfigure}{0.48\textwidth}
                 \centering

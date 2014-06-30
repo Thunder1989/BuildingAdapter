@@ -31,7 +31,7 @@ Raw sensor time series usually contain millions of readings which are too genera
 tasks. We need to distill the information embedded in the sensor readings in the time domain. A signal in the time domain
 trends the amplitude of a sensor reading and intuitively, different types of sensor would in general occupy distinct
 amplitude bins as demonstrated in Figure~\cite{}. As to characterize the amplitude distribution of a signal in the time
-domain, we can use percentiles in the readings, such as 25\%, 50\%, 75\% and so forth. Considering that there also
+domain, we can use the percentiles of readings, such as 25\%, 50\%, 75\% and so forth. Considering that there also
 exist outlieres in sensor readings, we pick the 50\% (also known as the median number) for use as a discriminator, which
 is more robust to outliers. However, on another side, sensor readings are subjective to the dynamics in the placed
 surroudings therefore sensors of different types can collide in a same amplitude bin. For example, during a rainy season, the humidity in an
@@ -42,7 +42,7 @@ formulating a feature vector for the time series.
 
 When extracting features from a raw sensor reading, the original trace can span over days, weeks or even months, and
 the trends can vary a lot even from day to day. Therefore extracting the certain features such as percentiles and
-variances from the entire sensor readings might make the features less discriminant, compared to doing so in shorter
+variances over the entire sensor readings might make the features less discriminant, compared to doing so in shorter
 windowed time slices. But computing features over windowed slices might end up producing too many elements for a
 feature vector and also, having too many unnecessary feature variables might deteriorate the performance of classifier.
 To better summarize the dynamics of sensor traces, we apply feature extraction to every X-minute long window and compute
