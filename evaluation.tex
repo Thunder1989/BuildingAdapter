@@ -64,7 +64,7 @@ Type & 5\% & 10\% & 20\% & 33\% & 50\% & LOO\\ % inserts table
 %heading
 \hline\hline % inserts double horizontal line
 $CO_{2}$ & 51.3 (38.5) & 83.7 (26.5) & 98.4 (3.1) & 100.0 (0) & 93.8 (6.25) & 93.8\\ \hline
-Humidity & 51.9.6 (26.5) & 66.8 (23.4) & 80.8 (9.3) & 82.3 (0.3) & 87.5 (4.2) & 83.3\\ \hline
+Humidity & 59.6 (26.5) & 66.8 (23.4) & 80.8 (9.3) & 82.3 (0.3) & 87.5 (4.2) & 83.3\\ \hline
 Room temp & 89.0 (9.3) & 93.0 (3.0) & 95.6 (1.9) & 93.3 (0.3) & 97.2 (0) & 95.1\\ \hline
 Setpoint & 97.0 (2.4) & 97.5 (2.2) & 99.2 (0.6) & 99.2 (0.3) & 98.5 (0.7) & 99.2\\ \hline
 Air volume & 22.2 (28.1) & 35.5 (21.9) & 46.7 (22.7) & 79.2 (5.9) & 41.7 (8.3) & 83.3\\ \hline
@@ -132,10 +132,12 @@ Overall & 68.2 (10.9) & 74.1 (5.3) & 78.4 (5.0) & 80.3 (2.1) & 81.2 (5.9)\\ \hli
 \label{table:sdh_x} % is used to refer this table in the text
 \end{table*}
 
-\subsubsection{Training Bootstrapping}
+\subsubsection{Learning Bootstrapping}
+In Table~\ref{table:sdh},~\ref{table:rice},~\ref{table:sdh_x},~\ref{table:rice_x}, the last columns demonstrate how accurately we can do classification on average. There also remains the question of how many number of instances we need to bootstrap the learning process for both of the intra- and inter- building cases. To examine the impact of number of instances on classification accuracy, we use different percentage of the original data set as training set, i.e, 5\%,10\%,20\%,33\%,50\%, and the results are presented as the first five columns in each table. For each percentage of training process, we apply stratified sampling\footnote{The sampled set contains the same percentage of samples of each class as the original complete set.} on the original set and repeat the same percentage 1/percentage times to get an averaged accuracy for that percentage. The standard deviation is also shown (in bracket) for each perentage. We can clearly see a trend that more training instances yield better classification results in all cases. However, we can also notice that after we have 20\% of the complete set (which is ~120 instances and ~260 instances for Rice and SDH respectively), the accuracy doesn't jump too much even reaching to 50\% of the complete set. This indicates that we don't need too many instances to bootstrap learning within or across buildings to achieve sensor type classification tasks.
+
 
 \subsection{Window Length Sensitivity}
-Remember that all the above classification results were obtained using features extracted in 45-minute long window on the original sensor traces. To corroborate our decision, we study how different size of time window affects the classification and Figure~\ref{fig:window} shows the results. For intra-building case, the classification is not sensitive to different window size 
+Remember that all the above classification results were obtained using features extracted in 45-minute long window on the original sensor traces. To corroborate our decision, we study how different size of time window affects the classification and Figure~\ref{fig:window} shows the results. For intra-building case, the classification is not sensitive to different window size as can be seen in the figure: basically, accuracy stays almost the same for both buildings because within the same building, as long as we can capture the short term characteristics in windowed time slots for sensor dynamics, the granularity of the time window size doesn't make much difference. However, for inter-building case, the time window size matters in the way that the local micro-climate in one building can be quite different from another, we need to ``tune'' this common short term window to capature the dynamics that can be used to infer type information across buildings. Therefore, even though we achieve decent type classification accuracy across buildings, (i.e, use information from one building to help classify the traces in another building), we still need to optimize the size of time window, which is 45 minutes in our case. We believe this ``tuning'' is significant to such kind of learning across buildings and is straightforward to achieve in general.
 
 \begin{figure}[h!]
 \centering
@@ -148,7 +150,8 @@ Remember that all the above classification results were obtained using features 
 \subsection{Feature Importance and Selection}
 
 \subsection{Identifying Misclassification}
-\begin{figure*}[ht]
+
+\begin{figure*}[ht!]
 \centering
 	\begin{subfigure}{0.48\textwidth}
                 \centering
@@ -166,7 +169,7 @@ Remember that all the above classification results were obtained using features 
 \label{fig:cdf}
 \end{figure*}
 
-\begin{figure*}[ht]
+\begin{figure*}[ht!]
 \centering
 	\begin{subfigure}{0.48\textwidth}
                 \centering
