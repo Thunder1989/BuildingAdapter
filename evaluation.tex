@@ -22,12 +22,13 @@ each buidlings is given in Table~\ref{table:spec} and the type ground truth for 
 \hline %inserts single horizontal lines
 Type & Rice & SDH \\ % inserts table 
 \hline\hline % inserts double horizontal line
-$CO_{2}$ & 1 & 2 \\ % inserting body of the table
-humidity & 2 & 4 \\
-room temp. & 3 & 2 \\
-setpoint & 4 & 7 \\
-air volume & 5 & 5 \\ 
-other temp. & 6 & 5 \\ \hline
+$CO_{2}$ & 16 & 52 \\ % inserting body of the table
+Humidity & 48 & 52 \\
+Room temp & 142 & 216 \\
+Setpoint & 265 & 819 \\
+Air volume & 12 & 158 \\ 
+Other temp & 119 & 37 \\ \hline
+Sum & 602 & 1334 \\ \hline
 \end{tabular}
 \label{table:spec} % is used to refer this table in the text
 \end{table}
@@ -133,11 +134,11 @@ Overall & 68.2 (10.9) & 74.1 (5.3) & 78.4 (5.0) & 80.3 (2.1) & 81.2 (5.9) & 83.0
 \end{table*}
 
 \subsubsection{Learning Bootstrapping}
-In Table~\ref{table:sdh},~\ref{table:rice},~\ref{table:sdh_x},~\ref{table:rice_x}, the last columns demonstrate how accurately we can do classification on average. There also remains the question of how many number of instances we need to bootstrap the learning process for both of the intra- and inter- building cases. To examine the impact of number of instances on classification accuracy, we use different percentage of the original data set as training set, i.e, 5\%, 10\%, 20\%, 33\%,
+In Table~\ref{table:rice},~\ref{table:sdh},~\ref{table:rice_x},~\ref{table:sdh_x}, the last columns demonstrate how accurately we can do classification on average. There also remains the question of how many number of instances we need to bootstrap the learning process for both of the intra- and inter- building cases. To examine the impact of number of instances on classification accuracy, we use different percentage of the original data set as training set, i.e, 5\%, 10\%, 20\%, 33\%,
 50\%, and the results are presented as the first five columns in each table. For each percentage of training process, we apply stratified sampling\footnote{The sampled set contains the same percentage of samples of each class as the original complete set.} on the original set and repeat the same percentage 1/percentage times to get an averaged accuracy for that percentage. The standard deviation is also shown (in bracket) for each perentage. We can clearly see a trend that more
 training instances yield better classification results in all cases. However, we can also notice that after having 20\% of the complete set (which is $\sim$120 instances and $\sim$260 instances for Rice and SDH respectively) the accuracy doesn't increase too much even reaching 50\% of the complete set. This indicates that we don't need too many instances to bootstrap the learning process within or across buildings to accomplish sensor type classification tasks.
 
-\subsection{Window Length Sensitivity}
+\subsection{Window Size Sensitivity}
 Remember that all the above classification results were obtained using features extracted in 45-minute long window on the original sensor traces. To corroborate our decision, we study how different size of time window affects the classification and Figure~\ref{fig:window} shows the results. For intra-building case, the classification is not sensitive to different window size as can be seen in the figure: basically, accuracy stays almost the same for both buildings because within the same building, as long as we can capture the short term characteristics in windowed time slots for sensor dynamics, the granularity of the time window size doesn't make much difference. However, for inter-building case, the time window size matters in the way that the local micro-climate in one building can be quite different from another, we need to ``tune'' this common short term window to capature the dynamics that can be used to infer type information across buildings. Therefore, even though we achieve decent type classification accuracy across buildings, (i.e, use information from one building to help classify the traces in another building), we still need to optimize the size of time window, which is 45 minutes in our case. We believe this ``tuning'' is significant to such kind of learning across buildings and is straightforward to achieve in general.
 
 \begin{figure}[h!]
