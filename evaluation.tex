@@ -42,8 +42,8 @@ data from a single building is split into training and testing sets, where the r
 information. The inter-building experiment performs training and testing across buildings, i.e, train the classifier on the data from building A and test it 
 on building B, and this set of experiments shows how much we can infer the type information of one building based on the knowledge from some other building.
 
-For identifying potential misclassifications, we choose the true-positive rate (TPR, also known as recall rate), false-positive rate (FPR) and positive predictive 
-value (PPV, also known as precision) as metrics to evaluate the performance of our entropy-based aprroach when making different choices of thresholding. In our 
+For identifying potential misclassifications, we choose the true-positive rate (TPR, also known as recall), false-positive rate (FPR, also known as fall-out) and positive predictive 
+value (PPV, also known as precision) as metrics to evaluate the performance of our entropy-based aprroach when making different choice of threshold. In our 
 case, a true-positive (TP) is when an instance considered to be misclassified is actually a correct classification while a false-positive (FP) is when an instance 
 considered to be misclassfied is misclassified.
 
@@ -133,8 +133,9 @@ Overall & 68.2 (10.9) & 74.1 (5.3) & 78.4 (5.0) & 80.3 (2.1) & 81.2 (5.9) & 83.0
 \end{table*}
 
 \subsubsection{Learning Bootstrapping}
-In Table~\ref{table:sdh},~\ref{table:rice},~\ref{table:sdh_x},~\ref{table:rice_x}, the last columns demonstrate how accurately we can do classification on average. There also remains the question of how many number of instances we need to bootstrap the learning process for both of the intra- and inter- building cases. To examine the impact of number of instances on classification accuracy, we use different percentage of the original data set as training set, i.e, 5\%, 10\%, 20\%, 33\%, 50\%, and the results are presented as the first five columns in each table. For each percentage of training process, we apply stratified sampling\footnote{The sampled set contains the same percentage of samples of each class as the original complete set.} on the original set and repeat the same percentage 1/percentage times to get an averaged accuracy for that percentage. The standard deviation is also shown (in bracket) for each perentage. We can clearly see a trend that more training instances yield better classification results in all cases. However, we can also notice that after we have 20\% of the complete set (which is $\sim$120 instances and $\sim$260 instances for Rice and SDH respectively), the accuracy doesn't jump too much even reaching 50\% of the complete set. This indicates that we don't need too many instances to bootstrap learning within or across buildings to achieve sensor type classification tasks.
-
+In Table~\ref{table:sdh},~\ref{table:rice},~\ref{table:sdh_x},~\ref{table:rice_x}, the last columns demonstrate how accurately we can do classification on average. There also remains the question of how many number of instances we need to bootstrap the learning process for both of the intra- and inter- building cases. To examine the impact of number of instances on classification accuracy, we use different percentage of the original data set as training set, i.e, 5\%, 10\%, 20\%, 33\%,
+50\%, and the results are presented as the first five columns in each table. For each percentage of training process, we apply stratified sampling\footnote{The sampled set contains the same percentage of samples of each class as the original complete set.} on the original set and repeat the same percentage 1/percentage times to get an averaged accuracy for that percentage. The standard deviation is also shown (in bracket) for each perentage. We can clearly see a trend that more
+training instances yield better classification results in all cases. However, we can also notice that after having 20\% of the complete set (which is $\sim$120 instances and $\sim$260 instances for Rice and SDH respectively) the accuracy doesn't increase too much even reaching 50\% of the complete set. This indicates that we don't need too many instances to bootstrap the learning process within or across buildings to accomplish sensor type classification tasks.
 
 \subsection{Window Length Sensitivity}
 Remember that all the above classification results were obtained using features extracted in 45-minute long window on the original sensor traces. To corroborate our decision, we study how different size of time window affects the classification and Figure~\ref{fig:window} shows the results. For intra-building case, the classification is not sensitive to different window size as can be seen in the figure: basically, accuracy stays almost the same for both buildings because within the same building, as long as we can capture the short term characteristics in windowed time slots for sensor dynamics, the granularity of the time window size doesn't make much difference. However, for inter-building case, the time window size matters in the way that the local micro-climate in one building can be quite different from another, we need to ``tune'' this common short term window to capature the dynamics that can be used to infer type information across buildings. Therefore, even though we achieve decent type classification accuracy across buildings, (i.e, use information from one building to help classify the traces in another building), we still need to optimize the size of time window, which is 45 minutes in our case. We believe this ``tuning'' is significant to such kind of learning across buildings and is straightforward to achieve in general.
@@ -146,18 +147,18 @@ Remember that all the above classification results were obtained using features 
 \label{fig:window}
 \end{figure}
 
-
 \subsection{Feature Importance and Selection}
 
 
-\subsection{Identifying Misclassification}
-As we discussed in early section, being able to identify misclassified instances in sensor type classification is vital to improving the overall accuracy. To identify potential misclassified instances, we first quantify the ``uncertainty'' of classification with the entropy-based approach described in Section 3.3. Figure~\ref{fig:cdf} shows the CDF of class probability entropy of classification in the intra- and inter- building scenarios. We can see that the collection of correct classification (solid lines) has a distinct distribution from the collection of misclassfication (dotted lines). Based on such distribution, we can choose a certain entropy value as threshold and pick out all the classified instances whose class probablity entropy is greater than the threshold outputted by the forest. Figure~\ref{fig:roc} illustrates the effectiveness of our entropy-based approach to measuring uncertainty. Here are the definitions needed to understand the statistics:
+\subsection{Identifying Potential Misclassification}
+As we discussed in early section, being able to identify misclassified instances in sensor type classification is vital to improving the overall accuracy. To identify potential misclassified instances, we propose to quantify the ``uncertainty'' of classification with the entropy-based approach described in Section 3.3. Figure~\ref{fig:cdf} shows the CDF of class probability entropy of classification in the intra- and inter- building scenarios. We see that the collection of correct
+classification (solid lines) has a distinct distribution from the collection of misclassfication (dotted lines). Based on such distinction in the distribution, we can choose a certain entropy value as threshold and filter out all the classified instances whose class probablity entropy is greater than the threshold outputted by the forest. Figure~\ref{fig:roc} illustrates the performance of our entropy-based approach to identifying potential misclassification. Here are the definitions needed to understand the statistics:
 
 $S_{1}$: the set of instance whose class probablity entropy is greater than the threshold.
 
-$S_{2}$: the set of instance that is misclassified in the classfication process from $S_{1}$.
+$S_{2}$: the set of instance falling in $S_{1}$ that is misclassified in the classfication process.
 
-$S_{3}$: the set of instance that is correctly classified in the classfication process from $S_{1}$.
+$S_{3}$: the set of instance falling in $S_{1}$ that is correctly classified in the classfication process.
 
 $S_{4}$: the set of instance that is misclassified in the classfication process.
 
@@ -169,6 +170,9 @@ TPR = \frac{|S_{2}|}{|S_{4}|},\quad
 FPR = \frac{|S_{3}|}{|S_{5}|},\quad
 PPV = \frac{|S_{2}|}{|S_{1}|},\quad
 \end{displaymath}
+Where $|\cdot|$ is the cardinality of a set. We see that as the threshold value increases, both the TPR (recall) and FPR (fall-out) decrease while the PPV (precision) keeps increasing. In our case, a smaller threshold essentially leads to more instances being filtered out as potential misclassification ``candidates'' thus helping identify more acutal misclassified instances. However, the more candidates we filter our, the more instances we need to manually inspect,
+which inevitably leads to lower precision of the identificatoin process. So we want to strike a balance between achieving a high recall rate as well as maintaining a high precision. As a result, we suggest picking a threshold somewhere between 0.4 and 0.45 is appropriate. In intra-building case, such a threshold (0.4~0.45) helps identify $\sim$30\% of the misclassified instances for Rice and $\sim$50\% for SDH while resulting in that $\sim$70\% and $\sim$50\% of the instances
+needing manual inspection are correct classification, for Rice and SDH respectively. As for the inter-building case, our approach is able to identify $\sim$75\% of the misclassified instances for both Rice and SDH with an overhead of $\sim$40\% and $\sim$70\% in the inspection candidates, for Rice and SDH respectively.
 
 \begin{figure*}[ht!]
 \centering
@@ -184,7 +188,7 @@ PPV = \frac{|S_{2}|}{|S_{1}|},\quad
                 \caption{Inter-building Classification}
                 \label{fig:cdf_inter}
 	\end{subfigure}
-\caption{The CDF curves depict the class probability entropy distribution for collection of both correct and wrong classification in intra- and inter- building test cases.}
+\caption{The CDF curves depict the class probability entropy distribution for the both collection of correct and wrong classification in the intra- and inter- building test cases.}
 \label{fig:cdf}
 \end{figure*}
 
@@ -202,8 +206,9 @@ PPV = \frac{|S_{2}|}{|S_{1}|},\quad
                 \caption{Inter-building Performance}
                 \label{fig:roc_inter}
 	\end{subfigure}
-\caption{The ROC curves depict the sensitivity of the raw signal and mid-frequency IMFs to the threshold value. We choose the 0.2 FPR point as the boundary threshold for each room. }
+\caption{The ROC curves depict the sensitivity of misclassification identification to different entropy threshold value. Choosing a threshold somewhere between 0.4 and 0.45 achieves the best compromise between recall and precision. }
 \label{fig:roc}
 \end{figure*}
 
 \subsection{Case Study}
+TBD

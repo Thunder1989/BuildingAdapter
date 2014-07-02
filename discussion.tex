@@ -4,3 +4,7 @@ We could further explore how using external or domain-specific knowledge would h
 
 \subsection{Extension of Taxonamy and Class Scope}
 We could extend the class scope to include more sensor types because there are more types than the most common ones included in this paper, e.g., alarm sensor, xxx. Meanwhile, we also want to build a more complicated taxonamy for some types, for instance, "setpoints", because there are setpoints for different parameters.  
+
+\subsection{Reducing Misclassification Iteratively}
+In the case when no ground truth labels are available and to improve the overall performance of classification, the entropy-based approach can be used in an iterative manner: in each iteration, only a few examples on the top of the entropy-based ranking list are inspected and corrected, and the corrected instances are added to the trainin set. After that the training and classification process is repeated, and this whole procedure is iterated until some criteria is satisfied.
+By doing this, we expect the number of exmples needed to be manually inspected is dramatically reduced compared to when a one time inspection is done on the set of candidates filtered out based on a small threshold value.
