@@ -95,7 +95,8 @@ Overall & 93.4 (1.3) & 95.6 (0.9) & 97.2 (0.8) & 97.8 (0.2) & 98.2 (0.3) & 98.3\
 \end{table*}
 
 \subsubsection{Inter Building Performance}
-This set of experiments illustrates how accurately we can refer the type information of one building based on the knowledge from another building. The overall accuracy for the two buildings by training on the entire data set (train on SDH for Rice and train on Rice for SDH) is around 82\%, as seen from the last columns in Table~\ref{table:rice_x} and~\ref{table:sdh_x}.
+This set of experiments illustrates how accurately we can refer the type information of one building based on the knowledge from another building. The overall accuracy for the two buildings by training on the entire data set (train on SDH for Rice and train on Rice for SDH) is around 82\%, as seen from the last columns in Table~\ref{table:rice_x} and~\ref{table:sdh_x}. Particularly, we see that the accuracy for ``other temperature'' in Rice is abnormal compared to the rest of the
+results. The issue with classifying ``other temperature'' in Rice is that there are many traces measuring the temperatrue of supply and return cold/hot water circulated in the ventilation system, which are abscent in the Berkeley building as a training set. Therefore the feature of these traces cannot be learned from SDH, which causes problem to classifying these traces.
 
 \begin{table*}[ht!]
 \centering % used for centering table
@@ -134,7 +135,7 @@ Overall & 68.2 (10.9) & 74.1 (5.3) & 78.4 (5.0) & 80.3 (2.1) & 81.2 (5.9) & 83.0
 \label{table:sdh_x} % is used to refer this table in the text
 \end{table*}
 
-\subsubsection{Learning Bootstrapping}
+\subsection{Learning Bootstrapping}
 In Table~\ref{table:rice},~\ref{table:sdh},~\ref{table:rice_x},~\ref{table:sdh_x}, the last columns demonstrate how accurately we can do classification on average. There also remains the question of how many number of instances we need to bootstrap the learning process for both of the intra- and inter- building cases. To examine the impact of number of instances on classification accuracy, we use different percentage of the original data set as training set, i.e, 5\%, 10\%, 20\%, 33\%,
 50\%, and the results are presented as the first five columns in each table. For each percentage of training process, we apply stratified sampling\footnote{The sampled set contains the same percentage of samples of each class as the original complete set.} on the original set and repeat the same percentage 1/percentage times to get an averaged accuracy for that percentage. The standard deviation is also shown (in bracket) for each perentage. We can clearly see a trend that more
 training instances yield better classification results in all cases. However, we can also notice that after having 20\% of the complete set (which is $\sim$120 instances and $\sim$260 instances for Rice and SDH respectively) the accuracy doesn't increase too much even reaching 50\% of the complete set. This indicates that we don't need too many instances to bootstrap the learning process within or across buildings to accomplish sensor type classification tasks.
