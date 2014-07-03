@@ -5,6 +5,23 @@ We could further explore how using external or domain-specific knowledge would h
 \subsection{Extension of Taxonamy and Class Scope}
 We could extend the class scope to include more sensor types because there are more types than the most common ones included in this paper, e.g., alarm sensor, xxx. Meanwhile, we also want to build a more complicated taxonamy for some types, for instance, "setpoints", because there are setpoints for different parameters.  
 
+\subsection{Feature Importance and Selection}
+\begin{table*}
+    \centering % used for centering table
+    \begin{tabular}{c c c}% centered columns (4 columns)
+        \hline %inserts single horizontal lines
+        Building & Accuracy Increase (\%) & Set of Best Features \\ % inserts table 
+        \hline\hline % inserts double horizontal line
+        Rice & 2.8 & min(MED), med(MED), med(VAR), var(VAR) \\ \hline
+        SDH & 0.7 & min(MED), max(MED), max(VAR), med(VAR) \\\hline
+    \end{tabular}
+    \caption{The set of best features and accuracy increase of intra-building test for each building. The best feature sets are obtained by exhausting all the feature combinations and running on a single decision tree with leave-one-out cross validation. The increase is obtained by comparing the accuracy from the best feature set and all the features.}
+    \label{table:feature} % is used to refer this table in the text
+\end{table*}
+
+In our study, we didn't delve into feature importance and selection analysis because the feature vector contains only 8 elements therefore doing classification based on such a vector is not computationally expensive. Another reason for not doing so is that selecting the set of best features for each building results in each building using different features (as demonstrated in Table~\ref{table:feature}), making the classfication across buildings impossible. However, in future study, as the feature space might grow for further
+improvement, selecting the set of best features is important to obtaining the best classification performance for intra-building tasks and single type analysis.
+
 \subsection{Reducing Misclassification Iteratively}
 In the case when no ground truth labels are available and to improve the overall performance of classification, the entropy-based approach can be used in an iterative manner: in each iteration, only a few examples on the top of the entropy-based ranking list are inspected and corrected, and the corrected instances are added to the trainin set. After that the training and classification process is repeated, and this whole procedure is iterated until some criteria is satisfied.
 By doing this, we expect the number of exmples needed to be manually inspected is dramatically reduced compared to when a one time inspection is done on the set of candidates filtered out based on a small threshold value.
