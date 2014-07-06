@@ -5,7 +5,7 @@ distinct buildings respectively. We also analyze how the amount of training inst
 
 \subsection{Taxonamy}
 In this paper, we consider 6 types of sensors, which are $CO_{2}$, humidity, room temperature, setpoint, air flow volume, other temperature. Specifically, room 
-temperature includes only sensors that measure the air temperature of rooms and other temperatures covers all other temperature measurements such as supply 
+temperature includes only sensors that measure the air temperature of rooms (as ``room temp'' in Table~\ref{table:num}) and other temperature (as ``other temp'' in Table~\ref{table:num}) incorporates all other temperature measurements such as supply 
 air/return air/mixed air temperature and supply/return water temperature. We also put only one general type for setpoint which includes all types of setpoints 
 installed in the buildings.
 
@@ -30,13 +30,13 @@ Air volume & 12 & 158 \\
 Other temp & 119 & 37 \\ \hline
 Sum & 602 & 1334 \\ \hline
 \end{tabular}
-\label{table:spec} % is used to refer this table in the text
+\label{table:num} % is used to refer this table in the text
 \end{table}
 
 All our learning and classification processes are implemented based on the scikit-learn~\cite{scikit} library, which is an open-source machine learning package implemented mostly in python and provides all the APIs in python.
 
 \subsection{Baseline and Metrics}
-As a baseline to compare our proposed approach against, we adpot a simple feature extraction scheme for each trace $F=\{med, var\}$, where $med$ and $var$ is just the $median$ and $variance$ computed over the entire trace.
+As a baseline to compare our proposed approach against, we adpot a simple feature extraction scheme for each trace $F=\{med, var\}$, where $med$ and $var$ is simply the $median$ and $variance$ computed over the entire trace.
 
 For classification, we measure the averaged cross-validation accuracy in two different scenarios (intra- and inter- buildings). In the intra-building case, the 
 data from a single building is split into training and testing sets, where the results illustrate how accurate the type information can be inferred using local 
@@ -131,7 +131,7 @@ Other temp & 48.3 (10.3) & 49.7 (5.4) & 58.4 (9.0) & 45.0 (6.4) & 45.9 (5.4) & 6
 Overall & 68.2 (10.9) & 74.1 (5.3) & 78.4 (5.0) & 80.3 (2.1) & 81.2 (5.9) & 83.0\\ \hline
 \end{tabular}
 \caption{Inter-building Classification Accuracy for SDH}
-\caption*{Each table shows the averaged classification accuracy (in the last column only for intra-building case) and the accuracy of experiments where different percentage of the complete training set is used (denoted in `X\%'). In the percentage analysis, each percentage is repeated 1/percent times and the averaged accuracy is calculated as presented in the tables.}
+\caption*{Each table shows the averaged classification accuracy (in the last column only for intra-building case) and the accuracy of experiments where different percentage of the complete training set is used (denoted as `X\%'). In the percentage analysis, each percentage is repeated 1/percent times and the averaged accuracy is calculated as presented in the tables.}
 \label{table:sdh_x} % is used to refer this table in the text
 \end{table*}
 
@@ -141,12 +141,12 @@ In Table~\ref{table:rice},~\ref{table:sdh},~\ref{table:rice_x},~\ref{table:sdh_x
 training instances yield better classification results in all cases. However, we can also notice that after having 20\% of the complete set (which is $\sim$120 instances and $\sim$260 instances for Rice and SDH respectively) the accuracy doesn't increase too much even reaching 50\% of the complete set. This indicates that we don't need too many instances to bootstrap the learning process within or across buildings to accomplish sensor type classification tasks.
 
 \subsection{Window Size Sensitivity}
-Remember that all the above classification results were obtained using features extracted in 45-minute long window on the original sensor traces. To corroborate our decision, we study how different size of time window affects the classification and Figure~\ref{fig:window} shows the results. For intra-building case, the classification is not sensitive to different window size as can be seen in the figure: basically, accuracy stays almost the same for both buildings because within the same building, as long as we can capture the short term characteristics in windowed time slots for sensor dynamics, the granularity of the time window size doesn't make much difference. However, for inter-building case, the time window size matters in the way that the local micro-climate in one building can be quite different from another, we need to ``tune'' this common short term window to capature the dynamics that can be used to infer type information across buildings. Therefore, even though we achieve decent type classification accuracy across buildings, (i.e, use information from one building to help classify the traces in another building), we still need to optimize the size of time window, which is 45 minutes in our case. We believe this ``tuning'' is significant to such kind of learning across buildings and is straightforward to achieve in general.
+Remember that all the above classification results were obtained using features extracted in 45-minute long window on the original sensor traces. To corroborate our decision, we study how different size of time window affects the classification and Figure~\ref{fig:window} shows the results. Intra- case performs LOO cross validation while inter- case runs 10-fold cross validation. For intra-building case, the classification is not sensitive to different window size as can be seen in the figure: basically, accuracy stays almost the same for both buildings because within the same building, as long as we can capture the short term characteristics in windowed time slots for sensor dynamics, the size of the time window doesn't make much difference. However, for the inter-building case, the time window size matters in the way that the local micro-climate in one building can be quite different from another, we need to ``tune'' this common short term window to capature the dynamics that can be used to infer type information across buildings. Therefore, even though we achieve decent type classification accuracy across buildings, (i.e, use information from one building to help classify the traces in another building), we still need to optimize the size of time window, which is 45 minutes in our case. We believe this ``tuning'' is significant to such kind of learning across buildings and is straightforward to achieve in general.
 
 \begin{figure}[h!]
 \centering
 	\includegraphics[width=0.45\textwidth]{./fig/window.eps}
-\caption{Classification accuracy for intra- and inter- building testing with different size of window. Intra- case performs LOO cross validation while inter- case runs 10-fold cross validation.}
+\caption{Classification accuracy for intra- and inter- building against different size of time window. A window size of 45 minutes is optimal for our classification tasks.}
 \label{fig:window}
 \end{figure}
 
