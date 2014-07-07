@@ -41,17 +41,17 @@ the classification technique we adopt as well as detail the training and testing
 a solution to identifying potential misclassification when no ground truth labels of sensor type are available.
 
 \subsection{Feature Extraction}
-Raw sensor time series usually contain millions of readings which are too general to be informative for classification
+Raw sensor time series\footnote{In this paper, we use the term ``trace'', ``readings'' and ``time series'' \textit{interchangably}.} usually contain millions of readings which are too general to be informative for classification
 tasks. We need to distill the information embedded in the sensor readings in the time domain. A signal in the time domain
 trends the amplitude of a sensor reading and intuitively, different types of sensor would in general occupy distinct
 amplitude bins as demonstrated in Figure~\ref{fig:example}. As to characterize the amplitude distribution of a signal in the time
 domain, we can use the percentiles of readings, such as 25th, 50th, 75th and so forth. Considering that there also can
 exist outlieres in sensor readings, we pick the 50th (also known as the median) for use as a discriminator, which
-is more robust to outliers. However, on another side, sensor readings are subjective to the dynamics in the placed
-surroudings therefore sensors of different types can collide in a same amplitude bin. For example, during a rainy season, the humidity in an
+is more robust to outliers. However, on another side, sensor readings are subjective to the dynamics in the proximate
+environment therefore sensors of different types can collide in a same amplitude bin. For example, during a rainy season, the humidity in an
 office can reach the range of 60-70 which is the same as typical temeprature sensor readings. Therefore, simply relying
-on reading amplitude might not be able to effetively differentiate sensor types. Figure~\ref{fig:same_bin} show some of such
-examples. To capture these short term ``events'' as features, we also need to include the variance of the signals when
+on some percentile of reading amplitude might not be able to effetively differentiate sensor types. Figure~\ref{fig:same_bin} show some of such
+examples. To capture these ``changes'' as features, we also need to include the variance of the signals when
 formulating a feature vector for the time series.
 
 \begin{figure}[ht!]
@@ -70,17 +70,16 @@ formulating a feature vector for the time series.
 \label{fig:same_bin}
 \end{figure}
 
-When extracting features from raw sensor readings, the original trace can span over days, weeks or even months, and
-the trends can vary a lot even from day to day. Therefore extracting the certain features such as percentiles and
-variances over the entire sensor readings might make the features less discriminant, compared to doing so in shorter
-windowed time slices. But computing features over windowed slices might end up producing too many elements for a
-feature vector and also, having too many unnecessary feature variables might deteriorate the performance of classifier.
-To better summarize the dynamics of sensor traces, we apply feature extraction to every X-minute long window and compute
-the statistics of the accumulated features from windowed slices as the final features. 
+When we extract features from a raw sensor reading, the original trace can span over hour, days or even weeks, and
+the trend can vary significantly even from hour to hour. On one side, extracting certain features such as percentiles and
+variances over the entire sensor reading might miss too many short term dynamics thus making the features less discriminant, compared to doing so in shorter
+windowed time slices. On the other side, computing features over windowed slices can produce too many elements for a
+feature vector and also, having too many unnecessary feature variables might degrade the performance of classifier.
+To better and succintly summarize the dynamics of sensor traces, we apply feature extraction to every time window of fixed length on the original trace and compute the statistics of the accumulated features from windowed slices as the final features. 
 
 As a summary, the feature extraction procedure goes as follows. First, each single sensor signal is segmented into N
-non-overlapping X-minute long windows (we will discuss the decision of window length X in later section). Second, within
-each time window, we compute the median and variance of the signal, obtaining a vector of medians and a vector of
+non-overlapping 45-minute long windows (we will discuss the decision of window length in later section). Second, within
+each time window, we compute the median and variance of the signal, producing a vector of medians and a vector of
 variances after the window slides over the entire traces: 
 \begin{displaymath}
 \begin{split}
@@ -88,7 +87,7 @@ MED = \{median^{1}, median^{2}, ..., median^{N}\}\\
 VAR = \{variance^{1}, variance^{2}, ..., variance^{N}\}
 \end{split}
 \end{displaymath}
-Where N is the number of time windows. The vector $MED$ and $VAR$ reflect short term changes but not all the intermidiate values are essentially helpful for classification. So as a statistical summary of the two vectors, as a last step, for each vector we compute the minimun, maximun, median and variance, resulting in a feature vector of eight elements:
+Where N is the number of time windows. The vector $MED$ and $VAR$ reflect short term changes but not all the intermidiate values are essentially useful for classification. So as a statistical summary of the two vectors, in a last step, for each vector we compute the minimun, maximun, median and variance, resulting in a feature vector of eight variables:
 \begin{displaymath}
 \begin{split}
 F = \{min(MED), max(MED), median(MED), var(MED),\\
@@ -110,7 +109,7 @@ feed the vector down each of the trees in the forest. Each tree gives a classifi
 tree ``votes" for that class. The forest chooses the class having the most votes over all the trees in the forest. 
 As a quick overview of how each tree is grown in the forest, the process goes as follows:
 \begin{enumerate}
-\item Sample N instances at random with replacement, from the original data set. These samples will be the training set for growing this particular tree.
+\item Sample N instances at random with replacement\footnote{An element may appear multiple times in the sample set.}, from the original data set. These samples will be the training set for growing this particular tree.
 \item Specify M feature variables at random out of the total feature vector when growing each node of a tree. And the best split (measured by the information gain) on these M is used to split the node. The value of M is constant during the forest growing.
 \item Each tree is grown to the largest extent possible without pruning.
 \end{enumerate}
