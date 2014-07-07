@@ -1,46 +1,76 @@
-% \begin{figure*}[ht!]
-% \centering
-%   \begin{subfigure}{0.3\textwidth}
-%                 \centering
-%     \includegraphics[width=\textwidth]{./fig/emd.eps}
-%                 \caption{An example of EMD}
-%                 \label{fig:emd}
-%   \end{subfigure}
-%   \begin{subfigure}{0.32\textwidth}
-%                 \centering
-%     \includegraphics[width=\textwidth]{./fig/imf_aggr1.eps}
-%                 \caption{IMFs aggregation}
-%                 \label{fig:aggr1}
-%   \end{subfigure}
-%   \begin{subfigure}{0.32\textwidth}
-%                 \centering
-%     \includegraphics[width=\textwidth]{./fig/imf_aggr2.eps}
-%                 \caption{IMFs aggregation}
-%                 \label{fig:aggr2}
-%   \end{subfigure}
-% \caption{(a) EMD decomposes a signal and exposes intrinsic oscillatory components; (b) Aggregation of IMFs within a pre-defined frequency range makes seemingly similar signals from different locations more distinguishable; (c) IMF aggregation makes seemingly distinct signals of different sensors in the same room show high correlation.}
-% \end{figure*}
+\begin{figure*}[ht!]
+\centering
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/co2.eps}
+                \caption{$CO_{2}$}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/rh.eps}
+                \caption{Humidity}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/rmt.eps}
+                \caption{Room Temperature}
+  \end{subfigure}
+  %row2
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/stpt.eps}
+                \caption{Room Temperature Set Point}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/vav.eps}
+                \caption{VAV Air Volume}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/cwt.eps}
+                \caption{Chilled Water Supply Temperatere}
+  \end{subfigure}
+\caption{Different type of sensor occupies different amplitude bins in the time domain with different short term dynamics.}
+\label{fig:example}
+\end{figure*}
 
 \section{Methodology}
 We first describe how we design the feature extraction and explain why the feature set works. Then we discuss
 the classification technique we adopt as well as detail the training and testing process. In the end, we articulate
-a solution to identifying potential misclassification when no ground truth labels for sensor types are available.
+a solution to identifying potential misclassification when no ground truth labels of sensor type are available.
 
 \subsection{Feature Extraction}
 Raw sensor time series usually contain millions of readings which are too general to be informative for classification
 tasks. We need to distill the information embedded in the sensor readings in the time domain. A signal in the time domain
 trends the amplitude of a sensor reading and intuitively, different types of sensor would in general occupy distinct
-amplitude bins as demonstrated in Figure~\cite{}. As to characterize the amplitude distribution of a signal in the time
-domain, we can use the percentiles of readings, such as 25\%, 50\%, 75\% and so forth. Considering that there also
-exist outlieres in sensor readings, we pick the 50\% (also known as the median number) for use as a discriminator, which
+amplitude bins as demonstrated in Figure~\ref{fig:example}. As to characterize the amplitude distribution of a signal in the time
+domain, we can use the percentiles of readings, such as 25th, 50th, 75th and so forth. Considering that there also can
+exist outlieres in sensor readings, we pick the 50th (also known as the median) for use as a discriminator, which
 is more robust to outliers. However, on another side, sensor readings are subjective to the dynamics in the placed
 surroudings therefore sensors of different types can collide in a same amplitude bin. For example, during a rainy season, the humidity in an
-office can reach the range of 70~80 which is the same as typical temeprature sensor readings. Therefore, simply relying
-on reading amplitude might not be able to effetively differentiate different sensors. Figure~\cite{} show some of such
+office can reach the range of 60-70 which is the same as typical temeprature sensor readings. Therefore, simply relying
+on reading amplitude might not be able to effetively differentiate sensor types. Figure~\ref{fig:same_bin} show some of such
 examples. To capture these short term ``events'' as features, we also need to include the variance of the signals when
 formulating a feature vector for the time series.
 
-When extracting features from a raw sensor reading, the original trace can span over days, weeks or even months, and
+\begin{figure}[ht!]
+\centering
+  \begin{subfigure}{0.22\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/rmt_ex.eps}
+                \caption{Room Temperature}
+  \end{subfigure}
+  \begin{subfigure}{0.22\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/rh_ex.eps}
+                \caption{Humidity}
+  \end{subfigure}
+\caption{An example of two differernt type of sensors occupying the same amplitude bin.}
+\label{fig:same_bin}
+\end{figure}
+
+When extracting features from raw sensor readings, the original trace can span over days, weeks or even months, and
 the trends can vary a lot even from day to day. Therefore extracting the certain features such as percentiles and
 variances over the entire sensor readings might make the features less discriminant, compared to doing so in shorter
 windowed time slices. But computing features over windowed slices might end up producing too many elements for a
