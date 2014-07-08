@@ -1,11 +1,4 @@
 \section{Discussion}
-\subsection{Improvement on Classification Accuracy}
-We could further explore how using external or domain-specific knowledge would help improve the classification accuracy. For example, if we know the sun sets around 6 PM and observe a trough in the reading of some streams, 
-
-\subsection{Extension of Taxonamy and Class Scope}
-We could extend the class scope to include more sensor types because there are more types than the most common ones included in this paper, e.g., alarm sensor, xxx. Meanwhile, we also want to build a more complicated taxonamy for some types, for instance, "setpoints", because there are setpoints for different parameters.  
-
-\subsection{Feature Importance and Selection}
 \begin{table*}
     \centering % used for centering table
     \begin{tabular}{c c c}% centered columns (4 columns)
@@ -19,9 +12,26 @@ We could extend the class scope to include more sensor types because there are m
     \label{table:feature} % is used to refer this table in the text
 \end{table*}
 
-In our study, we didn't delve into feature importance and selection analysis because the feature vector contains only 8 elements therefore doing classification based on such a vector is not computationally expensive. Another reason for not doing so is that selecting the set of best features for each building results in each building using different features (as demonstrated in Table~\ref{table:feature}), making the classfication across buildings impossible. However, in future study, as the feature space might grow for further
+\subsection{Extension of Taxonomy and Class Scope}
+Our taxonomy currectly covers 6 types with one being general. We could extend the class scope to include more sensor types and make our technique more versatile since there are 
+more types than the most common ones included in this paper, e.g., occupancy sensors, light sensors and so forth. Meanwhile, we also want to build a more complicated taxonamy for certain types, 
+for instance, the "setpoint", because there are set points for quite different parameters such as temperature and air quality. Being able to further differentiate between these parameters can
+help enable more meaningful control and applications on a building.
+
+\subsection{Improvement on Classification Accuracy}
+The learning and classification processes in our work rely only on a set of general features, however, we could further explore how using external or domain-specific knowledge 
+would help improve the classification accuracy. For instance, if we know the humidity in rooms will increase for sure since it has been raining for a week, then we could search for 
+traces with increase in average in readings as external knowledge to help identify humidity traces. 
+
+\subsection{Feature Importance and Selection}
+In our study, we didn't delve into feature importance and selection analysis because on one side, the feature vector contains only 8 variables therefore doing classification based on 
+such a vector is not computationally expensive. On another side, the reason for not doing so is that selecting the set of best features for each building results in using different features 
+(as demonstrated in Table~\ref{table:feature}) for each building, making the classfication across buildings impossible. However, in future study, as the feature space might grow for further
 improvement, selecting the set of best features is important to obtaining the best classification performance for intra-building tasks and single type analysis.
 
 \subsection{Reducing Misclassification Iteratively}
-In the case when no ground truth labels are available and to improve the overall performance of classification, the entropy-based approach can be used in an iterative manner: in each iteration, only a few examples on the top of the entropy-based ranking list are inspected and corrected, and the corrected instances are added to the trainin set. After that the training and classification process is repeated, and this whole procedure is iterated until some criteria is satisfied.
-By doing this, we expect the number of exmples needed to be manually inspected is dramatically reduced compared to when a one time inspection is done on the set of candidates filtered out based on a small threshold value.
+In cases where no ground truth labels are available, to improve the overall performance of classification, the entropy-based approach can be used in an iterative manner: in each iteration, 
+only a few examples on the top of the entropy-based ``uncertainty'' ranking list are inspected and corrected, and the corrected instances are added to the training set. After that the training 
+and classification process is repeated, and this whole procedure is iterated until some criteria is satisfied. By doing this, we expect the number of exmples needed to be manually inspected 
+is dramatically reduced both in each iteration and in overall, compared to when a one time inspection is performed on the set of candidates filtered out based on a some small threshold value.
+We believe such an interative supervised learning process can produce better classification results as well as reduce the human labelling efforts needed.
