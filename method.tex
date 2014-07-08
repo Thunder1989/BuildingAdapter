@@ -50,8 +50,8 @@ exist outlieres in sensor readings, we pick the 50th (also known as the median) 
 is more robust to outliers. However, on another side, sensor readings are subjective to the dynamics in the proximate
 environment therefore sensors of different types can collide in a same amplitude bin. For example, during a rainy season, the humidity in an
 office can reach the range of 60-70 which is the same as typical temeprature sensor readings. Therefore, simply relying
-on some percentile of reading amplitude might not be able to effetively differentiate sensor types. Figure~\ref{fig:same_bin} show some of such
-examples. To capture these ``changes'' as features, we also need to include the variance of the signals when
+on some percentile of reading amplitude might not be able to effetively differentiate sensor types. Figure~\ref{fig:same_bin} show such an
+example. To capture these ``changes'' as features, we also need to include the variance of the signals when
 formulating a feature vector for the time series.
 
 \begin{figure}[ht!]
