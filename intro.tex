@@ -14,15 +14,15 @@
 % this places a significant road-block for wide deployment of software-based solutions.
 
 Buildings consume a large fraction of the energy produced in the US and much of it is wasted.
-Fortunately many buildings are sites of very large sensor deployments, allowing us, in principle, to
-understand the dynamics of each building and optimize its performance.
+Many buildings are also sites of very large sensor deployments.  Therefore, in principle, we can observe
+their dynamics and optimize their performance.
 % , typically containing
 % up to several thousand sensors continuously reporting physical measurement.
 With the recent interest in reducing building energy consumption and
 increasing their efficiency, it
 is important to consider ways to quickly bootstrap a set of building data streams
-into an analytical pipeline, such as overall building energy performance  or
-comfort-assessment and control analytics.
+into an analytical pipeline, such as overall building efficiency or
+comfort-assessment analytics and control.
 
 % These analyses consist of jobs that measure the performance
 % of the building with respect to overall comfort, determine where there are 
@@ -76,11 +76,17 @@ indicates that this are measurement is produced by a temperature sensor. In addi
 to point names there may be some descriptive metadata.  The description for this point (if it 
 exists) would describe that this is a ``temperature sensors in room 435''.
 However, point names do not always follow the exact same structure within and across
-buildings and certainly do not 
-follow the same convention across vendors.  
-Because each
-point is named by a human, the names can vary. This makes it difficult to construct a general
-set of rules for name construction.  
+buildings and certainly do not follow the same convention across vendors.  
+Because each point is named by a human, the names can vary. This makes it difficult to construct a general
+set of rules for name construction.  It also means that no single approach could solve the normalization
+problem.  A suite of approaches is necessary.
+
+One of the important aspects of the data that we can leverage are the actual patterns in the readings themselves.
+Deep inspection of features in the data can yield meaningful results about the \emph{type} of data that it is
+and can help us with the label normalization problem.  This paper examines this path using standard machine learning
+approaches.  We observe that statistical features over small time windows can be used to identify the stream type.
+Moreover, we show that the classification of stream-type can be improve using multiple classifiers and 
+gaining a majority vote on the stream type.
 % In this paper we aim to boost the existing 
 % metadata by learning the rules of construction through a programming-by-example
 % approach where the user provides some input-output examples to boost the existing
@@ -158,7 +164,7 @@ Our technique can be used to unify that data across many deployment and enable b
 and exploration of new applications.  For example, sensing device names for 
 the internet of things are likely to follow similar conventions with very little 
 context.  We argue that unification through boosting will be necessary in this broader domain.
-Buildings are but one example that serve as a testbed for the proposed techniques.
+%Buildings are but one example that serve as a testbed for the proposed techniques.
 
 
 % We observe that every naming scheme looks to capture three point attributes: 
