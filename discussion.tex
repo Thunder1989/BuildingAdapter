@@ -1,14 +1,14 @@
 \section{Discussion}
 \begin{table*}
     \centering % used for centering table
-    \begin{tabular}{c c c}% centered columns (4 columns)
+    \begin{tabular}{c|c|c|c}% centered columns (4 columns)
         \hline %inserts single horizontal lines
-        Building & Accuracy Increase (\%) & Set of Best Features \\ % inserts table 
+        Building & Set of Best Features & Acc. on All & Acc. on Best Set \\ % inserts table 
         \hline\hline % inserts double horizontal line
-        Rice & 2.8 & min(MED), med(MED), med(VAR), var(VAR) \\ \hline
-        SDH & 0.7 & min(MED), max(MED), max(VAR), med(VAR) \\\hline
+        Rice & min(MED), med(MED), med(VAR), var(VAR) & 88.7\% & 91.5\% \\ \hline
+        SDH & min(MED), max(MED), max(VAR), med(VAR) & 97.1\% & 97.8\% \\\hline
     \end{tabular}
-    \caption{The set of best features and accuracy increase of intra-building test for each building. The best feature sets are obtained by exhausting all the feature combinations and running on a single decision tree with leave-one-out cross validation. The increase is obtained by comparing the accuracy from the best feature set and all the features.}
+    \caption{Classification accuracy on all the features and on the best set of feautures in intra-building test for each building: the best feature sets are obtained by exhausting all the feature combinations and running on a single decision tree with leave-one-out cross validation. The increase is obtained by comparing the accuracy from the best feature set and all the features.}
     \label{table:feature} % is used to refer this table in the text
 \end{table*}
 
