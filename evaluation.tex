@@ -149,7 +149,7 @@ Other temp & 48.3 (51.4) & 49.7 (53.1) & 58.4 (4.6) & 45.0 (52.3) & 45.9 (54.1) 
 Overall & 68.2 (55.5) & 74.1 (54.3) & 78.4 (54.5) & 80.3 (56.2) & 81.2 (60.1) & 83.0 (59.6)\\ \hline
 \end{tabular}
 \caption{Inter-building Classification Accuracy for SDH}
-\caption*{Each table shows the averaged classification accuracy (in the last column only for intra-building case) and the accuracy of experiments where different percentage of the complete training set is used (denoted as `X\%'). In the percentage analysis, each percentage is repeated 1/percent times and the averaged accuracy is calculated as presented in the tables.}
+\caption*{Each table shows the averaged classification accuracy (in the last column only for intra-building case) and the accuracy of experiments where different percentage of the complete training set is used (denoted as `X\%'). In the percentage analysis, each percentage is repeated 1/percentage times and the averaged accuracy is calculated as presented in the tables. The accuracy of baseline approach is also shown in bracket.}
 \label{table:sdh_x} % is used to refer this table in the text
 \end{table*}
 
@@ -248,9 +248,10 @@ Where $|\cdot|$ is the cardinality of a set. We see that as the threshold value 
 In our case, a smaller threshold essentially leads to a larger population of instances being filtered out as potential misclassification ``candidates'', which helps identify more real 
 misclassified instances. However, the more candidates we filter our, the more instances we need to manually inspect, which inevitably leads to a lower precision of the identificatoin process. 
 So we want to strike a balance between achieving a high recall rate as well as maintaining a high precision. As a result, based on the observation from Figure~\ref{fig:roc}, we suggest 
-picking a threshold value somewhere between 0.4 and 0.45 is appropriate. In intra-building case, such a threshold (0.4-0.45) helps identify $\sim$30\% of the misclassified instances for 
-Rice and $\sim$50\% for SDH while resulting in that $\sim$70\% and $\sim$50\% of the instances needing manual inspection are actually correct classifications, for Rice and SDH respectively. 
-As for the inter-building case, our approach is able to identify $\sim$75\% of the misclassified instances for both Rice and SDH with an overhead of $\sim$40\% and $\sim$70\% in the candidate inspection, for Rice and SDH respectively.
+picking a threshold value somewhere between 0.4 and 0.45 is appropriate. To note, we have 50 and 13 misclassified instances for Rice and SDH respectively for the intra-building testing case. 
+In the intra-building case, such a threshold (0.4-0.45) helps identify $\sim$30\% of the misclassified instances for Rice and $\sim$50\% for SDH while resulting in that $\sim$70\% and $\sim$50\% 
+of the instances being manual inspected are actually correct classifications, for Rice and SDH respectively. As for the inter-building case, our approach is able to identify $\sim$75\% of the 
+misclassified instances for both Rice and SDH with an overhead of $\sim$40\% and $\sim$70\% in the candidate inspection, for Rice and SDH respectively.
 
 %\subsection{Case Study}
 %TBD
