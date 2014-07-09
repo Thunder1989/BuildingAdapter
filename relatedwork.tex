@@ -1,8 +1,24 @@
 \section{Related Work}
-To our knowledge, we are the first to approahc the problem of sensor type classification. There has been much research work on type classification 
-in the context of audio~\cite{audio1,audio2}, music~\cite{music1,music2}, video~\cite{video1,video2}, web query~\cite{query1,query2} and human 
-activity~\cite{activity1, activity2}. ~\cite{audio1} uses support vector machines, 
+To our knowledge, we are the first to approahc the problem of sensor type classification and we describe the closet work to us on type classification in different contexts and work using random forest as the tool to perform classification. 
 
-Much work also adopts random forest to achieve classification tasks including ~\cite{RF1,RF2,RF3,cvpr}.
+There has been much research work on type classification in the context of audio~\cite{audio1,audio2}, music~\cite{music1,music2}, video~\cite{video1,video2}, 
+web query~\cite{query1,query2} and human activity~\cite{activity1, activity2}. The goal of~\cite{audio1} is to classify audios into categories such as speech, 
+music, background sound and silence using support vector machines, and the work in~\cite{audio2} address the same problem with a HMM-based statistical model. 
+Examples of music genre (i.e, jazz, pop and so forth) classificatoin are~\cite{music1,music2}, which use GMM with EM algorithm and logistic regression
+respectively. And commonly used features for these audio-related classification work are MFCC, zero crossing rate, energy/power and spectral/temporal statistics. 
+In~\cite{video1,video2}, the authors try to extract texture and color-based features to classify videos into classes including cartoon, commercial, news and so on 
+with decision tree and nearal network respectively. Query categorization has also been researched, ~\cite{query1} exploits a rule-based classifier
+and~\cite{query2} uses a Markov random walk model. There is also work on human activity classification in general cases~\cite{activity1} (i.e, running, walking 
+and sitting) and home setting~\cite{activity2} (i.e, sleeping, toileting and showering) using accelerometer data with voting-based classifier and HMM with 
+conditional random fields respectively. In contrast, our work is focuses on sensor type classification using ensemble learning technique.
 
-Tarzia~\cite{ABS} et. al and Wang~\cite{business} et. al utilize percentile-based feature for indoor localization and business ambience characertization purposes.
+Much work also adopts random forest in different areas to achieve classification tasks including ~\cite{RF1,RF2,RF3,RF4}. ~\cite{RF1} uses gene as feature i
+to classify microarray data. ~\cite{RF2} uses the intensity of hundreds of measured metabolites from medical experiment subjectives as features to classify the 
+subjectives into groups of normal, diseased and diseased with drug treatment. Random forest has also been used in~\cite{RF3} to solve the problem of classification 
+of objects in image with image-relevant features. In the area of remote sensing, ~\cite{RF4} utilizes user-defined parameters as features to classify land cover 
+types. In our work, we use simple and general statistical features for type classification.
+
+It's also worth mentioning that there is work leveraging percentile-based features in time series data for different classification purposes. Tarzia~\cite{ABS} 
+et. al use a certain percentile in the audio spectrum to classify the current location. Wang~\cite{business} et. al utilize percentile-based feature in audio as 
+part of the feature to characterize business ambience such as occupancy and noise level. For comparison, we use statistics of apercentile in sensor time seris as 
+part of our feature to differentiate between different type of sensors in the context of commercial buildings.
