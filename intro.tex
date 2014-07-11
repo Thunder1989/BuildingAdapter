@@ -13,7 +13,9 @@
 % However, it is well known that building sensor metadata is different across buildings and 
 % this places a significant road-block for wide deployment of software-based solutions.
 
-Buildings consume a large fraction of the energy produced in the US and much of it is wasted.
+{\bf points to make: 1) heterogeneity and inconsistency in sensor naming skema. 2) worse case, metadata is misssing, 3) the problem in 1) and 2) make a lot of research efforts hard or impossible to accomplish 4) we can take advantage of both metadata and data available to a) verify, b) generate and c) normalize the metadata.}
+
+Buildings consume a large fraction of the energy produced in the US and much of it is wasted~\cite{EIA, waste}.
 Many buildings are also sites of very large sensor deployments.  Therefore, in principle, we can observe
 their dynamics and optimize their performance.
 % , typically containing
@@ -85,8 +87,8 @@ One of the important aspects of the data that we can leverage are the actual pat
 Deep inspection of features in the data can yield meaningful results about the \emph{type} of data that it is
 and can help us with the label normalization problem.  This paper examines this path using standard machine learning
 approaches.  We observe that statistical features over small time windows can be used to identify the stream type.
-Moreover, we show that the classification of stream-type can be improve using multiple classifiers and 
-gaining a majority vote on the stream type.
+Moreover, we show that the classification of stream-type can be achieved using an ensemble of classifiers which is
+known to outperform a single classifier.
 % In this paper we aim to boost the existing 
 % metadata by learning the rules of construction through a programming-by-example
 % approach where the user provides some input-output examples to boost the existing
