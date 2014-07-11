@@ -65,7 +65,7 @@ We run the two sets of experiments described above, i.e, the intra- and inter- b
 the classifier performs. The classfication results are summarized in Table~\ref{table:rice},~\ref{table:sdh},~\ref{table:rice_x},~\ref{table:sdh_x}.
 
 \subsubsection{Intra Building Performance}
-From the last column in Table~\ref{table:rice} and~\ref{table:sdh}, we see that type classification in a single building achieves accuracy of ~92\% and ~98\% on Rice Hall 
+From the last column in Table~\ref{table:rice} and~\ref{table:sdh}, we see that type classification in a single building achieves accuracy of $\sim$92\% and $\sim$98\% on Rice Hall 
 and SDH respectively, for leave-one-out (LOO) cross validation\footnote{In LOO cross validation, each training set takes all the instances except one with the test set being 
 the sample held out.}. The accuracy for the baseline is also shown in the table (in bracket). The only type we have difficulty differentiating is ``other temp'', which includes 
 temperature measurements for air and water in the ventilation system, and particularly, the return air temperature measurements (as illustrated in Figure~\ref{fig:hvac}) are 
@@ -245,6 +245,7 @@ FPR = \frac{|S_{3}|}{|S_{5}|},\quad
 PPV = \frac{|S_{2}|}{|S_{1}|},\quad
 \end{displaymath}
 Where $|\cdot|$ is the cardinality of a set. We see that as the threshold value increases, both of the TPR (recall) and FPR (fall-out) decrease while the PPV (precision) keeps increasing. 
+
 In our case, a smaller threshold essentially leads to a larger population of instances being filtered out as potential misclassification ``candidates'', which helps identify more real 
 misclassified instances. However, the more candidates we filter our, the more instances we need to manually inspect, which inevitably leads to a lower precision of the identificatoin process. 
 So we want to strike a balance between achieving a high recall rate as well as maintaining a high precision. As a result, based on the observation from Figure~\ref{fig:roc}, we suggest 
