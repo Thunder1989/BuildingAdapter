@@ -36,23 +36,26 @@
 \end{figure*}
 
 \section{Methodology}
-We first describe how we design the feature extraction and explain why the feature set works. Then we discuss
-the classification technique we adopt as well as detail the training and testing process. In the end, we articulate
-a solution to identifying potential misclassification when no ground truth labels of sensor type are available.
+In this section, we describe the design and construction of the feature-vector we use to characterize sensor \emph{type}.  We
+explain what it captures, fundamentally and, hence, why it works so well for building sensor data. Then, we discuss
+the classification technique we apply and give a detailed description of the training and testing process. Finally, we articulate
+a solution for identifying potentially misclassified streams, when no type-label ground truth is available.
 
 \subsection{Feature Extraction}
-Raw sensor time series\footnote{In this paper, we use the term ``trace'', ``readings'' and ``time series'' \textit{interchangably}.} usually contain millions of readings which are too general to be informative for classification
-tasks. We need to distill the information embedded in the sensor readings in the time domain. A signal in the time domain
-trends the amplitude of a sensor reading and intuitively, different types of sensor would in general occupy distinct
-amplitude bins as demonstrated in Figure~\ref{fig:example}. As to characterize the amplitude distribution of a signal in the time
-domain, we can use the percentiles of readings, such as 25th, 50th, 75th and so forth. Considering that there also can
-exist outlieres in sensor readings, we pick the 50th (also known as the median) for use as a discriminator, which
-is more robust to outliers. However, on another side, sensor readings are subjective to the dynamics in the proximate
-environment therefore sensors of different types can collide in a same amplitude bin. For example, during a rainy season, the humidity in an
-office can reach the range of 60-70 which is the same as typical temeprature sensor readings. Therefore, simply relying
-on some percentile of reading amplitude might not be able to effetively differentiate sensor types. Figure~\ref{fig:same_bin} show such an
-example. To capture these ``changes'' as features, we also need to include the variance of the signals when
-formulating a feature vector for the time series.
+Raw sensor time series\footnote{In this paper, we use the term ``trace'', ``readings'' and ``time series'' \textit{interchangeably}.} usually contain millions of readings which are too general to be useful for type classification.   We need to distill the information embedded in the reading patterns.
+A signal in the time domain trends the amplitude of a sensor reading and different types of sensor generally occupy distinct
+amplitude bins, as demonstrated in Figure~\ref{fig:example}. We can characterize the amplitude distribution of a signal in the time
+domain by using the percentiles of the value distribution.%, such as 25th, 50th, 75th and so forth. 
+To identify outliers in the distribution, we pick the 50th percentile value (also known as the median) as a discriminator, which
+is more robust to outliers skew than the average. 
+
+% Sensor readings, in particular, are subject to the dynamics in the environment they are deployed in
+% therefore sensors of different types can overlap in a same amplitude bin.  
+Naturally, sensor reading value-ranges may overlap. For example, during a rainy season, the humidity in an
+office can reach the range of 60-70 (percent) which is the same as typical temperature sensor readings (Fahrenheit).
+If you do not consider measurement units, the distributions for each of the two types look similar. 
+Simply relying on percentiles is not sufficient for differentiating sensor types. Figure~\ref{fig:same_bin} demonstrates this
+point. To capture their difference we need to include the variance of the signal in our feature-vector.
 
 \begin{figure}[ht!]
 \centering
@@ -70,24 +73,32 @@ formulating a feature vector for the time series.
 \label{fig:same_bin}
 \end{figure}
 
-When we extract features from a raw sensor reading, the original trace can span over hour, days or even weeks, and
-the trend can vary significantly even from hour to hour. On one side, extracting certain features such as percentiles and
-variances over the entire sensor reading might miss too many short term dynamics thus making the features less discriminant, compared to doing so in shorter
-windowed time slices. On the other side, computing features over windowed slices can produce too many elements for a
-feature vector and also, having too many unnecessary feature variables might degrade the performance of classifier.
-To better and succintly summarize the dynamics of sensor traces, we apply feature extraction to every time window of fixed length on the original trace and compute the statistics of the accumulated features from windowed slices as the final features. 
+% When we extract features from a raw sensor reading, the original trace can span over hour, days or even weeks, and the trend can vary significantly even from hour to hour. On
+% one side, extracting certain features such as percentiles and variances over the entire sensor reading might miss too many short term dynamics thus making the features less discrimi- nant, compared to doing so in shorter windowed time slices. On the other side, computing features over windowed slices can produce too many elements for a feature vector and also, having too many unnecessary feature variables might degrade the performance of classifier. To better and suc- cintly summarize the dynamics of sensor traces, we apply feature extraction to every time window of fixed length on the original trace and compute the statistics of the accumu- lated features from windowed slices as the final features.
 
-As a summary, the feature extraction procedure goes as follows. First, each single sensor signal is segmented into N
+When we extract features from a raw sensor readings, the original trace can span hours, days, or weeks, and
+the trend can vary significantly, even from hour to hour. Extracting certain features, such as percentiles, and
+variances over the entire sensor trace might miss  short term dynamics thus missing discriminating characteristics.
+In contrast, computing features over short time windows can produce too much noise.  Too many  feature variables typically 
+degrades classifier performance.
+To succinctly summarize the dynamics of sensor traces, we apply feature extraction to every time window of fixed length on 
+the original trace and compute the statistics of the accumulated features from windowed slices as the final feature set. 
+
+Upon close inspection of the traces, we notice that the short-term dynamics of the phenomena being measured, could be used
+to differentiate them.  Therefore, the distribution of short-term summary statistics can be used discriminate
+traces by type.  We construct our feature vector as follows: first,
+% As a summary, the feature extraction procedure goes as follows. First, 
+each single sensor signal is segmented into N
 non-overlapping 45-minute long windows (we will discuss the decision of window length in later section). Second, within
 each time window, we compute the median and variance of the signal, producing a vector of medians and a vector of
-variances after the window slides over the entire traces: 
+variances after the window slides over an entire trace: 
 \begin{displaymath}
 \begin{split}
 MED = \{median^{1}, median^{2}, ..., median^{N}\}\\
 VAR = \{variance^{1}, variance^{2}, ..., variance^{N}\}
 \end{split}
 \end{displaymath}
-Where N is the number of time windows. The vector $MED$ and $VAR$ reflect short term changes but not all the intermidiate values are essentially useful for classification. So as a statistical summary of the two vectors, in a last step, for each vector we compute the minimun, maximun, median and variance, resulting in a feature vector of eight variables:
+Where N is the number of time windows. The vector $MED$ and $VAR$ reflect short term changes but not all the intermediate values are essentially useful for classification. Finally, we compute a statistical summary of the two vectors.   For each vector we compute the minimum, maximum, median and variance, resulting in a feature vector with eight variables:
 \begin{displaymath}
 \begin{split}
 F = \{min(MED), max(MED), median(MED), var(MED),\\
@@ -97,23 +108,25 @@ F = \{min(MED), max(MED), median(MED), var(MED),\\
 And $F$ is the feature vector for each sensor trace used in our classification process.
 
 \subsection{Classification}
-After transforming all sensor time series into feature vectors, we leverage an ensemble classifier to achieve 
-the type classification task. In general, ensemble learning methods obtain better predictive performance than
- any of the constituent learning methods as discussed in~\cite{ensem1,ensem2}, if two assumptions hold~\cite{ensem3}: 1) the 
- probability of a correct classification by each individual classsifier is greater than 0.5 and 2) the errors
+% After transforming all sensor time series into feature vectors, we use an ensemble classifier to achieve 
+% the type classification. 
+In general, ensemble learning methods obtain better predictive performance than
+ any of the constituent learning methods as discussed in~\cite{ensem1,ensem2}, if the following assumptions hold~\cite{ensem3}: 1) the 
+ probability of a correct classification by each individual classifier is greater than 0.5 and 2) the errors
   in predictions of the base-level classifiers are independent. Random forests~\cite{RF} have been widely used 
   and outperform a single tree classifier. They are also faster~\cite{cvpr} in training and testing compared to traditional classifiers such as SVM. The notion of randomized trees was first introduced in~\cite{RT} and further well developed in~\cite{RF}.
 
-Random forests grow a bunch of classification trees. To classify a new coming unlabeled object as a feature vector, 
-feed the vector down each of the trees in the forest. Each tree gives a classification, in other words, the 
-tree ``votes" for that class. The forest chooses the class having the most votes over all the trees in the forest. 
-As a quick overview of how each tree is grown in the forest, the process goes as follows:
+Random forests construct a multiple of classification trees. To classify an unlabeled object, we construct the feature vector and 
+``feed'' the vector down each of the trees in the forest. Each tree gives a classification and we use it as a 
+``vote" for that class. The forest chooses the class having the most votes over all the trees in the forest. 
+% As a quick overview of how each tree is grown in the forest, 
+The process proceeds as follows:
 \begin{enumerate}
 \item Sample N instances at random with replacement\footnote{An element may appear multiple times in the sample set.}, from the original data set. These samples will be the training set for growing this particular tree.
 \item Specify M feature variables at random out of the total feature vector when growing each node of a tree. And the best split (measured by the information gain) on these M is used to split the node. The value of M is constant during the forest growing.
 \item Each tree is grown to the largest extent possible without pruning.
 \end{enumerate}
-The randomness of this ensemble learning method originates in the first two steps and specifically, we set N equal the number of instances in the original training set, M equal the square root of the
+The randomness of this ensemble learning method occurs in the first two steps.  We set N equal the number of instances in the original training set, M equal the square root of the
 number of original feature variables, and the number of the trees in the forest be 50. Usually these parameters are optimized
 through cross-validation and we refer interested readers to~\cite{RF} for further deduction and proof of random forest.
 
@@ -142,24 +155,28 @@ an instance by averaging their probabilistic predictions, in order to facilitate
 %  \label{alg:emd}
 % \end{algorithm}
 
-\subsection{Quantify the Uncertainty of Classification}
-Being able to measure the confidence of prediction results and identify potential misclassifications is vital to a learning process. It is an easy job to 
-identify misclassification when we have groud truth labels, but in many of the cases motivating our work the ground truth labels are not available. Therefore the 
-efforts to identify potential misclassifications would suffer from the absence of ground truth. However, if we are able to quantify the uncertainty of classification, 
-that can help identify potential misclassified instances. To quantify the uncertainy of classifications in our learning process, we leverage the posterior probabilities 
-learned in the random forest.
+\subsection{Quantify Classification Uncertainty}
+Being able to measure the confidence of prediction results and to identify potential misclassifications, is vital to a learning process. 
+It is trivial to 
+identify misclassification when ground truth is available, but in many real-world cases ground truth is unavailable. %labels are not available.
+%  Therefore, the 
+% efforts to identify potential misclassifications would suffer from the absence of ground truth. 
+Quantifying classification uncertainty can help identify potential misclassified instances and presents an opportunity to solicit 
+the user for feedback that we can use to improve our results. To quantify the uncertainty of classifications in our learning process, we use
+ the posterior probabilities learned in the random forest.
 
-With the learned posterior probabilities for each class at each leaf in each tree, given a new coming instance, we can compute the averaged probabilities for each class as:
+With the learned posterior probabilities for each class, at each leaf in each tree, we can compute the average probabilities 
+for each class as follows:
 \begin{displaymath}
     \bar P(Y(i)=c) = \frac{\sum_{t} P_{t,l}(Y(i)=c)}{|T^{'}|}, t\in T^{'}
 \end{displaymath}
 Where $T^{'}$ is the collection of trees in the forest where $P_{t,l}(Y(i)=c)\neq 0$, and $|\cdot|$ denotes the cardinality of a set. Given these averaged 
-probabilities for each class, the forest produces a vector of class probability for each new coming instance as:
+probabilities for each class, the forest produces a vector of class probabilities for each new instance as:
 \begin{displaymath}
 \textbf{Pr} = \{\bar P(Y(i)=c)\}, c\in C
 \end{displaymath}
-Suppose we get a probablity vector $Pr_{1} = \{0.9, 0, 0, 0, 0, 0.1\}$ for intance $i_{1}$ and another vector $Pr_{2} = \{0.3, 0.25, 0.1, 0, 0.15, 0.2\}$ for intance $i_{2}$.
+Suppose we have a probability vector $Pr_{1} = \{0.9, 0, 0, 0, 0, 0.1\}$ for instance $i_{1}$ and another vector $Pr_{2} = \{0.3, 0.25, 0.1, 0, 0.15, 0.2\}$ for instance $i_{2}$.
 Both $i_{1}$ and $i_{2}$ will be assigned to the same class according to the class probability distribution, but the assignment of $i_{2}$ is less confident compared to that 
-of $i_{1}$ because its predicted class probability has a less ``concentrated'' distribution. As to measure this degree of ``uncertainty'' in classification of one instance, 
-we compute the entropy of its class probability yield by the forest. Based on this entropy as a confidence metric, we rank the classfications and filter out the instances for 
-further manual inspection whose entropy are above some threshold, and the inspection can help eliminate misclassifications.
+of $i_{1}$ because its predicted class probability has a less ``concentrated'' distribution. To measure the degree of ``uncertainty'' in classification of one instance, 
+we compute the entropy of its class probability yielded by the forest. We rank the classification results and filter out the instances for 
+further manual inspection whose entropy are above a threshold.  Inspection can help eliminate misclassifications.
