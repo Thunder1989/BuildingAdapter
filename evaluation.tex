@@ -16,7 +16,7 @@ For set points, we assign only one general type which includes all set points fo
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=0.4\textwidth]{./fig/hvac.pdf}
-\caption{A typical HVAC system consisting of water-based heating/cooling modules and air ventilation components.}
+\caption{A typical HVAC system consisting of water-based heating/cooling pipes and air circulation ducts.}
 \label{fig:hvac}
 \end{figure}
 
@@ -158,7 +158,7 @@ Other temp & 48.3 (51.4) & 49.7 (53.1) & 58.4 (4.6) & 45.0 (52.3) & 45.9 (54.1) 
 Overall & 68.2 (55.5) & 74.1 (54.3) & 78.4 (54.5) & 80.3 (56.2) & 81.2 (60.1) & 83.0 (59.6)\\ \hline
 \end{tabular}
 \caption{Inter-building Classification Accuracy for SDH}
-\caption*{Each table shows the averaged classification accuracy (in the last column only for intra-building case) and the accuracy of experiments where different percentage of the complete set is used as training set (denoted as `X\%'). In the percentage analysis, each percentage is repeated 1/percentage times and the averaged accuracy is calculated as presented in the tables. The accuracy of the baseline approach is also shown in parentheses.}
+\caption*{Each table shows the averaged classification accuracy of experiments where different percentage of the complete set is used as training set (denoted as `X\%'). In the percentage analysis, each percentage is repeated 1/percentage times and the averaged accuracy is presented. LOO cross validation accuracy is also shown for the intra-building test case. On average, our solution outperforms the baseline approach (shown in parentheses).}
 \label{table:sdh_x} % is used to refer this table in the text
 \end{table*}
 
@@ -179,7 +179,7 @@ to accomplish sensor type classification tasks.
 \begin{figure}[ht!]
 \centering
 	\includegraphics[width=0.45\textwidth]{./fig/window.eps}
-\caption{Classification accuracy for intra- and inter- building against different size of time window. A window size of 45 minutes is optimal for our classification tasks.}
+\caption{Classification accuracy of intra- and inter- building cases against different size of time window: a window size of 45 minutes is optimal for our classification tasks.}
 \label{fig:window}
 \end{figure}
 
@@ -207,7 +207,7 @@ which is 45 minutes in our case. This ``tuning'' is significant for the learning
                 \caption{Inter-building Classification}
                 \label{fig:cdf_inter}
 	\end{subfigure}
-\caption{The CDF curves depict the class probability entropy distribution for both the collection of correct (`-C' in solid lines) and wrong (`-W' in dotted lines) classification in the intra- and inter- building test cases.}
+\caption{The CDF curves depict the class probability entropy distribution for the collection of correct (`-C' in solid lines) and wrong (`-W' in dotted lines) classifications in the intra- and inter- building test cases. The collection of correct classifications has a distinct distribution from the collection of wrong ones.}
 \label{fig:cdf}
 \end{figure*}
 

@@ -29,9 +29,9 @@
   \begin{subfigure}{0.32\textwidth}
                 \centering
     \includegraphics[width=\textwidth]{./fig/cwt.eps}
-                \caption{Chilled Water Supply Temperatere}
+                \caption{Chilled Water Supply Temperature}
   \end{subfigure}
-\caption{Different type of sensor occupies different amplitude bins in the time domain with different short term dynamics.}
+\caption{Different type of sensors occupy different amplitude bins in the time domain with different short term dynamics.}
 \label{fig:example}
 \end{figure*}
 
@@ -69,7 +69,7 @@ point. To capture their difference we need to include the variance of the signal
     \includegraphics[width=\textwidth]{./fig/rh_ex.eps}
                 \caption{Humidity}
   \end{subfigure}
-\caption{An example of two differernt type of sensors occupying the same amplitude bin.}
+\caption{An example of two different type of sensors occupying the same amplitude bin.}
 \label{fig:same_bin}
 \end{figure}
 
@@ -134,7 +134,7 @@ All the instances in our data set are labeled with ground truth class. To train 
 a forest and one for testing the accuracy of the classifier. After the forest is built from training set, we learn the posterior probabilities of each class $c$ 
 at each leaf node $l$ for each tree $t$: suppose that $T$ is the set of all trees, $C$ is the set of all classes and $L$ is the set of all leaves for a given 
 tree $t\in T$. In the training stage the posterior probabilities $P_{t,l}(Y(i) = c))$ for each class $c\in C$ at each leaf $l\in L$, are learned for each tree $t\in T$. 
-These probabilities are calculated as \textit{the ratio of the number of instance $i$ of class $c$ that reach $l$ to the total number of intances that reach $l$}. $Y(i)$ 
+These probabilities are calculated as \textit{the ratio of the number of instance $i$ of class $c$ that reach $l$ to the total number of instances that reach $l$}. $Y(i)$ 
 is the class label for instance $i$. To classify an instance in the testing stage, the feature vector of an instance is passed down each tree until reaching a leaf 
 node, which gives a probability distribution. All the posterior probabilities accumulated from each tree are then averaged and the $argmax$ is taken as the class 
 of the instance. Note that instead of letting each tree vote for on class as described in the original paper~\cite{RF}, we combine the results from classifiers for 
