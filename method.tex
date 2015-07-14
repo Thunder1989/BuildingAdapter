@@ -31,7 +31,7 @@
     \includegraphics[width=\textwidth]{./fig/cwt.eps}
                 \caption{Chilled Water Supply Temperature}
   \end{subfigure}
-\caption{Different type of sensors occupy different amplitude bins in the time domain with different short term dynamics.}
+\caption{Different types of sensors occupy different amplitude bins in the time domain with different short term dynamics.}
 \label{fig:example}
 \end{figure*}
 
@@ -69,7 +69,7 @@ point. To capture their difference we need to include the variance of the signal
     \includegraphics[width=\textwidth]{./fig/rh_ex.eps}
                 \caption{Humidity}
   \end{subfigure}
-\caption{An example of two different type of sensors occupying the same amplitude bin.}
+\caption{An example of two different types of sensors occupying the same amplitude bin.}
 \label{fig:same_bin}
 \end{figure}
 
@@ -98,7 +98,7 @@ MED = \{median^{1}, median^{2}, ..., median^{N}\}\\
 VAR = \{variance^{1}, variance^{2}, ..., variance^{N}\}
 \end{split}
 \end{displaymath}
-Where N is the number of time windows. The vector $MED$ and $VAR$ reflect short term changes but not all the intermediate values are essentially useful for classification. Finally, we compute a statistical summary of the two vectors.   For each vector we compute the minimum, maximum, median and variance, resulting in a feature vector with eight variables:
+Where N is the number of time windows. The vector $MED$ and $VAR$ reflect short term changes but not all the intermediate values are useful for classification. Finally, we compute a statistical summary of the two vectors.   For each vector we compute the minimum, maximum, median and variance, resulting in a feature vector with eight variables:
 \begin{displaymath}
 \begin{split}
 F = \{min(MED), max(MED), median(MED), var(MED),\\

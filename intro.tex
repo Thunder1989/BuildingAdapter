@@ -1,222 +1,117 @@
 \section{Introduction}
-% Buildings contribute to a large portion of the energy bill in the US.
-% Buildings are instrumented with sensors to monitor and improve their performance.
-% The metadata of sensors are usually poorly maintained. We particularly delve into the type information which is useful for a lot of applications such as xx.
 
-% Buildings consume a large fraction of the energy produced in the US and much of it is wasted.  
-% Deep instrumentation is necessary in order to understand
-% their dynamics and find opportunities to run them more efficiently.  Moreover, in order to have 
-% significant impact across buildings, solutions must
-% be widely delivered across a large number of buildings.  
-% However, it is well known that building sensor metadata is different across buildings and 
-% this places a significant road-block for wide deployment of software-based solutions.
-
-% {\bf points to make: 1) heterogeneity and inconsistency in sensor naming skema. 2) worse case, metadata is misssing, 3) the problem in 1) and 2) make a lot of research efforts hard or impossible to accomplish 4) we can take advantage of both metadata and data available to a) verify, b) generate and c) normalize the metadata.}
-
-Commercial buildings are sites of large sensor/meter deployments used to monitor and optimize their performance.  
-With the recent interest in reducing building energy consumption and
-increasing their efficiency, it
-is important to consider ways to quickly bootstrap a set of building data streams
-into an analytical pipeline, such as overall building efficiency or
-comfort-assessment analytics and control.
-However, because sensor metadata is inconsistent across buildings, software-based
-solutions are \emph{tightly coupled} to the sensor metadata conventions (i.e. schemas and naming) for
-each building. 
-Running the same software across buildings requires significant integration effort.
-
-Current `point' naming conventions and unsystematic recording of metadata form a 
-bottleneck in deployment scalability for analytics jobs.  A `point' refers to a 
-physical location where a sensor is taking measurements. 
-Each building vendor uses their own naming scheme and
-unique variants of each scheme are implemented from building to building; variations exist
-even across buildings that have contracted the same vendor.
-In addition, expanded descriptive information about the point is sometimes unavailable 
--- so determining their meaning is painfully slow or impossible.  
-Because these are conventions carried
-out by humans, they are inconsistent within and across building data sets.
-This makes the integration process laborious for building experts and a non-starter for 
-non experts.  The process is fundamentally unscalable.
+To incentivize the reduction of building energy consumption, the U.S. government 
+launched the Better Buildings Challenge to make buildings at least 20 percent 
+more efficient by 2020~\cite{doe2013better}. To achive this goal, many organizations 
+are applying data analytics to the thousands of sensing and control points in 
+a typical commercial building to detect wasteful and incorrect operations. These 
+complicated analytical processes have proven to be useful and effective on 
+a single building, however, an important issue remains that how to make such a process 
+generalizable to multiple buildings in a scalable manner. [FIX] need some transition 
+before ``however" talking about why we want to port these processes from buildings 
+to buildings. On the one hand, analytics-based processes are \emph{tightly coupled} 
+to sensors of certain types or locations for each building; on the other hand, 
+sensor metadata about the type, location, and relationships between the sensing 
+and control units is usually inconsistent across buildings. Therefore, implanting 
+these analytical processes requires the correspondence between different naming 
+conventions be identified and points be mapped to the inputs of these processes 
+before any further analysis is viable. For instance, if Trane wants to execute their 
+control loops on a building contracted by Siemens, Trane needs to first manually 
+figure out the mapping of the same type of points between Siements' system and 
+their own system. This process alone can literally take weeks and is proportional 
+to the number of points required in the service. Running the same software across 
+buildings requires significant integration effort.
 
 
-% Metadata normalization is critical for scaling the deployment process and allows us to \emph{decouple} building-specific conventions 
-% from the code written for building applications.  It also allow us to deal with \emph{incorrect} or \emph{missing} metadata.  
-
-% We propose a general, simple, yet effective classification scheme to differentiate sensors in buildings by type.
-% We perform ensemble learning on data collected from over 2000 sensor streams in two buildings.
-% Our approach is able to achieve more than 92\% accuracy for classification within buildings and more than 82\% accuracy for across buildings. 
-% We also introduce a method for identifying potential misclassified streams.  This is important because it allows us to identify opportunities to 
-% attain more input from experts -- input that could help improve classification accuracy when ground truth is unavailable.  We show that
-% by adjusting a threshold value we are able to identify at least 30\% of the misclassified instances.
-
-% Buildings consume a large fraction of the energy produced in the US and much of it is wasted~\cite{EIA, waste}.
-% Many buildings are also sites of very large sensor deployments.  Therefore, in principle, we can observe
-% their dynamics and optimize their performance.
-% , typically containing
-% up to several thousand sensors continuously reporting physical measurement.
-
-
-% These analyses consist of jobs that measure the performance
-% of the building with respect to overall comfort, determine where there are 
-% opportunities for energy savings by detecting rooms that drive the energy consumption down --
-% also known and rogue rooms/zones -- and finding broken sensors. 
-% For broad impact, such analyses should be deployed across many buildings, quickly. 
-% However, 
-
-Consider a simple analysis program, which has the ability
-to identify anomalous readings from a specific kind of sensor. To execute this job, 
-the process organizes each sensor by type and location, generates the distribution of
-readings across them, and identifies broken sensors where some fraction of
-their readings are above some threshold value on the distribution.
-The identification step in the process is the most challenging 
-because of the problems described.  Ideally, the program would search for points the
-way you search for web pages in a search engine -- using semantically meaningful 
-terminology. 
-% Some codes and metadata across buildings might be unique but we aim 
-% to discover the overlap to order for the search results to yield a higher harvest
-% (increased coverage of the points that meet the search criteria).
-
-%In order to run this application
-%the job needs to know the names of each sensor, its type, and its location.  
-Point names contain set of codes that are 
-semantically meaningful to the building manager of a specific building.
-For example, the point \texttt{BLDA1R435\_\_ART} is constructed as a concatenation of such codes.
-The name of the building (first 4 characters), the air handling unit identifier (the 
-fifth character), the room number (R435), and the type ART (area room temperature) -- which 
-indicates that this are measurement is produced by a temperature sensor. In addition
-to point names, there may be some descriptive metadata.  The description for this point (if it 
-exists) could describe that this is a ``temperature sensor in room 435''.
-However, since point names do not follow the exact same structure within and across
-buildings (and certainly do not follow the same convention across vendors)
-% Because each point is named by a human, the names can vary. This makes it difficult to construct a general
-% set of rules for name construction.  It also means that 
-no single approach could solve the normalization problem.  A suite of approaches is necessary.
+\begin{table}[h]
+\centering
+\begin{tabular}{c|ll}
+\cline{1-2}
+Building & Point Name & \\
+\cline{1-2}
+\multirow{2}{*}{\texttt{A}}  & \texttt{Zone Temp 2 RMI204} &  \\
+					& \texttt{spaceTemperature 1st Floor Area1} &  \\ \cline{1-2}
+\multirow{2}{*}{\texttt{B}} & \texttt{SDH\_SF1\_R282\_RMT} &  \\
+                     & \texttt{SDH\_S1-01\_ROOM\_TEMP} &  \\ \cline{1-2}
+\multirow{2}{*}{\texttt{C}}  & \texttt{SODA1R300\_\_ART} &  \\
+					  & \texttt{SODA1R410B\_ART} &  \\ \cline{1-2}
+\end{tabular}
+\caption{Example point names for temperature sensors from three different buildings.}
+\label{table:ex}
+\end{table}
 
 
+In modern commercial buildings, a sensing or control ``point'' is a sensor
+measurement, a controller, or a software value, e.g., a temperature sensor
+installed in an office room. The metadata about the point indicates the physical
+location, the type of sensor or controller, how the sensor or controller relates
+to the mechanical systems, and other important contextual information. Most of
+the time, the metadata is encoded as a ``point name'', which is usually a short
+text string with several concatenated abbreviations. Table~\ref{table:ex} lists 
+a few point names of sensors in three different building management systems contracted 
+by Trane\footnote{\url{http://www.trane.com/}}, Siemens\footnote{\url{http://www.siemens.com/}} 
+and Barrington Controls\footnote{The company is no longer in business.}. 
+For example, the point name \texttt{SODA1R300\_\_ART} is constructed as a
+concatenation of the name of the building (\texttt{SOD}), the air handler unit
+identifier (\texttt{A1}), the room number (\texttt{R300}) and the sensor type
+(\texttt{ART}, area room temperature). As the name conveys, this point measures 
+the temperature in a particular room; and it also indicates the control unit that 
+can affect the temperature in this room. Unfortunately, different naming conventions 
+are used in most buildings due to different equipment, vendors, manufacturers, 
+and contractors being used. As shown in the table, the notion of {\em room temperature} is encoded with a different abbreviation in each of the three buildings: \texttt{Temp}, \texttt{RMT} and \texttt{ART}.
+Such variations across different buildings impose great difficulty on scaling up the same analytical process.
 
-Metadata normalization is critical for scaling the software deployment process.  
-It allows us to
-\emph{decouple} building-specific conventions from the code written for building applications.  Normalization allows us to
-boost existing metadata, correct incorrect metadata, or generate common metadata when it is missing altogether.
-% However, normalization is non-trivial and we believe it requires a suite of solutions. 
-One such component in the normalization suite should differentiate sensor feeds by \emph{type}.  For example, we should be able to 
-differentiate between sensors measuring 
-temperature from sensors measuring pressure.  In addition, we should be able to use what we learn from one building and apply
-it to another.  This is especially useful in cases where similar stream types are labeled differently, labeled incorrectly,
- or not labeled at all.
 
-Normalization would allow us to quickly run jobs across many sites by enabling wide \emph{searchability} of points across many buildings at once.
-In order to meaningfully deal with disparate building streams in a scalable 
-fashion the streams should be \emph{searchable} across various properties, such
-as building name, room location, and type.  Moreover, we
-assert that wide searchability is necessary for achieving scalability.  By providing a tool for
-searching across building streams, we minimize the deployment time for applications;  
-allowing them to be used in \emph{all} buildings, not just a single one.
+Manual normalization of the metadata in buildings becomes intractable due to 
+the practical number of buildings. What we often have is one or a few fully 
+labeled/normalized buildings. Because the sensor types existing in different buildings 
+overlap considerably (e.g., all buildings have temperature sensros installed), it 
+would be desirable to leverage the knowledge of one already labeled building to 
+help the normalization of a new buidling. 
+To abridge the gap between naming conventions for differnt buildings, we envison 
+a system that will infer metadata about sensing and control points to a normalized 
+common standard.
+%based on the knowledge extracted from existing normalized buildings. 
+It would allow an advanced analytic engine to quickly connect to and analyze the data 
+from a commercial building. Such a system would not only dramatically save time 
+but also allow building managers to more easily experiment with many different kinds 
+of analytic engines. 
+Nevertheless, there is limited work on this topic. 
+Bhattarcharya et al~\cite{arka} exploit a programming language based solution, 
+where they derive a set of regular expressions from a handful of labeled examples 
+to normalize the point name of sensors. 
+%This approach assumes a consistent format for all point names, which is not the case in practice, as shown in Table~\ref{table:ex}. 
+Schumann et al~\cite{ibm} develop a probabilistic framework to classify sensor types 
+based on the similarity of a raw point name to the entries in a manually constructed dictionary. 
+%However, the performance of this method is limited by the coverage and diversity of entries listed in the dictionary, and the dictionary size becomes intractable when there exist a lot of variations of the same type, or conflicting definitions of a dictionary entry in different buildings.
+Hong et al~\cite{cikm} formulate an active learning based approach to iteratively 
+acquire human labels for the building and propogate pseudo labels among points.
+However, none of these prior work addresses the scalability issue of metadata 
+normalization nor leverages the knowledge from already labeled buildings.
 
-One of the important aspect of the sensor meta/data that we can leverage are the actual patterns in the readings themselves.
-Deep inspection of features in the data can yield meaningful results about the \emph{type} of data that it is
-and can help us with the label normalization problem.  This paper examines this path using standard machine learning
-approaches.  We observe that statistical features over small time windows can be used to identify the stream type.
-Moreover, we show that the classification of stream-type can be achieved using an ensemble of classifiers which is
-known to outperform a single classifier.
+In this work, we demonstrate a first step towards automatic normalization of building 
+sensor metadata that requires minimal human intervention. We focus on a key category 
+of metadata: the type of a sensing point. In contrast to the aforementioned work, 
+where the normalization process is restricted only within the same building, 
+we borrow the idea of transfer learning and transfer the ``knowledge" from 
+an existing building to help infer the sensor type for a new building, which 
+effectively minimizes the manual labeling effort throughout the normalization process. 
+Based on our observation, the transferral of ``knowledge" is feasible because 
+to some extent the actual data of streams carries characteristics that are common 
+across buidlings while the point name doesn't. For instance, room temperature 
+readings in all buildings should be within the range of 60-70 F degree while 
+the point names of temperature points can vary a lot according to 
+Table~\ref{table:ex}.
 
-% In this paper we aim to boost the existing 
-% metadata by learning the rules of construction through a programming-by-example
-% approach where the user provides some input-output examples to boost the existing
-% metadata with extra terms.  We can then search across the boosted metadata to increase
-% our search harvest over time.
+To investigate the effectiveness of the proposed solution for sensor type 
+classification across buildings, we performed extensive experiments on a large 
+collection of real sensor stream data, which includes over 20 different sensor types 
+and 3,000 sensors in three different commercial buildings. To our knowledge, we are 
+making the first attempt to tackle this problem systematically and our main 
+contributions in this paper are as follows:
 
-%The aforementioned 
-%building management system user interface implicitly groups sensors by location in space
-%or association with a system.  This grouping is also captured in the name of the point used by
-%the underlying communication protocol.  
-
-%For example, 'AHU' -- air handling unit -- is typically
-%embedded in the name of every sensor that is associated with a particular air handling unit.
-%A similar convention is used for denoting the type of data produced by the point (i.e. all points
-%that contain 'ART' (area room temperature)  in their name refer to a temperature sensor).
-%However, these conventions vary slightly across buildings, making it difficult to
-%simply integrate based on such tags alone.  We need a way to unify and learn the basic
-%set and structure of the tags in order to unify them.
-
-%However, although name conventions are inexact, they 
-%are generally similar across buildings with the \emph{same vendor}, so the rules that 
-%describe the name in one building might also work to expand the names in another building.
-%When automatic construction is not possible or
-%uncertain, feedback from the building manager -- the expert who can identify the meaning of 
-%more cryptic name encodings -- could provide feedback about the metadata for the sensor.
-%We make use of automatic name expansion and programming by example (PBE) 
-%techniques using input-output examples, in order to learn
-%as much as possible from the set of names available and combine that with expert feedback to
-%improve the certainty and coverage of our scheme.
-
-%The stream identification process is manual.  The deployer loads the interface to the 
-%building management system, tracks down the spatial or system view, clicks through several windows
-%to locate the location of the point(s) of interest, mouses over the point(s) and records the name,
-%and then uses that point name to request it from the data-fetch protocol -- typically BACNet or 
-%LonTalk or another protocol. This process is repeated in \emph{every building} where this 
-%application runs.  Any application that uses building data requires access to the building
-%management system and the network carrying the data of interest.
-
-%In addition, not all buildings provide a consistent naming convention sensors within them.
-%Therefore, we also explore different ways to expand the metadata in a normalized fashion.
-%Commonality across certain statistical features can be used to group
-%different streams.  For example, consider the distribution of temperature reading across
-%the rooms in the building.  Given a value distribution, it might be easy to pick out values those
-%that classify as statistical anoamlies.  If you consider the distribution per sensor type, then
-%finding all statistically anomalous sensor might also identify those that are broken.
-%This can be determined and indexed a priori, easing the time it takes to identify the 
-%streams of interest to applications.
-
-% We propose a set of techniques which learns how to transform a 
-% building's metadata 
-% to a common namespace by using a small number of examples from an expert. Once the transformation 
-% rules are learnt for one building, it can be applied across buildings with a similar 
-% metadata structure.  
-% We show how our approach makes it easier to write applications across buildings by
-% demonstrating its use by three different applications: 1) a rogue zone detector and 
-% 2) an application that identifies and ranks the most comfortable
-% rooms. We illustrate these on a testbed consisting of nearly 60 buildings comprising more 
-% than 16,000 sense points. We also illustrate how this common namespace can help a user write 
-% analytics applications that do not require building-specific knowledge and scales across 
-% different buildings.
-
-We conduct a comprehensive study on the data collected from over 2000 sensors in two separate buildings on two campuses. Our main contributions are:
-
-\begin{itemize}
-\item We propose a simple, general yet effective feature extraction scheme to achieve sensor type classification in the context of commercial buildings.
-\item We formulate an approach to identifying potential misclassified sensor streams (in terms of the type classes) when no ground truth labels are available.
-\item We evaluate our classification technique using data from over 2000 sensor series of 6 types in two buildings on two campuses, and our technique is able to achieve around 92\% and 98\% accuracy when doing classification within each building, and around 82\% accuracy when inferring type information across buildings.
-\item We also evaluate our solution to misclassification identification and the results demonstrate that we are able to identify at least 30\% percent of the target population by choosing an optimal threshold for decision.
+\begin{itemize}\itemsep1pt \parskip1pt \parsep0pt
+\item We empirically analyze how data and point name of the streams can be transferred for classification across buildings.
+\item We propose a novel, effective yet general transfer learning approach by exploiting the domain knowledge learnt from building 1 to help predict on building 2.
+\item We evaluate our proposed solution on sensor type classification based on real metadata from over 20 different sensor types and 3,000 sensors in three different commercial buildings; and our solution can automatically label at least xx\% of the streams with more than yy\% accuracy.
 \end{itemize}
-
-
-We believe this is an important study given the recent trends in the penetration
-of the \emph{internet of things} into our homes and environments.  Studies show that normalization is an especially pernicious
-and widely ubiquitous problem in embedded systems, with only 7\% of data tagged and only 1\% analyzed~\cite{kpcb}.
-Our technique can be used to unify that data across many deployment and enable broad search 
-and exploration of new applications.  For example, sensing device names for 
-the internet of things are likely to follow similar conventions with very little 
-context.  We argue that unification through boosting will be necessary in this broader domain.
-%Buildings are but one example that serve as a testbed for the proposed techniques.
-
-
-% We observe that every naming scheme looks to capture three point attributes: 
-% 1) the location in space, 2) its relation to an subsytem, and 3) the type of 
-% measurement it is taking.  
-
-% We want to make the streams searchable.  How do we do that?
-% ) We need index the metadata for the streams but the metadata available is not enough
-% 2) We need to expand the metadata, but how?
-% 3) name expansion --> tag unification
-% 4) timeseries feature extraction --> tag unification
-
-% top things to expand upon:  location, type, system
-% secondary: statistical features about the data
- 
-
-
-% The rest of the papers is organized as follows: Section 2 motivates our work. Section 3 details the feature extraction design, classification process as well as a solution to identifying potential misclassified instances. Section 4 discusses the results of our evaluation of the proposed techinuqes. Section 5 discusses the limits of our work and future directions. We conclude the paper with Section 6 \& 7.
-
-
-
-

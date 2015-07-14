@@ -1,10 +1,23 @@
 %\documentclass{sensys-proc}
 %\documentclass{sig-alternate-ipsn13}
 \documentclass{acm_proc_article-sp}
+%\documentclass{sig-alternate}
 \usepackage{subcaption}
-%\usepackage{epsfig}
+\usepackage{epstopdf}
+%\usepackage{times}
 \usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{comment}
+%\usepackage[ruled,linesnumbered]{algorithm2e}
 \usepackage[ruled]{algorithm2e}
+%\usepackage{algorithmic}
+%\usepackage{algpseudocode}
+\usepackage[yyyymmdd, hhmmss]{datetime}
+%\pagestyle{fancy}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\mt}{\mathsf{T}}
 
 \begin{document}
 \conferenceinfo{BuildSys'13,} {November 14--15, 2013, Rome, Italy} 
@@ -13,16 +26,15 @@
 \clubpenalty=10000 
 \widowpenalty = 10000
 
-\title{Sensor Type Classification in Buildings Through Time-Series Data
+\title{Sensor Type Classification\\ with Transfer Learning Across Buildings
 }
 \numberofauthors{1} 
 \author{
 \alignauthor
-Dezhi Hong$^1$, Jorge Ortiz$^2$, Arka Bhattacharya$^3$, Kamin Whitehouse$^1$\\
-	\affaddr{$^1$Department of Computer Science, University of Virginia, USA}\\
-	\affaddr{$^2$IBM T.J. Watson Research Center, Yorktown Heights, USA}\\
-	\affaddr{$^3$Computer Science Division, University of California Berkeley, USA}\\
-	\email{\{hong, whitehouse\}@virginia.edu, jjortiz@us.ibm.com, arka@eecs.berkeley.edu}
+Dezhi Hong$^1$,  Hongning Wang$^1$,  Kamin Whitehouse$^1$, Jorge Ortiz$^2$\\
+	\affaddr{$^1$Department of Computer Science, University of Virginia, VA USA}\\
+	\affaddr{$^2$IBM T.J. Watson Research Center, Yorktown Heights, NY USA}\\
+	\email{\{hong, hongning, whitehouse\}@virginia.edu, jjortiz@us.ibm.com}
 }
 
 \maketitle
@@ -60,7 +72,7 @@ by adjusting a threshold value we are able to identify at least 30\% of the misc
 
 \category{C.3}{Special-Purpose And Application-Based Systems}{Real-time and embedded systems}
 \terms{Performance, Experimentation, Verification}
-\keywords{Building, Sensor Type, Random Forest, Classification}
+\keywords{Building, Sensor Type, Transfer Learning}
 
 % \newpage
 \input{intro}
