@@ -15,9 +15,9 @@ sensor metadata about the type, location, and relationships between the sensing
 and control units is usually inconsistent across buildings. Therefore, implanting 
 these analytical processes requires the correspondence between different naming 
 conventions be identified and points be mapped to the inputs of these processes 
-before any further analysis is viable. For instance, if Trane wants to execute their 
-control loops on a building contracted by Siemens, Trane needs to first manually 
-figure out the mapping of the same type of points between Siements' system and 
+before any further analysis is viable. For instance, if A company wants to execute their 
+control loops on a building contracted by B company, A needs to first manually 
+figure out the mapping of the same type of points between B's system and 
 their own system. This process alone can literally take weeks and is proportional 
 to the number of points required in the service. Running the same software across 
 buildings requires significant integration effort.
@@ -52,7 +52,7 @@ a few point names of sensors in three different building management systems cont
 by Trane\footnote{\url{http://www.trane.com/}}, Siemens\footnote{\url{http://www.siemens.com/}} 
 and Barrington Controls\footnote{The company is no longer in business.}. 
 For example, the point name \texttt{SODA1R300\_\_ART} is constructed as a
-concatenation of the name of the building (\texttt{SOD}), the air handler unit
+concatenation of the building name (\texttt{SOD}), the air handler unit
 identifier (\texttt{A1}), the room number (\texttt{R300}) and the sensor type
 (\texttt{ART}, area room temperature). As the name conveys, this point measures 
 the temperature in a particular room; and it also indicates the control unit that 
@@ -99,7 +99,7 @@ effectively minimizes the manual labeling effort throughout the normalization pr
 Based on our observation, the transferral of ``knowledge" is feasible because 
 to some extent the actual data of streams carries characteristics that are common 
 across buidlings while the point name doesn't. For instance, room temperature 
-readings in all buildings should be within the range of 60-70 F degree while 
+readings in all buildings are in the range of 60-70 Fahrenheit degree while 
 the point names of temperature points can vary a lot according to 
 Table~\ref{table:ex}.
 
@@ -112,6 +112,6 @@ contributions in this paper are as follows:
 
 \begin{itemize}\itemsep1pt \parskip1pt \parsep0pt
 \item We empirically analyze how data and point name of the streams can be transferred for classification across buildings.
-\item We propose a novel, effective yet general transfer learning approach by exploiting the domain knowledge learnt from building 1 to help predict on building 2.
-\item We evaluate our proposed solution on sensor type classification based on real metadata from over 20 different sensor types and 3,000 sensors in three different commercial buildings; and our solution can automatically label at least xx\% of the streams with more than yy\% accuracy.
+\item We propose a novel, effective yet general transfer learning approach by exploiting the domain knowledge learnt from an existing building to help the prediction for another building.
+\item We evaluate our proposed solution on sensor type classification based on real data and metadata from over 20 different sensor types and 3,000 sensors in three different commercial buildings; and our solution can automatically label at least xx\% of the streams with more than yy\% accuracy without human intervention.
 \end{itemize}

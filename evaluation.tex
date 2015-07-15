@@ -1,54 +1,79 @@
 \section{Evaluation}
-To demonstrate the effectiveness of our methodology, we evaluate our classification technique in two different scenarios: a) intra-building, that is, the 
-training and testing data for classification is taken from the same building, and b) inter-building, where the training and testing instances are from two 
-distinct buildings. We also discuss how the amount of training instances and the window size of segment affect the performance of classification.
-At last, we analyze the results of our solution for identifying potential misclassifications.
-%show a small application as a case study built based on the generated type information in two buildings, which would be difficult to achieve in the absence of sensor type metadata.
+To demonstrate the effectiveness of our method, we evaluate our transfer learning based classification technique on actual data and point names of sensors from three commercial buildings. Extensive experiments demonstrate that our technique is able to accurately classify by type for a considerable portion of examples without human intervention. We also discuss how the threshold parameter $\delta$ on similarity score affect the learning accuracy and also explain the decision of how to set such a parameter.
 
-\subsection{Taxonomy}
-Most of the sensing points in the building can be classified into 6 general types, which we use in our work.
-In this paper, we consider 6 types of sensors: $CO_{2}$, humidity, room temperature, setpoint, air flow volume, other temperature.  Room 
-temperature includes only sensors that measure the air temperature of rooms (as ``room temp'' in Table~\ref{table:num}) and other temperature (as ``other temp'' 
-in Table~\ref{table:num}) incorporates all other temperature measurements involved in an air ventilation system (illustrated in Figure\footnote{Included 
-with permission from the authors of~\cite{sentinel}.}~\ref{fig:hvac}) such as supply air/return air/mixed air temperature and chilled or hot supply water/return water temperature. 
-For set points, we assign only one general type which includes all set points for every actuator configured in the building.
-
-\begin{figure}[ht!]
+\subsection{Taxonomy and Data Collection}
+\begin{figure}[t]
 \centering
-\includegraphics[width=0.4\textwidth]{./fig/hvac.pdf}
-\caption{A typical HVAC system consisting of water-based heating/cooling pipes and air circulation ducts.}
+\includegraphics[width=0.38\textwidth]{./fig/hvac}
+\caption{A typical HVAC system consisting of an air handler unit (AHU), several variable air volume boxes (VAV), water-based heating/cooling pipes and air circulation ducts. (Figure used with permission from the authors of~\cite{sentinel}.)}
 \label{fig:hvac}
 \end{figure}
 
-\subsection{Experimental Setup}
-We collected a week's worth of data from two separate buildings on two campuses. One is from the Rice Hall at the University of Virginia, where 
-the sense points report to a database~\cite{trane} anywhere between every 10 seconds to every 10 minutes. The other building is the Sutardja Dai Hall (SDH) at UC Berkeley, 
-where the deployed sensors~\cite{keti, bacnet} transmit to an archiver~\cite{smap} periodically from anywhere between every 5 seconds to every 10 minutes. The number for each type 
-of sensor in each building is summarized in Table~\ref{table:num} and the type \emph{ground truth} for each sense point is manually expanded based on the metadata in the database.
+Figure~\ref{fig:hvac} illustrates a typical heating, ventilation, and air conditioning (HVAC) system deployed in modern commercial buildings. 
+An HVAC system usually uses a combination of hot and cold water pipes in conjunction with
+air handler units (AHU) to maintain the appropriate thermal environment within the building.
+An HAVC system usually consists of several AHUs and each AHU is responsible for a physical zone
+in the building. An AHU consists of variable speed drives that supply cold air
+(cooled by the supplied cold water) using ducts to VAV boxes distributed throughout the building.
+The hot water loop is also connected to these VAV boxes using separate pipes. Each VAV box
+controls the amount of air to be let into an HVAC zone using dampers, whose opening angle
+can be programmed. A reheat coil, which uses supplied hot water, is used to heat the air to
+meet the appropriate HVAC settings for each zone.
 
-\begin{table}[ht!]
-\centering % used for centering table
-\begin{tabular}{c c c}% centered columns (4 columns)
-\hline %inserts single horizontal lines
-Type & Rice & SDH \\ % inserts table 
-\hline\hline % inserts double horizontal line
-$CO_{2}$ & 16 & 52 \\ % inserting body of the table
-Humidity & 48 & 52 \\
-Room temp & 142 & 216 \\
-Setpoint & 265 & 819 \\
-Air volume & 12 & 158 \\ 
-Other temp & 119 & 37 \\ \hline
-Sum & 602 & 1334 \\ \hline
+Our evaluation data set containing both data and point names of sensor streams is collected from over 2,500 sensors of different types deployed in three commercial buildings. 
+We collected a week's worth of data from each building.
+Specially, Building A is the Rice Hall at the University of Virginia, where the sense points report to a database by Trane anywhere between every 10 seconds to every 10 minutes.
+Both building B and C are from UC Berkeley: B is the Sutardja Dai Hall with sensors and equippment from KETI~\cite{keti} and Siemens~\cite{bacnet}, while building C is the Soda Hall what uses an archaic system by Barrington Controls which is no longer in business. 
+Points and sensors in these two buildings transmit data to an archiver~\cite{smap} periodically from anywhere between every 5 seconds to every 10 minutes.
+
+Table~\ref{table:num} summarizes all the types of sensors evaluated in our analysis in these three buildings and the number of sensors of each type. ``Room temperature'' measures the temperature in room and for a better understanding, all the other temperature measurements on water circulation and air ventilation are illustrated in Figure~\ref{fig:hvac}. For setpoints, we assign only
+one general type which includes all set points for every actuator configured in the building.
+
+\begin{table}[t]
+\centering
+\begin{tabular}{l | l l l}
+\hline
+& \multicolumn{3}{c}{Building} \\
+Type & A & B & C\\
+\hline\hline
+$CO_{2}$ & 16 & 52 & 0\\
+Humidity & 54 & 52 & 0\\
+Air Pressure & 142 & 216 & 215\\
+Room Temp & 159 & 231 & 208\\
+Facility Operation Status & 59 & 72 & 41\\
+Facility Control & 0 & 138 & 403\\
+Setpoint & 140 & 486 & 229\\
+Air Flow Volume & 14 & 172 & 9\\
+Damper Position & 0 & 290 & 10\\
+Fan Speed & 0 & 25 & 15\\
+HW Supply Temp & 27 & 1 & 0\\
+HW Return Temp & 15 & 1 & 0\\
+CW Supply Temp & 18 & 2 & 11\\
+CW Return Temp & 15 & 3 & 10\\
+Supply Air Temp & 20 & 17 & 3\\
+Return Air Temp & 6 & 2 & 4\\
+Mixed Air Temp & 5 & 2 & 3\\
+Ice Tank Entering Temp & 1 & 2 & 0\\
+Ice Tank Leaving Temp & 1 & 4 & 0\\
+Occupancy & 25 & 52 & 0\\
+Timer & 0 & 0 & 15\\ \hline
+Sum & 575 & 1124 & 1166\\ \hline
 \end{tabular}
-\caption{Number of Sensors by Type}
-\label{table:num} % is used to refer this table in the text
+\caption{Number of points by type for the 3 test buildings. ``Temp" stands for ``temperature", ``HW" for ``hot water" and ``CW" for ``cold water".}
+\label{table:num}
 \end{table}
 
-All of our learning and classification processes are implemented based on the scikit-learn~\cite{scikit} library, which is an open-source machine learning package 
-implemented mostly in Python providing a rich set of APIs.%abundant collection of APIs for state-of-the-art machine learning techniques in python.
 
-\subsection{Baseline and Metrics}
+All of our learning and classification processes are implemented based on the scikit-learn~\cite{scikit} library, which is an open-source machine learning package 
+implemented mostly in Python providing a rich set of APIs.
+
+
+\subsection{Base Classifers and Baseline}
 \label{sec:baseline}
+Our transfer learning based approach exploits a few base classifiers. Each base classifier will be trained on the same set of data features from the source building in a general way, therefore there is no particular requirement on what classifiers should be selected here.
+Particularly, we employ three base classifiers: Ranfom forest, linear regression and support vector machines with RBF kernels.
+
+
 As a baseline to compare our proposed approach against, we adopt a simple feature extraction scheme for each trace $F=\{med, var\}$, where $med$ and $var$ is simply 
 the $median$ and $variance$ computed over the entire trace.
 
@@ -63,7 +88,7 @@ value (PPV, also known as precision) as metrics to evaluate the performance of o
 identification context, a true-positive (TP) is when an instance considered to be misclassified is really misclassified while a false-positive (FP) is when an instance considered to be misclassified 
 is instead a correct classification.
 
-\subsection{Classification Accuracy}
+\subsection{Transfer Learning Accuracy}
 We run the two sets of experiments described above, i.e, the intra- and inter- building tests, to examine the effectiveness of feature design and measure how well 
 the classifier performs. The classification results are summarized from Table~\ref{table:rice}-\ref{table:sdh_x}. %,~\ref{table:sdh},~\ref{table:rice_x},~\ref{table:sdh_x}.
 In the table, each row is specific to a \emph{type} and each column is the \emph{percentage} of the full data set that was used for training.
@@ -72,196 +97,9 @@ The value in parentheses is the average classification accuracy for the approach
 Section~\ref{sec:baseline}. These are compared throughout the table.
 The last column summarizes ``leave-one-out'' cross-validation\footnote{In LOO cross validation, each training set takes all the instances except one with the test set being 
 the sample held out.} results for each approach.
-% Each table shows the averaged classification accuracy (in the last column only for intra-building case). The classification accuracy is also shown for each experiment, as we vary the percentage of the complete training set (denoted as X\%). Each data subset is repeated 1/X times (where X is the percentage) and the average accuracy is calculated. The accuracy of the baseline approach is shown in parentheses.
 
-\subsubsection{Intra Building Performance}
-From the last column in Table~\ref{table:rice} and~\ref{table:sdh}, we see that type classification in a single building achieves accuracy of $\sim$92\% and $\sim$98\% on Rice Hall 
-and SDH respectively, for leave-one-out (LOO) cross validation. The accuracy for the baseline is also shown in the table (in parentheses). The only type we have difficulty differentiating is ``other temp'', which includes 
-temperature measurements for air and water in the ventilation system, and particularly, the return air temperature measurements (as illustrated in Figure~\ref{fig:hvac}) are 
-almost identical to the ones measuring air temperature in rooms because what the return duct exhausts is mostly the air from a room.
-
-\begin{table*}[ht!]
-\centering % used for centering table
-\begin{tabular}{c | c | c | c | c | c | c}% centered columns (4 columns)
-\hline %inserts single horizontal lines
-Type & 5\% & 10\% & 20\% & 33\% & 50\% & LOO\\ % inserts table 
-%heading
-\hline\hline % inserts double horizontal line
-$CO_{2}$ & 51.3 (60.7) & 83.7 (94.0) & 98.4 (98.5) & 100.0 (100.0) & 93.8 (100.0) & 93.8 (100.0)\\ \hline
-Humidity & 59.6 (61.8) & 66.8 (67.9) & 80.8 (77.1) & 82.3 (74.3) & 87.5 (83.8) & 83.3 (89.8)\\ \hline
-Room temp & 89.0 (88.5) & 93.0 (94.0) & 95.6 (94.7) & 93.3 (95.9) & 97.2 (93.7) & 95.1 (95.6)\\ \hline
-Setpoint & 97.0 (93.1) & 97.5 (95.2) & 99.2 (95.7) & 99.2 (96.5) & 98.5 (97.4) & 99.2 (97.8)\\ \hline
-Air volume & 22.2 (21.8) & 35.5 (30.5) & 46.7 (49.6) & 79.2 (66.7) & 41.7 (83.3) & 83.3 (75.0)\\ \hline
-Other temp & 54.7 (47.2) & 64.8 (59.0) & 70.0 (71.0) & 72.7 (75.4) & 74.7 (71.7) & 74.8 (83.1)\\ \hline
-Overall & 80.4 (78.3) & 85.9 (84.4) & 90.0 (88.3) & 90.9 (90.0) & 91.4 (90.2) & 91.7 (93.3)\\ \hline
-\end{tabular}
-\caption{Intra-building Classification Accuracy for Rice Hall}
-\label{table:rice} % is used to refer this table in the text
-\end{table*}
-
-\begin{table*}[ht!]
-\centering % used for centering table
-\begin{tabular}{c | c | c | c | c | c | c}% centered columns (4 columns)
-\hline %inserts single horizontal lines
-Type & 5\% & 10\% & 20\% & 33\% & 50\% & LOO\\ % inserts table 
-%heading
-\hline\hline % inserts double horizontal line
-$CO_{2}$ & 80.4 (63.4) & 87.8 (75.8) & 91.4 (74.6) & 89.5 (83.7) & 92.3 (86.5) & 96.2 (76.9)\\ \hline
-Humidity & 91.6 (92.4) & 94.4 (92.1) & 97.6 (95.2) & 98.1 (98.1) & 100.0 (100.0) & 98.1 (98.1)\\ \hline
-Room temp & 98.3 (96.0) & 98.9 (96.3) & 99.2 (95.6) & 98.4 (94.7) & 97.7 (93.1) & 99.1 (95.8)\\ \hline
-Setpoint & 99.2 (89.0) & 99.6 (90.4) & 99.5 (91.4) & 99.7 (91.8) & 99.5 (90.7) & 99.5 (93.3)\\ \hline
-Air volume & 78.4 (41.8) & 87.1 (47.4) & 92.7 (52.9) & 96.8 (57.1) & 98.7 (55.3) & 97.5 (57.1)\\ \hline
-Other temp & 23.7 (19.4) & 38.4 (28.7) & 62.3 (36.5) & 68.9 (48.7) & 75.7 (59.9) & 73.0 (59.5)\\ \hline
-Overall & 93.4 (81.4) & 95.6 (83.7) & 97.2 (85.2) & 97.8 (86.6) & 98.2 (86.0) & 98.3 (87.7)\\ \hline
-\end{tabular}
-\caption{Intra-building Classification Accuracy for SDH}
-\label{table:sdh} % is used to refer this table in the text
-\end{table*}
 
 \subsubsection{Inter Building Performance}
 This set of experiments illustrates how accurately we can learn the type information of one building based on the knowledge from another building. The overall classification accuracy 
 achieved for the two buildings by training on the entire data set (train on SDH for Rice and train on Rice for SDH) is around 82\%, as seen from the last columns in Table~\ref{table:rice_x} 
-and~\ref{table:sdh_x}. Particularly, we see that the accuracy for ``other temperature'' in Rice is abnormal compared to the rest of the
-results. The issue with classifying ``other temperature'' in Rice is that there are many sensing points measuring the temperature of supply and return cold/hot water utilized in the 
-ventilation system, which are absent in the Berkeley building as a training set. Therefore the feature of these traces cannot be learned from SDH and causes problems in classifying these traces.
-
-\begin{table*}[ht!]
-\centering % used for centering table
-\begin{tabular}{c | c | c | c | c | c | c}% centered columns (4 columns)
-\hline %inserts single horizontal lines
-Type & 5\% & 10\% & 20\% & 33\% & 50\% & 100\% \\ % inserts table 
-%heading
-\hline\hline % inserts double horizontal line
-$CO_{2}$ & 29.7 (44.4) & 45.6 (56.9) & 75.0 (75.0) & 93.8 (72.9) & 93.8 (75.0) & 87.5 (93.8)\\ \hline
-Humidity & 50.9 (30.5) & 72.1 (26.7) & 76.2 (28.6) & 76.4 (21.1) & 89.6 (16.3) & 87.5 (26.5)\\ \hline
-Room temp & 97.6 (92.7) & 99.4 (91.4) & 100.0 (90.9) & 97.2 (92.5) & 100.0 (93.1) & 100.0 (91.8)\\ \hline
-Setpoint & 97.8 (94.7) & 98.2 (94.6) & 98.0 (92.8) & 97.7 (91.4) & 97.5 (92.3) & 98.9 (92.6)\\ \hline
-Air volume & 57.5 (21.2) & 58.3 (18.3) & 66.7 (23.3) & 63.9 (25.0) & 70.8 (20.8) & 83.3 (25.0)\\ \hline
-Other temp & 5.3 (5.8) & 10.8 (6.2) & 11.1 (6.9) & 16.8 (10.2) & 18.9 (10.5) & 19.3 (12.9)\\ \hline
-Overall & 73.1 (69.1) & 76.9 (68.7) & 78.3 (68.7) & 79.1 (68.5) & 81.3 (68.7) & 81.9 (70.3)\\ \hline
-\end{tabular}
-\caption{Inter-building Classification Accuracy for Rice Hall}
-\label{table:rice_x} % is used to refer this table in the text
-\end{table*}
-
-\begin{table*}[ht!]
-\centering % used for centering table
-\begin{tabular}{c | c | c | c | c | c | c} \hline
-Type & 5\% & 10\% & 20\% & 33\% & 50\% & 100\%\\ % inserts table 
-\hline\hline % inserts double horizontal line
-$CO_{2}$ & 63.5 (94.2) & 96.9 (96.2) & 90.8 (96.9) & 93.6 (94.9) & 92.3 (95.2) & 98.1 (98.1)\\ \hline
-Humidity & 67.4 (28.8) & 86.3 (47.4) & 98.1 (45.0) & 96.2 (41.0) & 98.1 (25) & 98.1 (44.2)\\ \hline
-Room temp & 78.0 (78.0) & 78.2 (75.8) & 72.9 (73.8) & 77.9 (76.7) & 80.3 (77.3) & 53.2 (77.3)\\ \hline
-Setpoint & 77.4 (53.3) & 83.3 (50.8) & 86.5 (53.4) & 87.9 (54.4) & 87.2 (62.0) & 91.8 (58.1)\\ \hline
-Air volume & 13.8 (34.7) & 15.2 (33.1) & 37.8 (25.1) & 42.4 (32.9) & 50.3 (30.3) & 71.5 (38.8)\\ \hline
-Other temp & 48.3 (51.4) & 49.7 (53.1) & 58.4 (4.6) & 45.0 (52.3) & 45.9 (54.1) & 67.6 (51.4)\\ \hline
-Overall & 68.2 (55.5) & 74.1 (54.3) & 78.4 (54.5) & 80.3 (56.2) & 81.2 (60.1) & 83.0 (59.6)\\ \hline
-\end{tabular}
-\caption{Inter-building Classification Accuracy for SDH}
-\caption*{Each table shows the averaged classification accuracy of experiments where different percentage of the complete set is used as training set (denoted as `X\%'). In the percentage analysis, each percentage is repeated 1/percentage times and the averaged accuracy is presented. LOO cross validation accuracy is also shown for the intra-building test case. On average, our solution outperforms the baseline approach (shown in parentheses).}
-\label{table:sdh_x} % is used to refer this table in the text
-\end{table*}
-
-\subsection{Learning Bootstrapping}
-We also experiment with different amount of training instances to examine how that affects the classification accuracy, which gives some insight on how many instances are needed 
-to bootstrap the classification process. In Table~\ref{table:rice}-~\ref{table:sdh_x}, %,~\ref{table:sdh},~\ref{table:rice_x},~\ref{table:sdh_x}, 
-the last columns demonstrate how accurately we can do 
-classification on average. There also remains the question of how many number of instances we need to bootstrap the learning process in both of the intra- and inter- building cases. 
-To examine the impact of number of instances on classification accuracy, we use different percentage of the original data set as training set, i.e, 5\%, 10\%, 20\%, 33\%, 50\%, and the 
-results are presented in the first five columns in each table. For each percentage of training instances used, we apply stratified sampling\footnote{The sampled set contains the same 
-percentage of samples of each class as the original complete set.} on the original set and the remaining instances are used as testing set. We repeat the same percentage 1/percentage times 
-to reduce random errors and get an averaged accuracy for that percentage. We can clearly see a trend that more training instances yield better classification results in all cases. 
-However, we can also notice that after the training set includes about 20\% of the complete set (which is $\sim$120 instances and $\sim$260 instances for Rice and SDH respectively) the 
-accuracy doesn't increase too much even reaching 100\% of the complete set. This indicates that we don't need too many instances to bootstrap the learning process within or across buildings 
-to accomplish sensor type classification tasks.
-
-\subsection{Window Size Sensitivity}
-\begin{figure}[ht!]
-\centering
-	\includegraphics[width=0.45\textwidth]{./fig/window.eps}
-\caption{Classification accuracy of intra- and inter- building cases against different size of time window: a window size of 45 minutes is optimal for our classification tasks.}
-\label{fig:window}
-\end{figure}
-
-All the classification results, thus far, were obtained using features extracted in 45-minute window slices on the original sensor traces. We study how different windows sizes affect the classification performance. Figure~\ref{fig:window} shows those results. The \emph{intra} case performs LOO cross validation while \emph{inter}
-case runs 10-fold cross validation. For the intra-building case, the classification is not sensitive to different window sizes as seen in the figure: basically, accuracy stays almost the same 
-for both buildings because within the same building, as long as we can capture the short term characteristics of sensor dynamics in the windowed time slots, the size of the time window 
-doesn't make too much difference. However, for the inter-building case, the time window size matters in the way that usually the local micro-climate in one building can be quite different 
-from another, we need to ``tune'' this common short term window to capture the dynamics that can be used to learn type-related information across buildings. Therefore, in order to achieve 
-decent type classification accuracy across buildings, (i.e, use information from one building to help classify the traces in another building), we still need to optimize the size of time window, 
-which is 45 minutes in our case. This ``tuning'' is significant for the learning process across buildings and is straightforward to perform.
-
-%\subsection{Feature Importance and Selection}
-\subsection{Identifying Potential Misclassifications}
-\begin{figure*}[ht!]
-\centering
-	\begin{subfigure}{0.48\textwidth}
-                \centering
-		\includegraphics[width=\textwidth]{./fig/cdf_intra.eps}
-                \caption{Intra-building Classification}
-                \label{fig:cdf_intra}
-	\end{subfigure}
-	\begin{subfigure}{0.48\textwidth}
-                \centering
-		\includegraphics[width=\textwidth]{./fig/cdf_inter.eps}
-                \caption{Inter-building Classification}
-                \label{fig:cdf_inter}
-	\end{subfigure}
-\caption{The CDF curves depict the class probability entropy distribution for the collection of correct (`-C' in solid lines) and wrong (`-W' in dotted lines) classifications in the intra- and inter- building test cases. The collection of correct classifications has a distinct distribution from the collection of wrong ones.}
-\label{fig:cdf}
-\end{figure*}
-
-\begin{figure*}[ht!]
-\centering
-	\begin{subfigure}{0.48\textwidth}
-                \centering
-		\includegraphics[width=\textwidth]{./fig/roc_intra.eps}
-                \caption{Intra-building Performance}
-                \label{fig:roc_intra}
-	\end{subfigure}
-	\begin{subfigure}{0.48\textwidth}
-                \centering
-		\includegraphics[width=\textwidth]{./fig/roc_inter.eps}
-                \caption{Inter-building Performance}
-                \label{fig:roc_inter}
-	\end{subfigure}
-\caption{The ROC curves depict the sensitivity of misclassification identification to different entropy threshold value. Choosing a threshold somewhere between 0.4 and 0.45 achieves the best compromise between recall and precision. }
-\label{fig:roc}
-\end{figure*}
-
-As we discussed in early section, being able to quantify the confidence in classifications and identify misclassified instances in our sensor type classification is vital to improving 
-the overall accuracy considering that in many cases our technique is used there will be the absence of ground truth. As an intermediate step to identify potentially misclassified instances, 
-we propose to quantify the ``uncertainty'' of classification with an entropy-based approach described in Section 3.3. Figure~\ref{fig:cdf} shows the CDF of class probability entropy of 
-classification in the intra- and inter- building scenarios. We see that the collection of correct classifications (in solid lines) has a distinct distribution from the collection of 
-misclassification (in dotted lines). Based on such distinction in the distribution, we can choose a certain entropy value as a threshold and filter out all the classified instances whose 
-class probability entropy are greater than the threshold outputted by the forest. Figure~\ref{fig:roc} gives a summary of the performance of our entropy-based approach to 
-identifying potential misclassification. Here are some definitions needed to understand the statistics:
-
-$S_{1}$: the set of instance whose class probability entropy is greater than the threshold.
-
-$S_{2}$: the set of instance falling in $S_{1}$ that is misclassified in the classification process.
-
-$S_{3}$: the set of instance falling in $S_{1}$ that is correctly classified in the classification process.
-
-$S_{4}$: the set of instance that is misclassified in the classification process.
-
-$S_{5}$: the set of instance that is correctly classified in the classification process.
-
-And the TPR, FPR and PPV are defined as: 
-\begin{displaymath}
-TPR = \frac{|S_{2}|}{|S_{4}|},\quad
-FPR = \frac{|S_{3}|}{|S_{5}|},\quad
-PPV = \frac{|S_{2}|}{|S_{1}|},\quad
-\end{displaymath}
-Where $|\cdot|$ is the cardinality of a set. We see that as the threshold value increases, both of the TPR (recall) and FPR (fall-out) decrease while the PPV (precision) keeps increasing. 
-
-In our case, a smaller threshold essentially leads to a larger population of instances being filtered out as potential misclassification ``candidates'', which helps identify more real 
-misclassified instances. However, the more candidates we filter our, the more instances we need to manually inspect, which inevitably leads to a lower precision of the identification process. 
-So we want to strike a balance between achieving a high recall rate as well as maintaining a high precision. As a result, based on the observation from Figure~\ref{fig:roc}, we suggest 
-picking a threshold value somewhere between 0.4 and 0.45 is appropriate. To note, we have 50 and 13 misclassified instances for Rice and SDH respectively for the intra-building testing case. 
-In the intra-building case, such a threshold (0.4-0.45) helps identify $\sim$30\% of the misclassified instances for Rice and $\sim$50\% for SDH while resulting in that $\sim$70\% and $\sim$50\% 
-of the instances being manual inspected are actually correct classifications, for Rice and SDH respectively. As for the inter-building case, our approach is able to identify $\sim$75\% of the 
-misclassified instances for both Rice and SDH with an overhead of $\sim$40\% and $\sim$70\% in the candidate inspection, for Rice and SDH respectively.
-
-%\subsection{Case Study}
-%TBD
+and~\ref{table:sdh_x}. 
