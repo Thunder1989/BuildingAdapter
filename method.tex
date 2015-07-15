@@ -1,182 +1,144 @@
-\begin{figure*}[ht!]
+\section{Transfer Learning}
+In this section, we first describe the intuition behind transfer learning.
+Then, we elaborate the details of our transfer learning based approach with running examples.
+
+\subsection{Knowledge Transfer}
+In our case, the use of transfer learning is motivated by the fact that people often have one or only a few buildings labeled which they want to take advantage of to aid the labeling of a new buidlings.
+Transfer learning fits such a scenario well in that it exploits knowledge gained from one domain\footnote{A ``domain'' particularly refers to a data set  in this paper.} where labeled data is abundant to help classify examples in a new related domain. 
+Such knowledge transfer is possible when the training domain and the test domain have the same set of class labels. 
+In our sensor type classfication setting, we assume that we are provided with some labeled examples only from the training domain but do not have any labeled ones from the testing domain. 
+The reason that traditional supervised learning techniques is not successful in transferring knowledge across domains in our case is because it usually requires the training and the testing examples sampled i.i.d. from the same distribution, which is not the case for our problem.
+
+%For example, the classiers can be trained from several relevant domains or built using different learning algorithms on the same domain.
+Based on the observation in Section x.x that classifers constructed with data features perform better than name features, we construct a few classifiers with different learning algorithms on the same set of data features from an existing building. 
+Each different classifier usually contains a different perspective of the knowledge on the building, due to the inductive bias of the specific learning model. 
+We refer to these different classifiers as {\it base} models and will combine them for classification on the new building.
+
+\subsection{Locally Weighted Ensemble}
+Different models can be effective at diffrent regions or structures in the new testing building, and no single model can perform well on all examples. 
+Ideally, we want to combine the knowledge in the base models, rather than only using any particular model, to more effectively transfer the knowledge to the new building. A natural choice is model averaging that additively combines the predictions of multiple base learners. 
+However, the existing model averaging methods for traditional supervised learning usually assign global weights to models, which are either uniform (e.g., in Bagging~\cite{bagging}) or proportional to the training accuracy (e.g., in Boosting~\cite{boosting}), or simply relying on a specific model (e.g., single model classification).
+Such global weighting schemes may not perform well in transfer learning because different testing examples may favor predictions from different base models. 
+For example, when the base models carry conflicting concepts at a testing example, it is essential to select the model that better represents the distribution underlying the example.
+
+We employ a locally weighted ensemble~\cite{lwe} to weight the predictions from each base classifier. The weight is computed per model per example based on the similarity between the model and the local structure of the target example. The similarity is measured by comparing neighborhood graphs which we will explain in the next section. Such local weighting will prefer models whose predicted local structure is close to the true local structure of the target example in the new testing domain. Let $x$ be the data feature vector of an example in the new building and $y$ be its predicted class label. Given a set of k base models $M_1$,..., $M_k$ and the new testing set $D_T$ represented with the data feature view, the general Bayesian model averaging rule to estimate the posterior distribution of y is,
+\begin{equation}\label{lwe}
+p(y|x)=\sum_{i=1}^k p(y|x,D_T,M_i) p(M_i|D_T)
+\end{equation}
+where $p(y|x,D_T,M_i) = p(y|x,M_i)$ because $x \in D_T$ and $p(y|x,M_i)$ is actually the prediction on $x$ by $M_i$. And $p(M_i|D_T)$ is the probability to choose $M_i$ given the testing set $D_T$. As $x \in D_T$, $p(M_i|D_T)$ equals to $p(M_i|x)$ which is the locally adjusted weight for $M_i$ and Eq.~\ref{lwe} becomes,
+\begin{equation}\label{sum}
+p(y|x)=\sum_{i=1}^k w_{x}^{M_i} p(y|x, M_i)
+\end{equation}
+where $w_{x}^{M_i} = p(M_i|x)$ and intuitively, a model $M_i$ should have higher weights for $x$ if $M_i$ predicts a similar local structure of $x$ to the true one.
+We will next explain how the weight is calculated per example.
+
+\subsection{Graph-based Weight Estimation}
+If $p(y|x)$ is known, we can estimate the weights $w_{x}^{M_i}$ for each model by minimizing the square error between its prediction and the ground truth. 
+However, in practice the truth value of $p(y|x)$ for a new building is not available a priori . 
+The main task becomes to properly define the similarity between classifier's predicted structure and the true structure. 
+Based on the clustering assumption~\cite{cluster} that $p(y|x)$ is not expected
+to change much in a dense area where $p(x)$ is high, which means the decision boundary probably exists in areas with smaller $p(x)$.
+Therefore, we perform clustering on the new testing set and assume the boundries between clusters represent areas where $p(x)$ is small.
+If the clustering boundary for the region where $x$ locates agrees with the decision boundary of $M_i$, we assume that $p(y|x,M_i)$ is similar to the true $p(y|x)$ around $x$, which means we can assign a larger weight to $Mi$ at $x$. 
+In other words, if the predicitons of $M_i$ on the area surrounding $x$ have higher consistency with the clustering results, $M_i$ would have a larger weight at $x$. 
+
+Following these observations, we employ a graph-based algorithm to compute the weight.
+To compute the $w_{x}^{M_i}$ for $M_i$ at example $x$, we construct two neighorhood graphs: 
+$G_M = (V, E_M)$ and $G_C = (V, E_C)$, for classification and clustering respectively, 
+where each vertex is an example and $V = D_T$. In $G_M$, an edge exists between two vertices (denoting the two examples are ``neighbors'') if and only if an $M_i$ predicts the same label for these two examples. Likewise, in $G_C$, an edge exists between two vertices if and only if these two examples reside in the same cluster.
+If $x$ neighborhs on both graphs have significant overlap, then $M_i$ will be assigned a larger weight.
+So the weight $w_{x}^{M_i}$ for $M_i$ at $x$ is proportional to the similarity of the two graphs:
+\begin{equation}\label{sim}
+w_{x}^{M_i} \propto s(G_M, G_C|x) = \frac {|V_M \cap V_C|} {|V_M \cup V_C|}
+\end{equation}
+where $V_M$ ($V_C$) is the set of neighbors of $x$ on graph $G_M$ ($G_C$), |$\cdot$| is the cardinality of a set, and $s(G_M, G_C|x)$ is the similarity of between two graphs. 
+Figure~\ref{fig:graph} illustrates an example of neighborhood graphs for an example $x$ (in grey circle): model 1 has a similarity of 0.75 while model 2 has 0.4.
+
+\begin{figure}[h]
 \centering
-  \begin{subfigure}{0.32\textwidth}
-                \centering
-    \includegraphics[width=\textwidth]{./fig/co2.eps}
-                \caption{$CO_{2}$}
-  \end{subfigure}
-  \begin{subfigure}{0.32\textwidth}
-                \centering
-    \includegraphics[width=\textwidth]{./fig/rh.eps}
-                \caption{Humidity}
-  \end{subfigure}
-  \begin{subfigure}{0.32\textwidth}
-                \centering
-    \includegraphics[width=\textwidth]{./fig/rmt.eps}
-                \caption{Room Temperature}
-  \end{subfigure}
-  %row2
-  \begin{subfigure}{0.32\textwidth}
-                \centering
-    \includegraphics[width=\textwidth]{./fig/stpt.eps}
-                \caption{Room Temperature Set Point}
-  \end{subfigure}
-  \begin{subfigure}{0.32\textwidth}
-                \centering
-    \includegraphics[width=\textwidth]{./fig/vav.eps}
-                \caption{VAV Air Volume}
-  \end{subfigure}
-  \begin{subfigure}{0.32\textwidth}
-                \centering
-    \includegraphics[width=\textwidth]{./fig/cwt.eps}
-                \caption{Chilled Water Supply Temperature}
-  \end{subfigure}
-\caption{Different types of sensors occupy different amplitude bins in the time domain with different short term dynamics.}
-\label{fig:example}
-\end{figure*}
-
-\section{Methodology}
-In this section, we describe the design and construction of the feature-vector we use to characterize sensor \emph{type}.  We
-explain what it captures, fundamentally and, hence, why it works so well for building sensor data. Then, we discuss
-the classification technique we apply and give a detailed description of the training and testing process. Finally, we articulate
-a solution for identifying potentially misclassified streams, when no type-label ground truth is available.
-
-\subsection{Feature Extraction}
-Raw sensor time series\footnote{In this paper, we use the term ``trace'', ``readings'' and ``time series'' \textit{interchangeably}.} usually contain millions of readings which are too general to be useful for type classification.   We need to distill the information embedded in the reading patterns.
-A signal in the time domain trends the amplitude of a sensor reading and different types of sensor generally occupy distinct
-amplitude bins, as demonstrated in Figure~\ref{fig:example}. We can characterize the amplitude distribution of a signal in the time
-domain by using the percentiles of the value distribution.%, such as 25th, 50th, 75th and so forth. 
-To identify outliers in the distribution, we pick the 50th percentile value (also known as the median) as a discriminator, which
-is more robust to outliers skew than the average. 
-
-% Sensor readings, in particular, are subject to the dynamics in the environment they are deployed in
-% therefore sensors of different types can overlap in a same amplitude bin.  
-Naturally, sensor reading value-ranges may overlap. For example, during a rainy season, the humidity in an
-office can reach the range of 60-70 (percent) which is the same as typical temperature sensor readings (Fahrenheit).
-If you do not consider measurement units, the distributions for each of the two types look similar. 
-Simply relying on percentiles is not sufficient for differentiating sensor types. Figure~\ref{fig:same_bin} demonstrates this
-point. To capture their difference we need to include the variance of the signal in our feature-vector.
-
-\begin{figure}[ht!]
-\centering
-  \begin{subfigure}{0.22\textwidth}
-                \centering
-    \includegraphics[width=\textwidth]{./fig/rmt_ex.eps}
-                \caption{Room Temperature}
-  \end{subfigure}
-  \begin{subfigure}{0.22\textwidth}
-                \centering
-    \includegraphics[width=\textwidth]{./fig/rh_ex.eps}
-                \caption{Humidity}
-  \end{subfigure}
-\caption{An example of two different types of sensors occupying the same amplitude bin.}
-\label{fig:same_bin}
+    \includegraphics[width=0.45\textwidth]{./fig/lwe_graph}
+\caption{An example of local neighborhood graphs of $x$ (in grey circle).}
+\label{fig:graph}
 \end{figure}
 
-% When we extract features from a raw sensor reading, the original trace can span over hour, days or even weeks, and the trend can vary significantly even from hour to hour. On
-% one side, extracting certain features such as percentiles and variances over the entire sensor reading might miss too many short term dynamics thus making the features less discrimi- nant, compared to doing so in shorter windowed time slices. On the other side, computing features over windowed slices can produce too many elements for a feature vector and also, having too many unnecessary feature variables might degrade the performance of classifier. To better and suc- cintly summarize the dynamics of sensor traces, we apply feature extraction to every time window of fixed length on the original trace and compute the statistics of the accumu- lated features from windowed slices as the final features.
+With the eq.~\ref{sim} defined, we can compute the weight for each $M_i$ by normalizing among all similarity scores:
+\begin{equation}\label{sim}
+w_{x}^{M_i} = \frac {s(G_{M_i}, G_C|x)} {\sum_{i=1}^k s(G_{M_i}, G_C|x)}
+\end{equation}
+And the final prediction for $x$ is simply $\hat y = argmax_y \enspace p(y|x)$ as $p(y|x)$ is defined in Eq.\label{lwe}.
 
-When we extract features from a raw sensor readings, the original trace can span hours, days, or weeks, and
-the trend can vary significantly, even from hour to hour. Extracting certain features, such as percentiles, and
-variances over the entire sensor trace might miss  short term dynamics thus missing discriminating characteristics.
-In contrast, computing features over short time windows can produce too much noise.  Too many  feature variables typically 
-degrades classifier performance.
-To succinctly summarize the dynamics of sensor traces, we apply feature extraction to every time window of fixed length on 
-the original trace and compute the statistics of the accumulated features from windowed slices as the final feature set. 
+\subsubsection{Distance-based correction}
+We notice if considering the distance between examples as shown in Figure~\ref{graph_dist}, the original similarity definition is problematic in that both models will be assigned the same weight while obviously model 2 ought to have a higher weight because the neighbors are closer to the target example.
+As a correction to include the distance between examples into consideration, the adjusted similarity is:
+\begin{equation}\label{sim}
+s\ast(G_M, G_C|x) = 1 - \frac {\sum d_{V_I}/|V_I|} {\sum d_{V_U}/|V_U|}
+\end{equation}
+where $V_I = V_M \cap V_C$, $V_U = V_M \cup V_C$, and $\sum d_{V_I}$ is the sum of distance between $x$ to its neighbors in $V_I$ (likewise for $\sum d_{V_U}$).
 
-Upon close inspection of the traces, we notice that the short-term dynamics of the phenomena being measured, could be used
-to differentiate them.  Therefore, the distribution of short-term summary statistics can be used discriminate
-traces by type.  We construct our feature vector as follows: first,
-% As a summary, the feature extraction procedure goes as follows. First, 
-each single sensor signal is segmented into N
-non-overlapping 45-minute long windows (we will discuss the decision of window length in later section). Second, within
-each time window, we compute the median and variance of the signal, producing a vector of medians and a vector of
-variances after the window slides over an entire trace: 
-\begin{displaymath}
-\begin{split}
-MED = \{median^{1}, median^{2}, ..., median^{N}\}\\
-VAR = \{variance^{1}, variance^{2}, ..., variance^{N}\}
-\end{split}
-\end{displaymath}
-Where N is the number of time windows. The vector $MED$ and $VAR$ reflect short term changes but not all the intermediate values are useful for classification. Finally, we compute a statistical summary of the two vectors.   For each vector we compute the minimum, maximum, median and variance, resulting in a feature vector with eight variables:
-\begin{displaymath}
-\begin{split}
-F = \{min(MED), max(MED), median(MED), var(MED),\\
- min(VAR), max(VAR), median(VAR), var(VAR)\}
-\end{split}
-\end{displaymath}
-And $F$ is the feature vector for each sensor trace used in our classification process.
+\begin{figure}[h]
+\centering
+    \includegraphics[width=0.45\textwidth]{./fig/lwe_graph}
+\caption{An example of local neighborhood graphs of $x$ with distance into consideration.}
+\label{graph_dist}
+\end{figure}
 
-\subsection{Classification}
-% After transforming all sensor time series into feature vectors, we use an ensemble classifier to achieve 
-% the type classification. 
-In general, ensemble learning methods obtain better predictive performance than
- any of the constituent learning methods as discussed in~\cite{ensem1,ensem2}, if the following assumptions hold~\cite{ensem3}: 1) the 
- probability of a correct classification by each individual classifier is greater than 0.5 and 2) the errors
-  in predictions of the base-level classifiers are independent. Random forests~\cite{RF} have been widely used 
-  and outperform a single tree classifier. They are also faster~\cite{cvpr} in training and testing compared to traditional classifiers such as SVM. The notion of randomized trees was first introduced in~\cite{RT} and further well developed in~\cite{RF}.
+\subsection{Clustering with Non-parametric Bayesian}
+\label{sec_clustering}
+In our transfer learning based approach, data density $p(x)$ is exploited via its latent clustering structure. We choose Gaussian Mixture Model (GMM) \cite{zivkovic2004improved}, a partitional clustering algorithm, to perform the clustering.
 
-Random forests construct a multiple of classification trees. To classify an unlabeled object, we construct the feature vector and 
-``feed'' the vector down each of the trees in the forest. Each tree gives a classification and we use it as a 
-``vote" for that class. The forest chooses the class having the most votes over all the trees in the forest. 
-% As a quick overview of how each tree is grown in the forest, 
-The process proceeds as follows:
-\begin{enumerate}
-\item Sample N instances at random with replacement\footnote{An element may appear multiple times in the sample set.}, from the original data set. These samples will be the training set for growing this particular tree.
-\item Specify M feature variables at random out of the total feature vector when growing each node of a tree. And the best split (measured by the information gain) on these M is used to split the node. The value of M is constant during the forest growing.
-\item Each tree is grown to the largest extent possible without pruning.
-\end{enumerate}
-The randomness of this ensemble learning method occurs in the first two steps.  We set N equal the number of instances in the original training set, M equal the square root of the
-number of original feature variables, and the number of the trees in the forest be 50. Usually these parameters are optimized
-through cross-validation and we refer interested readers to~\cite{RF} for further deduction and proof of random forest.
+In GMM, the cluster label for every instance is treated as a latent variable, which is drawn from a multinomial distribution $p(c)$, i.e., $p(c)\propto\alpha_c$, where $\forall c, \alpha_c\ge0$ and $\sum_c\alpha_c=1$. In any given cluster $c$, the conditional data likelihood of an instance $x$ is specified by a multivariate Gaussian distribution. To reduce the number of parameters to estimate, we choose the isotropic Gaussian in our solution,
+\begin{equation}
+p(x|c)=(2\pi\sigma^2)^{-d/2}\exp{-\frac{(x-\mu_c)^\mt(x-\mu_c)}{2\sigma^2}}
+\end{equation}
+where the variance $\sigma^2$ is shared by all the clusters. $\{\alpha_c, \mu_c\}^k_{c=1}$ and $\sigma$ are considered as model parameters in GMM.
 
-All the instances in our data set are labeled with ground truth class. To train a random forest, we split the original set into two subsets, one for building 
-a forest and one for testing the accuracy of the classifier. After the forest is built from training set, we learn the posterior probabilities of each class $c$ 
-at each leaf node $l$ for each tree $t$: suppose that $T$ is the set of all trees, $C$ is the set of all classes and $L$ is the set of all leaves for a given 
-tree $t\in T$. In the training stage the posterior probabilities $P_{t,l}(Y(i) = c))$ for each class $c\in C$ at each leaf $l\in L$, are learned for each tree $t\in T$. 
-These probabilities are calculated as \textit{the ratio of the number of instance $i$ of class $c$ that reach $l$ to the total number of instances that reach $l$}. $Y(i)$ 
-is the class label for instance $i$. To classify an instance in the testing stage, the feature vector of an instance is passed down each tree until reaching a leaf 
-node, which gives a probability distribution. All the posterior probabilities accumulated from each tree are then averaged and the $argmax$ is taken as the class 
-of the instance. Note that instead of letting each tree vote for on class as described in the original paper~\cite{RF}, we combine the results from classifiers for 
-an instance by averaging their probabilistic predictions, in order to facilitate our technique used to help identify potential misclassified instances as described in the following section.  
+However, in GMM, we need to manually specify the number of clusters for a given input data set; and the clustering result of GMM is very sensitive to such setting. More importantly, in our study, usually there is more than one pattern in the point names even for the same type of sensors; therefore we cannot assume one class has only one cluster. It is impossible for us to predefine those optimal cluster sizes. To make clustering feasible on the new building, we appeal to a non-parameter Bayesian solution: we assume the model parameters $(\alpha, \mu)$ in each cluster are also random variables, which are drawn from a Dirichlet Process prior \cite{dp}.
 
-% \begin{algorithm}[h!]
-%  \SetAlgoLined
-%  Give signal $X(t)$:\\
-%   \While{the \# of maxima in $X(t)$ >3}{
-%   (1) identify all the local extrema in $X(t)$\;
-%   (2) perform a cubic spline interpolation of maxima to get the upper envelope\;
-%   (3) repeat (2) on minima to get the lower envelope\;
-%   (4) $h(t) = X(t) - mean((2),(3))$ \;
-%   (5) repeat (2)-(4) until $h(t)$ is an IMF\;
-%   (6) $X(t) = X(t) - h(t)$, and return the IMF\;
-%   }
-%  \caption{Empirical Mode Decomposition}
-%  \label{alg:emd}
-% \end{algorithm}
+A Dirichlet Process $DP(G_0, \eta)$ with a base distribution $G_0$ and a scaling parameter $\eta$ is a distribution over distributions~\cite{dp}. The base distribution $G_0$ specifies the prior distribution of model parameters, e.g., mean parameter $\mu$ in each cluster, and the scaling parameter $\eta$ specifies the concentration of samples drawn from the DP, e.g., cluster proportion $p(c)$. An important property of the DP is that though the draws from a DP have countably infinite size, they are discrete with probability one, which leads to a probability distribution on partitions of the data. The number of unique draws, i.e., the number of clusters, varies with respect to the data and therefore is random, instead of being pre-specified.
 
-\subsection{Quantify Classification Uncertainty}
-Being able to measure the confidence of prediction results and to identify potential misclassifications, is vital to a learning process. 
-It is trivial to 
-identify misclassification when ground truth is available, but in many real-world cases ground truth is unavailable. %labels are not available.
-%  Therefore, the 
-% efforts to identify potential misclassifications would suffer from the absence of ground truth. 
-Quantifying classification uncertainty can help identify potential misclassified instances and presents an opportunity to solicit 
-the user for feedback that we can use to improve our results. To quantify the uncertainty of classifications in our learning process, we use
- the posterior probabilities learned in the random forest.
+As a result, with the introduced $DP(G_{0}, \eta)$ prior, data density in a given collection of instances can be expressed using a stick-breaking representation
+\cite{sethuraman1994constructive}:
+\begin{equation}\label{eq_dp_density}
+p(x)=\sum_{c=1}^\infty \alpha_c \mathcal{N}(x|\mu_c,\sigma)p(\mu_c|G_0)
+\end{equation}
+where $\alpha={\alpha}_{c=1}^\infty\sim Stick(\eta)$ represents the proportion of clusters in the whole collection. The stick-breaking process $Stick(\eta)$ for the cluster proportion parameter $\alpha$ is defined as: $\alpha'_c\sim Beta(1, \eta), \alpha_c=\alpha'_c\prod_{i=1}^{c-1}(1-\alpha'_i)$. Since the variance $\sigma^2$ is fixed in all clusters, we use a conjugate prior for $\mu$ in $G_0$, i.e., for $\forall c, \mu_{ci}\sim \mathcal{N}(a,b)$, with the assumption that each dimension in $\mu_c$ is independently drawn from a univariate Gaussian. This will greatly simplify the later on inference procedure.
 
-With the learned posterior probabilities for each class, at each leaf in each tree, we can compute the average probabilities 
-for each class as follows:
-\begin{displaymath}
-    \bar P(Y(i)=c) = \frac{\sum_{t} P_{t,l}(Y(i)=c)}{|T^{'}|}, t\in T^{'}
-\end{displaymath}
-Where $T^{'}$ is the collection of trees in the forest where $P_{t,l}(Y(i)=c)\neq 0$, and $|\cdot|$ denotes the cardinality of a set. Given these averaged 
-probabilities for each class, the forest produces a vector of class probabilities for each new instance as:
-\begin{displaymath}
-\textbf{Pr} = \{\bar P(Y(i)=c)\}, c\in C
-\end{displaymath}
-Suppose we have a probability vector $Pr_{1} = \{0.9, 0, 0, 0, 0, 0.1\}$ for instance $i_{1}$ and another vector $Pr_{2} = \{0.3, 0.25, 0.1, 0, 0.15, 0.2\}$ for instance $i_{2}$.
-Both $i_{1}$ and $i_{2}$ will be assigned to the same class according to the class probability distribution, but the assignment of $i_{2}$ is less confident compared to that 
-of $i_{1}$ because its predicted class probability has a less ``concentrated'' distribution. To measure the degree of ``uncertainty'' in classification of one instance, 
-we compute the entropy of its class probability yielded by the forest. We rank the classification results and filter out the instances for 
-further manual inspection whose entropy are above a threshold.  Inspection can help eliminate misclassifications.
+Because the data density distribution defined in Eq~\eqref{eq_dp_density} only has finite support at the points of $\{\alpha_c, \mu_c\}^k_{c=1}$, we can calculate the posterior distribution of latent cluster labels in each unlabeled instance to discover the clustering structure. Following the sampling scheme proposed in \cite{neal2000markov}, we appeal to a Gibbs sampling method to infer the posterior of cluster membership. Detailed specifications of this sampling algorithm can be found in \cite{neal2000markov}.
+
+\subsubsection{Features for Clustering}
+We use point name features to generate clusters for the new building. In general, point names following the same pattern would not vary too much, which will yield clusters of higher quality than data features.
+Table~\ref{quality} shows the quality of clusters generated by DP with data features and name features measured by rand index~\cite{rand}. Rand index is a standard measure of the similarity between the grouping in clusters and the true labels.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{l|c|c}
+\hline
+                & Data Feature & Name Feature \\ \hline
+Rand Index & 0.34       & 0.75       \\ \hline
+\end{tabular}
+\caption{Quality of clusters generated with different features measure by rand index (in the range [0,1], higher is better).}
+\label{table:clf}
+\end{table}
+
+{\bf Putting it all together:} Algorithm~\ref{algo} summarizes our  tranfer learning based solution for the sensor type classification. FIX: algorithm and a quick sum here.
+
+\begin{algorithm}[ht]
+ \caption{Clustering-based Active Learning}
+ \label{algo}
+ %\SetAlgoLined
+ {\bf Input}: point names $\mathcal{D}=\{x_1,x_2,\dots,x_n\}$, and label budget $B$\\
+ {\bf Output}: predicted labels of the point names $Y$\\
+ Initialize: Generate clusters with $DP(G_{0}, \eta)$ on $\mathcal{D}$, reset the labeled instance set $\mathcal{D}_l$ and propagated label set $\mathcal{D}_p$ to empty\\
+\While{$B>0$}{
+Train classifier $f(x)\to y$ based on $\mathcal{D}_l$ and $\mathcal{D}_p$\;
+Apply $f(x)$ to all instances in $\mathcal{D}$\;
+Compute class entropy $H(c)$ defined in Eq~\eqref{eq_entropy} for each cluster $c$\;
+Retrieve a cluster by $\hat c=\argmax_c p(c)H(c)$\;
+Acquire label $\hat y$ for example $\hat x$ given by $\argmax_{x\in\mathcal{D}} Pr(x|\hat c)$, and move $(\hat x, \hat y)$ from $\mathcal{D}$ to $\mathcal{D}_l$\;
+Update the distance threshold $r$ by Eq~\eqref{eq_threshold}\;
+Update all previous propagated label in $\mathcal{D}_p$ with new threshold $r$\;
+Assign $\hat y$ to all unlabeled examples $x_{u}$, where $x_{u} \in \hat c$ and $d(x_u,\hat x)<r$\;
+Move $(x_u, y)$ from $\mathcal{D}$ to $\mathcal{D}_p$\;
+Perform sub-clustering with $DP(G_0, \eta)$ in $\hat c$\;
+}
+\end{algorithm}

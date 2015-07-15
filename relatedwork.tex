@@ -1,26 +1,17 @@
 \section{Related Work}
-To the best of our knowledge, we are the first to approach the problem of sensor-type classification of physical data in buildings.
+To the best of our knowledge, we are the first to approach the problem of sensor type classification leveraging knowledge across buildings.
   We describe the closest, related work in different problem domains and describe work that uses the random forest as a tool.
 
-There has been much research work on type classification in the context of audio~\cite{audio1,audio2}, music~\cite{music1,music2}, video~\cite{video1,video2}, 
-web query~\cite{query1,query2} and human activity~\cite{activity1, activity2}. The goal of~\cite{audio1} is to classify audios into categories such as speech, 
-music, background sound and silence using support vector machines, and the work in~\cite{audio2} addresses the same problem with a HMM-based statistical model. 
-Examples of music genre (i.e, jazz, pop and so forth) classification are~\cite{music1,music2}, which use GMM with EM algorithm and logistic regression
-respectively. And commonly used features for these audio-related classification work are MFCC, zero crossing rate, energy/power and spectral/temporal statistics. 
-For video type classification, texture and color-based features are used to classify videos into classes including cartoon, commercial, news and so on 
-with decision tree~\cite{video1} and neural network~\cite{video2}. Query categorization has also been researched, ~\cite{query1} exploits a rule-based classifier
-while~\cite{query2} uses a Markov random walk model. There is also work on human activity classification in general cases~\cite{activity1} (i.e, running, walking 
-and sitting) and home setting~\cite{activity2} (i.e, sleeping, toiletting and showering) using accelerometer data with voting-based classifier and HMM with 
-conditional random fields respectively. In contrast, our work is focused on sensor type classification using ensemble learning technique.
+Bhattarcharya et al~\cite{arka} exploit a programming language based solution, 
+where they derive a set of regular expressions from a handful of labeled examples 
+to normalize the point name of sensors. 
+This approach assumes a consistent format for all point names, which is not the case in practice, as shown in Table~\ref{table:ex}. 
+Schumann et al~\cite{ibm} develop a probabilistic framework to classify sensor types 
+based on the similarity of a raw point name to the entries in a manually constructed dictionary. 
+However, the performance of this method is limited by the coverage and diversity of entries listed in the dictionary, and the dictionary size becomes intractable when there exist a lot of variations of the same type, or conflicting definitions of a dictionary entry in different buildings.
+Hong et al~\cite{cikm} formulate an active learning based approach to iteratively 
+acquire human labels for the building and propogate pseudo labels among points.
+However, none of these prior work addresses the scalability issue of metadata 
+normalization nor leverages the knowledge from already labeled buildings.
 
-Random forests have been applied in many different areas~\cite{RF1,RF2,RF3,RF4}. ~\cite{RF1} uses a gene as a feature 
-to classify microarray data. ~\cite{RF2} uses the intensity of hundreds of measured metabolites from medical subjects as features, to classify the 
-subjects into groups of normal, diseased and diseased with drug treatment. Random forests have also been used in~\cite{RF3} to classify 
- objects in images with image-relevant features. In the area of remote sensing, ~\cite{RF4} utilizes user-defined parameters as features 
- to classify land cover 
-types. In our work, we use simple and general statistical feature-set for type classification.
-
-There is work leveraging percentile-based features in time series data for different classification purposes. 
-Tarzia~\cite{ABS} 
-et. al use a certain percentile in the audio spectrum to classify the current room location. Wang~\cite{business} et. al utilize percentile-based features in audio to characterize occupancy and noise levels. For comparison, we use percentile statistics in sensor time series as 
-part of our feature-set to differentiate between different sensor types in commercial buildings.
+Tranfer Learning
