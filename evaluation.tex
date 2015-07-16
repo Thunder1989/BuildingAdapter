@@ -74,6 +74,28 @@ Our transfer learning based approach exploits a few base classifiers. Each base 
 Particularly, we employ three base classifiers: Ranfom forest, linear regression and support vector machines with RBF kernels.
 
 
+\begin{figure*}[ht!]
+\centering
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/TL_AB.eps}
+                \caption{A and B}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/TL_BC.eps}
+                \caption{B and C}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/TL_AC.eps}
+                \caption{A and C}
+  \end{subfigure}
+\caption{Type classification accuracy against labeled percentage with transfer learning between different pairs of buildings.}
+\label{fig:tl_acc}
+\end{figure*}
+
+
 As a baseline to compare our proposed approach against, we adopt a simple feature extraction scheme for each trace $F=\{med, var\}$, where $med$ and $var$ is simply 
 the $median$ and $variance$ computed over the entire trace.
 
