@@ -54,7 +54,7 @@ So the weight $w_{x}^{M_i}$ for $M_i$ at $x$ is proportional to the similarity o
 w_{x}^{M_i} \propto s(G_M, G_C|x) = \frac {|V_M \cap V_C|} {|V_M \cup V_C|}
 \end{equation}
 where $V_M$ ($V_C$) is the set of neighbors of $x$ on graph $G_M$ ($G_C$), |$\cdot$| is the cardinality of a set, and $s(G_M, G_C|x)$ is the similarity between two graphs. 
-Figure~\ref{fig:graph} illustrates an example of neighborhood graphs for an example $x$ (in grey circle): model 1 has a similarity of 0.75 while model 2 has 0.4.
+Figure~\ref{fig:graph} illustrates an example of neighborhood graphs for an example $x$ (in grey circle): model 1 has a similarity of 0.75 while model 2 has 0.5.
 
 \begin{figure}[h]
 \centering
@@ -70,7 +70,8 @@ w_{x}^{M_i} = \frac {s(G_{M_i}, G_C|x)} {\sum_{i=1}^k s(G_{M_i}, G_C|x)}
 And the final prediction for $x$ is simply $\hat y = argmax_y \enspace p(y|x)$ as $p(y|x)$ is defined in Eq.~\ref{eq_sum}.
 
 \subsubsection{Distance-based Adjustment}
-We notice if considering the distance between examples as shown in Figure~\ref{graph_dist}, the original similarity definition is problematic in that both models will be assigned the same weight while obviously model 2 ought to have a higher weight because the neighbors are closer to the target example.
+We notice in some cases the original similarity definition can be problematic. Consider the case as shown in Figure~\ref{graph_dist}, there are two neighbors on both of the graphs for the two models and the distance between vertices are marked on the edge. Since the original similarity definition only considers the number of neighbors, both models will be assigned the same weight of 0.5 in this case while obviously model 1 ought to have a higher weight because the neighbors on
+the left graph are closer to the target example.
 To fix the issue, we include the distance between examples into consideration, the adjusted similarity is:
 \begin{equation}\label{d_sim}
 s^\ast(G_M, G_C|x) = 1 - \frac {\sum d_{V_I}/|V_I|} {\sum d_{V_U}/|V_U|}
@@ -79,7 +80,7 @@ where $V_I = V_M \cap V_C$, $V_U = V_M \cup V_C$, and $\sum d_{V_I}$ is the sum 
 
 \begin{figure}[h]
 \centering
-    \includegraphics[width=0.4\textwidth]{./fig/lwe_graph}
+    \includegraphics[width=0.4\textwidth]{./fig/lwe_d_graph}
 \caption{An example of local neighborhood graphs of $x$ with distance into consideration.}
 \label{graph_dist}
 \end{figure}

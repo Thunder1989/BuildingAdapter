@@ -106,16 +106,22 @@ and test it on building B.
 This set of experiments tests how well we can apply the classification boundaries from one building and apply it to another.
 
 \subsection{Base Classifier Performance}
-
+In the table, each row is specific to a \emph{type} and each column is the \emph{percentage} of the full data set that was used for training.
+Each cell shows two values.  
+\begin{table}[h]
+\centering
+\begin{tabular}{r|c|c|c}
+\hline
+ & A     & B     & C     \\ \hline
+A & N/A   & 1/2/3 & 1/2/3 \\ \hline
+B & 1/2/3 & N/A   & 1/2/3 \\ \hline
+C & 1/2/3 & 1/2/3 & N/A   \\ \hline
+\end{tabular}
+\caption{Base classifier performance across buildings on data features. The three numbers are for random forest, logistic regression and SVM respectively.}
+\label{acc_base}
+\end{table}
 
 \subsection{Transfer Learning Accuracy}
-We run the two sets of experiments described above, i.e, the intra- and inter- building tests, to examine the effectiveness of feature design and measure how well 
-the classifier performs. The classification results are summarized from Table~\ref{table:rice}-\ref{table:sdh_x}. %,~\ref{table:sdh},~\ref{table:rice_x},~\ref{table:sdh_x}.
-In the table, each row is specific to a \emph{type} and each column is the \emph{percentage} of the full data set that was used for training.
-Each cell shows two values.  The value without parentheses is the average classification accuracy for the richer feature-vector. 
-The value in parentheses is the average classification accuracy for the approach described in 
-Section~\ref{sec:baseline}. These are compared throughout the table.
-The last column summarizes ``leave-one-out'' cross-validation\footnote{In LOO cross validation, each training set takes all the instances except one with the test set being 
-the sample held out.} results for each approach.
+We investigate the overall accuracy of transfer learning for type classification across our three testing buildings. There are three pair of choices and for each pair the transferral can be done either way, therefore, we have six testing case. The classification results is illustrated in Figure~\ref{fig:tl_acc}.
 
 \subsection{Exploitation of Labels in the New Building}
