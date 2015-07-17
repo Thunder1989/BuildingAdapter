@@ -20,14 +20,15 @@ controls the amount of air to be let into an HVAC zone using dampers, whose open
 can be programmed. A reheat coil, which uses supplied hot water, is used to heat the air to
 meet the appropriate HVAC settings for each zone.
 
+Table~\ref{table:num} summarizes all the types of sensors evaluated in our analysis in these three buildings and the number of sensors of each type. ``Room temperature'' measures the temperature in room and for a better understanding, all the other temperature measurements on water circulation and air ventilation are illustrated in Figure~\ref{fig:hvac}. For setpoints, we assign only
+one general type which includes all set points for every actuator configured in the building.
+
 Our evaluation data set containing both data and point names of sensor streams is collected from over 2,500 sensors of different types deployed in three commercial buildings. 
 We collected a week's worth of data from each building.
 Specially, Building A is the Rice Hall at the University of Virginia, where the sense points report to a database by Trane anywhere between every 10 seconds to every 10 minutes.
 Both building B and C are from UC Berkeley: B is the Sutardja Dai Hall with sensors and equippment from KETI~\cite{keti} and Siemens~\cite{bacnet}, while building C is the Soda Hall what uses an archaic system by Barrington Controls which is no longer in business. 
 Points and sensors in these two buildings transmit data to an archiver~\cite{smap} periodically from anywhere between every 5 seconds to every 10 minutes.
 
-Table~\ref{table:num} summarizes all the types of sensors evaluated in our analysis in these three buildings and the number of sensors of each type. ``Room temperature'' measures the temperature in room and for a better understanding, all the other temperature measurements on water circulation and air ventilation are illustrated in Figure~\ref{fig:hvac}. For setpoints, we assign only
-one general type which includes all set points for every actuator configured in the building.
 
 \begin{table}[t]
 \centering
@@ -67,8 +68,7 @@ Sum & 575 & 1124 & 1166\\ \hline
 All of our learning and classification processes are implemented based on the scikit-learn~\cite{scikit} library, which is an open-source machine learning package 
 implemented mostly in Python providing a rich set of APIs.
 
-
-\subsection{Base Classifers and Baseline}
+\subsection{Base Classifiers and Baseline}
 \label{sec:baseline}
 Our transfer learning based approach exploits a few base classifiers. Each base classifier will be trained on the same set of data features from the source building in a general way, therefore there is no particular requirement on what classifiers should be selected here.
 Particularly, we employ three base classifiers: Ranfom forest, linear regression and support vector machines with RBF kernels.
@@ -96,8 +96,8 @@ Particularly, we employ three base classifiers: Ranfom forest, linear regression
 \end{figure*}
 
 
-As a baseline to compare our proposed approach against, we adopt a simple feature extraction scheme for each trace $F=\{med, var\}$, where $med$ and $var$ is simply 
-the $median$ and $variance$ computed over the entire trace.
+As a baseline to compare our proposed approach against, we adopt a 
+
 
 For classification, we measure the averaged cross-validation accuracy in two different scenarios (intra- and inter- buildings). In the intra-building case, the 
 data from a single building is split into training and testing sets, where the results illustrate how accurately the type information can be inferred using local 
@@ -105,10 +105,8 @@ within-building information. For inter-building case, the experiment performs tr
 and test it on building B.  
 This set of experiments tests how well we can apply the classification boundaries from one building and apply it to another.
 
-For identifying potential misclassifications, we choose the true-positive rate (TPR, also known as recall), false-positive rate (FPR, also known as fall-out) and positive predictive 
-value (PPV, also known as precision) as metrics to evaluate the performance of our entropy-based approach when making different choice of threshold. Particularly, under our misclassification
-identification context, a true-positive (TP) is when an instance considered to be misclassified is really misclassified while a false-positive (FP) is when an instance considered to be misclassified 
-is instead a correct classification.
+\subsection{Base Classifier Performance}
+
 
 \subsection{Transfer Learning Accuracy}
 We run the two sets of experiments described above, i.e, the intra- and inter- building tests, to examine the effectiveness of feature design and measure how well 
@@ -120,8 +118,4 @@ Section~\ref{sec:baseline}. These are compared throughout the table.
 The last column summarizes ``leave-one-out'' cross-validation\footnote{In LOO cross validation, each training set takes all the instances except one with the test set being 
 the sample held out.} results for each approach.
 
-
-\subsubsection{Inter Building Performance}
-This set of experiments illustrates how accurately we can learn the type information of one building based on the knowledge from another building. The overall classification accuracy 
-achieved for the two buildings by training on the entire data set (train on SDH for Rice and train on Rice for SDH) is around 82\%, as seen from the last columns in Table~\ref{table:rice_x} 
-and~\ref{table:sdh_x}. 
+\subsection{Exploitation of Labels in the New Building}

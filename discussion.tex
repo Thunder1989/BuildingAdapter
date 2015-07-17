@@ -6,41 +6,13 @@ by looking for data sources outside the building data sets. We also discuss why 
 did not explore in depth and how the principal components can change from building to building.  Finally, we 
 explain how our misclassification identifier could be used to improve classification results.
 
-\begin{table*}
-    \centering % used for centering table
-    \begin{tabular}{c|c|c|c}% centered columns (4 columns)
-        \hline %inserts single horizontal lines
-        Building & Set of Best Features & Acc. on All & Acc. on Best Set \\ % inserts table 
-        \hline\hline % inserts double horizontal line
-        Rice & min(MED), med(MED), med(VAR), var(VAR) & 88.7\% & 91.5\% \\ \hline
-        SDH & min(MED), max(MED), max(VAR), med(VAR) & 97.1\% & 97.8\% \\\hline
-    \end{tabular}
-    \caption{Classification accuracy on all the features and on the best set of features in intra-building test for each building: the best feature sets are obtained by exhausting all the feature combinations and running on a single decision tree with leave-one-out cross validation. The best feature set is different for each building.}
-    \label{table:feature} % is used to refer this table in the text
-\end{table*}
+\subsection{Unlabeled Streams}
 
-\subsection{Extension of Taxonomy and Class Scope}
-Our taxonomy covers 5 specific and one general sensor \emph{type}. We could extend the class scope to include more sensor types and make our technique more versatile. There are many types of sensors in modern buildings and the sensing fabric in smart buildings continue to diversify, e.g., occupancy sensors, light sensors, etc. We also want to build a deeper taxonomy for certain types.  
-For instance, there are set points for very different actuators.  Temperature set-points drive the HVAC system, while the air quality set-point drives the filters and air mixers. Being able to differentiate between these can help enable general control applications in buildings.
+\subsection{Complementing Single Building Labeling}
 
-\subsection{Improvement on Classification Accuracy}
+\subsection{Better Features for Base Classifiers}
 The learning and classification processes in our work relies only on a set of general features. However, we wish to explore how using external or domain-specific knowledge could help improve the classification accuracy. For instance, if we know the humidity in rooms will increase due to a rain forecast, then we could search for traces with increases in average in reading values as external knowledge to help identify humidity traces. 
 
-\subsection{Feature Importance and Selection}
-In our study, we did not delve into the the importance of features (i.e. principle component analysis) 
-because the feature vector contains only eight variables.  Therefore, doing classification in a hyperspace of only eight dimensions 
-is not computationally expensive -- even if some of the vector elements carry redundant information. More importantly, 
-that selecting the set of principle features for each building results in using a different feature set 
-(as demonstrated in Table~\ref{table:feature}) per building.  This makes classification across buildings impossible. Still, 
-evaluating the principle components and uncovering overlap is
-% selecting the set of best features is 
-important for obtaining optimal classification performance for intra-building tasks and single-type analysis.
+\subsection{New Weighting Functions for Ensemble}
 
-\subsection{Reducing Misclassification Iteratively}
-In cases where no ground truth labels are available, an entropy-based approach can be used in an iterative manner to improve classification results. 
-In each iteration, 
-only a few examples (on the top of the entropy-based ``uncertainty'' ranking list) are inspected and corrected, and the corrected instances could be
- added to the training set.  The training 
-and classification process is repeated until some criteria is satisfied. We expect the number of examples needed for manual inspection 
-will be dramatically reduced in each iteration and overall, compared to a one-time inspection of candidates filtered by some threshold value.
-Such an interactive, supervised learning process can produce better classification results and reduce the human labeling effort needed.
+
