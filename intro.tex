@@ -22,6 +22,32 @@ their own system. This process alone can literally take weeks and is proportiona
 to the number of points required in the service. Running the same software across 
 buildings requires significant integration effort.
 
+%> Lots of innovation in the building application space (much promise to bridge the gap between cyber and physical for increased efficency and comfort)
+%> Building applications are written against the protocol-guided, building-specific namespaces (LonTalk, Bacnet, OPC)
+%> Recent work has proposed a software stack (BAS) that provides a fuzzy-query based interface as a level of 
+%>   indirection between protocol namespace and application code, allowing applications to be decoupled from building ``hardware''
+%> BAS is built on top of a driver-based architecture (BOSS) where each sensors (or sensor group) is *manually* registered
+%> Registration is tedious, error-prone, slow and difficult to verify and maintain (over time)
+%> In order to enable rapid application deployment, this manual process must be improved 
+
+In recent years, we have a seen a groundswell of research and commercial activity around to building
+analytics\cite{}.  Although there have been many promising analyitcal approaches to increase
+efficiencies, health, and comfort~\cite{}, widespread deployment is a major challenge.  Dawson-Haggerty~\cite{boss} et al.
+and Krioukov~\cite{bas} et al. address these concerns through a Building Operating System Service stack, whereby
+the underlying building sensor stock is presented to application through a driver-based model and the 
+BAS API and runtime provide a fuzzy-query based interface to the namespace exposed through the driver interface.
+Although this model certainly provides some of the necessary capabilities for easing generalizability across
+buildings, the driver registration process is still a manual process that can take weeks to complete;
+it is tedious, error-prone, and difficult to verify and maintain over time.  Even in non-BOSS/BAS based systems, manual
+translation between buildings is a major bottleneck, preventing widespread adoption of new algorithms and techniques.
+
+[Some information about related approaches]
+
+
+
+
+
+
 
 \begin{table}[h]
 \centering
