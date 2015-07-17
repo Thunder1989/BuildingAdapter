@@ -9,7 +9,7 @@ Although there have been many promising analyitcal approaches~\cite{}, widesprea
 major challenge.  Heterogeneity amongst buildings is pervasive and that diversity is reflected
 in the sensor stock and naming conventions used within and across different buildings.
 
-To address this concern, researchers have tried to address this non-unformity systematically.
+Researchers have tried to address this non-unformity systematically.
 Dawson-Haggerty et al.~\cite{boss} and Krioukov et al.~\cite{bas}
 introduce a Building Operating System Service stack, whereby
 the underlying building sensor stock is presented to applications through a driver-based model and 
@@ -32,20 +32,6 @@ buildings requires significant integration effort.
 
 %Non-BOSS/BAS based systems, manual
 %translation between buildings is a major bottleneck, preventing widespread adoption of new algorithms and techniques.
-
-Several researchers have started addressing this challenge using a variety of techniques.
-Bhattarcharya et al~\cite{arka} use a programming language based solution, 
-where they derive a set of regular expressions from a handful of labeled examples 
-to normalize the sensor point names. 
-%This approach assumes a consistent format for all point names, which is not the case in practice, as shown in Table~\ref{table:ex}. 
-Schumann et al~\cite{ibm} develop a probabilistic framework to classify sensor types 
-based on the similarity between a building's point names and entries in a manually constructed dictionary. 
-%However, the performance of this method is limited by the coverage and diversity of entries listed in the dictionary, and the dictionary size becomes intractable when there exist a lot of variations of the same type, or conflicting definitions of a dictionary entry in different buildings.
-Hong et al~\cite{cikm} formulate an active learning based approach to iteratively 
-acquire human labels for building sensors and propogate pseudo labels among points.
-All prior work is focused on normalization in the context of a single building.  Our work looks to 
-transfer the knowledge from one building to another, leveraging the information about the metadata that
-we learn in each building to improve the model, increase coverage, and maximize performance.
 
 %sensor metadata about the type, location, and relationships between the sensing 
 %and control units is usually inconsistent across buildings.
@@ -84,6 +70,8 @@ we learn in each building to improve the model, increase coverage, and maximize 
 %normalization nor leverages the knowledge from already labeled buildings.
 
 \subsection{Metadata Heterogeneity}
+
+
 \begin{table}[h]
 \centering
 \begin{tabular}{c|ll}
@@ -126,6 +114,22 @@ are used in across buildings. As shown in the table, the notion of {\em room tem
 with a different abbreviation in each of the three buildings: \texttt{Temp}, \texttt{RMT} and \texttt{ART}.
 Such variations across different buildings impose great difficulty on quickly deploying any software-based
 solution.
+
+Several researchers have started addressing this challenge using a variety of techniques.
+Bhattarcharya et al~\cite{arka} use a programming language based solution, 
+where they derive a set of regular expressions from a handful of labeled examples 
+to normalize the sensor point names. 
+%This approach assumes a consistent format for all point names, which is not the case in practice, as shown in Table~\ref{table:ex}. 
+Schumann et al~\cite{ibm} develop a probabilistic framework to classify sensor types 
+based on the similarity between a building's point names and entries in a manually constructed dictionary. 
+%However, the performance of this method is limited by the coverage and diversity of entries listed in the dictionary, and the dictionary size becomes intractable when there exist a lot of variations of the same type, or conflicting definitions of a dictionary entry in different buildings.
+Hong et al~\cite{cikm} formulate an active learning based approach to iteratively 
+acquire human labels for building sensors and propogate pseudo labels among points.
+All prior work is focused on normalization in the context of a single building.  Our work looks to 
+transfer the knowledge from one building to another, leveraging the information about the metadata that
+we learn in each building to improve the model, increase coverage, and maximize performance.
+
+
 %scaling up the same analytical process.
 
 
