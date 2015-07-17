@@ -26,7 +26,7 @@ one general type which includes all set points for every actuator configured in 
 Our evaluation data set containing both data and point names of sensor streams is collected from over 2,500 sensors of different types deployed in three commercial buildings. 
 We collected a week's worth of data from each building.
 Specially, Building A is the Rice Hall at the University of Virginia, where the sense points report to a database by Trane anywhere between every 10 seconds to every 10 minutes.
-Both building B and C are from UC Berkeley: B is the Sutardja Dai Hall with sensors and equippment from KETI~\cite{keti} and Siemens~\cite{bacnet}, while building C is the Soda Hall what uses an archaic system by Barrington Controls which is no longer in business. 
+Both building B and C are from UC Berkeley: B is the Sutardja Dai Hall with sensors and equippment from KETI\footnote{\url{http://www.keti.re.kr/}}  and Siemens~\cite{bacnet}, while building C is the Soda Hall what uses an archaic system by Barrington Controls which is no longer in business. 
 Points and sensors in these two buildings transmit data to an archiver~\cite{smap} periodically from anywhere between every 5 seconds to every 10 minutes.
 
 
@@ -71,7 +71,7 @@ implemented mostly in Python providing a rich set of APIs.
 \subsection{Base Classifiers and Baseline}
 \label{sec:baseline}
 Our transfer learning based approach exploits a few base classifiers. Each base classifier will be trained on the same set of data features from the source building in a general way, therefore there is no particular requirement on what classifiers should be selected here.
-Particularly, we employ three base classifiers: Ranfom forest, linear regression and support vector machines with RBF kernels.
+Particularly, we employ three base classifiers: ranfom forest, linear regression and support vector machines with RBF kernels.
 
 
 \begin{figure*}[ht!]
@@ -124,4 +124,4 @@ C & 1/2/3 & 1/2/3 & N/A   \\ \hline
 \subsection{Transfer Learning Accuracy}
 We investigate the overall accuracy of transfer learning for type classification across our three testing buildings. There are three pair of choices and for each pair the transferral can be done either way, therefore, we have six testing case. The classification results is illustrated in Figure~\ref{fig:tl_acc}.
 
-\subsection{Exploitation of Labels in the New Building}
+%\subsection{Exploitation of Labels in the New Building}

@@ -6,13 +6,13 @@ by looking for data sources outside the building data sets. We also discuss why 
 did not explore in depth and how the principal components can change from building to building.  Finally, we 
 explain how our misclassification identifier could be used to improve classification results.
 
-\subsection{Unlabeled Streams}
+\textbf{Unlabeled Streams}
 
-\subsection{Complementing Single Building Labeling}
+\textbf{Complementing Traditional Labeling}
 
-\subsection{Better Features for Base Classifiers}
-The learning and classification processes in our work relies only on a set of general features. However, we wish to explore how using external or domain-specific knowledge could help improve the classification accuracy. For instance, if we know the humidity in rooms will increase due to a rain forecast, then we could search for traces with increases in average in reading values as external knowledge to help identify humidity traces. 
+\textbf{Better Features for Classifiers}
+The performance of transfer learning and classification processes in our work is bounded by the base classifiers which rely only on a set of general features. The line of work to represent time series with discretized symbols (e.g., the SAX~\cite{sax}) or primitive ``shapes'' (e.g., the ``shapelets''~\cite{shapelet1, shapelet2}) doesn't work well for our problem due to the variability in ``shapes'' and unpredictable human noises. There, we wish to explore how using external or domain-specific knowledge could help improve the classification accuracy. 
 
-\subsection{New Weighting Functions for Ensemble}
+\textbf{Multiple Buildings as Source}
 
 
