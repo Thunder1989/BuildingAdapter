@@ -3,45 +3,37 @@
 To incentivize the reduction of building energy consumption, the U.S. government 
 launched the Better Buildings Challenge to make buildings at least 20 percent 
 more efficient by 2020~\cite{doe2013better}. To achive this goal, many organizations 
-are applying data analytics to the thousands of sensing and control points in 
-a typical commercial building to detect wasteful and incorrect operations. These 
-complicated analytical processes have proven to be useful and effective on 
-a single building, however, an important issue remains that how to make such a process 
-generalizable to multiple buildings in a scalable manner. [FIX] need some transition 
-before ``however" talking about why we want to port these processes from buildings 
-to buildings. On the one hand, analytics-based processes are \emph{tightly coupled} 
-to sensors of certain types or locations for each building; on the other hand, 
-sensor metadata about the type, location, and relationships between the sensing 
-and control units is usually inconsistent across buildings. Therefore, implanting 
-these analytical processes requires the correspondence between different naming 
-conventions be identified and points be mapped to the inputs of these processes 
-before any further analysis is viable. For instance, if A company wants to execute their 
-control loops on a building contracted by B company, A needs to first manually 
-figure out the mapping of the same type of points between B's system and 
-their own system. This process alone can literally take weeks and is proportional 
-to the number of points required in the service. Running the same software across 
+are applying data analytics to the thousands of sense and control points in 
+buildings to detect wasteful, incorrect, and unhealthy operation.  
+Although there have been many promising analyitcal approaches~\cite{}, widespread deployment is a 
+major challenge.  Heterogeneity amongst buildings is widespread and that diversity is reflected
+in the sensor stock and naming conventions used within and across different buildings.
+
+To address this concern, researchers have tried to address this non-unformity systematically.
+Dawson-Haggerty et al.~\cite{boss} and Krioukov et al.~\cite{bas}
+introduce a Building Operating System Service stack, whereby
+the underlying building sensor stock is presented to applications through a driver-based model and 
+an application stack 
+provides a fuzzy-query based interface to the namespace exposed through the driver interface.
+Although this architecture provides some of the necessary capabilities for easing generalizability across
+buildings, the driver registration process is still done manually. This process is tedious, error-prone, 
+and especially difficult to verify and maintain over time.  
+Analytical processes are \emph{tightly coupled} to the sensors and their naming conventions in each building. 
+Sensor metadata about the type, location, and relationships between the sensing 
+and control units is mostly inconsistent across buildings.
+Analytical processes require the correspondence between different naming 
+conventions, so that points can be mapped to the inputs of these processes.
+For instance, if company A wants to execute their 
+control loops on a building contracted by company B, A needs to manually 
+map the points between A and B's system. This process can take weeks and is proportional 
+to the number of points that need to be used by the process. Running the same software across 
 buildings requires significant integration effort.
 
-%> Lots of innovation in the building application space (much promise to bridge the gap between cyber and physical for increased efficency and comfort)
-%> Building applications are written against the protocol-guided, building-specific namespaces (LonTalk, Bacnet, OPC)
-%> Recent work has proposed a software stack (BAS) that provides a fuzzy-query based interface as a level of 
-%>   indirection between protocol namespace and application code, allowing applications to be decoupled from building ``hardware''
-%> BAS is built on top of a driver-based architecture (BOSS) where each sensors (or sensor group) is *manually* registered
-%> Registration is tedious, error-prone, slow and difficult to verify and maintain (over time)
-%> In order to enable rapid application deployment, this manual process must be improved 
 
-In recent years, we have a seen a groundswell of research and commercial activity around to building
-analytics\cite{}.  Although there have been many promising analyitcal approaches to increase
-efficiencies, health, and comfort~\cite{}, widespread deployment is a major challenge.  Dawson-Haggerty~\cite{boss} et al.
-and Krioukov~\cite{bas} et al. address these concerns through a Building Operating System Service stack, whereby
-the underlying building sensor stock is presented to application through a driver-based model and the 
-BAS API and runtime provide a fuzzy-query based interface to the namespace exposed through the driver interface.
-Although this model certainly provides some of the necessary capabilities for easing generalizability across
-buildings, the driver registration process is still a manual process that can take weeks to complete;
-it is tedious, error-prone, and difficult to verify and maintain over time.  Even in non-BOSS/BAS based systems, manual
-translation between buildings is a major bottleneck, preventing widespread adoption of new algorithms and techniques.
+%Non-BOSS/BAS based systems, manual
+%translation between buildings is a major bottleneck, preventing widespread adoption of new algorithms and techniques.
 
-As such, there has been some recent work in this area.
+There has been some recent work in this area.
 Bhattarcharya et al~\cite{arka} use a programming language based solution, 
 where they derive a set of regular expressions from a handful of labeled examples 
 to normalize the point name of sensors. 
@@ -53,7 +45,40 @@ Hong et al~\cite{cikm} formulate an active learning based approach to iterativel
 acquire human labels for building sensors and propogate pseudo labels among points.
 All prior work is focused on normalization in the context of a single building.  Our work looks to 
 transfer the knowledge from one building to another, leveraging the information about the metadata that
-we learn in each building to improve the model, increase coverage, and maximize performance.
+we learn in each building to improve the model, increase coverage, and maximize performan
+
+%sensor metadata about the type, location, and relationships between the sensing 
+%and control units is usually inconsistent across buildings.
+
+%These 
+%complicated analytical processes have proven to be useful and effective on 
+%a single building, however, an important issue remains that how to make such a process 
+%generalizable to multiple buildings in a scalable manner. [FIX] need some transition 
+%before ``however" talking about why we want to port these processes from buildings 
+%to buildings. On the one hand, analytics-based processes are \emph{tightly coupled} 
+%to sensors of certain types or locations for each building; on the other hand, 
+%sensor metadata about the type, location, and relationships between the sensing 
+%and control units is usually inconsistent across buildings. Therefore, implanting 
+%these analytical processes requires the correspondence between different naming 
+%conventions be identified and points be mapped to the inputs of these processes 
+%before any further analysis is viable. For instance, if A company wants to execute their 
+%control loops on a building contracted by B company, A needs to first manually 
+%figure out the mapping of the same type of points between B's system and 
+%their own system. This process alone can literally take weeks and is proportional 
+%to the number of points required in the service. Running the same software across 
+%buildings requires significant integration effort.
+
+%> Lots of innovation in the building application space (much promise to bridge the gap between cyber and physical for increased efficency and comfort)
+%> Building applications are written against the protocol-guided, building-specific namespaces (LonTalk, Bacnet, OPC)
+%> Recent work has proposed a software stack (BAS) that provides a fuzzy-query based interface as a level of 
+%>   indirection between protocol namespace and application code, allowing applications to be decoupled from building ``hardware''
+%> BAS is built on top of a driver-based architecture (BOSS) where each sensors (or sensor group) is *manually* registered
+%> Registration is tedious, error-prone, slow and difficult to verify and maintain (over time)
+%> In order to enable rapid application deployment, this manual process must be improved 
+
+%In recent years, we have a seen a groundswell of research and commercial activity around to building
+%analytics\cite{}.  Although there have been many promising analyitcal approaches to increase
+%efficiencies, health, and comfort~\cite{}, widespread deployment is a major challenge.  ce.
 
 %None of these address the scalability issue of metadata 
 %normalization nor leverages the knowledge from already labeled buildings.
