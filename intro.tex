@@ -41,12 +41,22 @@ buildings, the driver registration process is still a manual process that can ta
 it is tedious, error-prone, and difficult to verify and maintain over time.  Even in non-BOSS/BAS based systems, manual
 translation between buildings is a major bottleneck, preventing widespread adoption of new algorithms and techniques.
 
-[Some information about related approaches]
+As such, there has been some recent work in this area.
+Bhattarcharya et al~\cite{arka} use a programming language based solution, 
+where they derive a set of regular expressions from a handful of labeled examples 
+to normalize the point name of sensors. 
+%This approach assumes a consistent format for all point names, which is not the case in practice, as shown in Table~\ref{table:ex}. 
+Schumann et al~\cite{ibm} develop a probabilistic framework to classify sensor types 
+based on the similarity of a raw point names to the entries in a manually constructed dictionary. 
+%However, the performance of this method is limited by the coverage and diversity of entries listed in the dictionary, and the dictionary size becomes intractable when there exist a lot of variations of the same type, or conflicting definitions of a dictionary entry in different buildings.
+Hong et al~\cite{cikm} formulate an active learning based approach to iteratively 
+acquire human labels for building sensors and propogate pseudo labels among points.
+All prior work is focused on normalization in the context of a single building.  Our work looks to 
+transfer the knowledge from one building to another, leveraging the information about the metadata that
+we learn in each building to improve the model, increase coverage, and maximize performance.
 
-
-
-
-
+%None of these address the scalability issue of metadata 
+%normalization nor leverages the knowledge from already labeled buildings.
 
 
 \begin{table}[h]
