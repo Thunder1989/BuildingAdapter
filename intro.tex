@@ -2,14 +2,14 @@
 
 To incentivize the reduction of building energy consumption, the U.S. government 
 launched the Better Buildings Challenge to make buildings at least 20 percent 
-more efficient by 2020~\cite{doe2013better}. To achive this goal, many organizations 
+more efficient by 2020~\cite{doe2013better}. To achieve this goal, many organizations 
 are applying data analytics to the thousands of sense and control points in 
 buildings to detect wasteful, incorrect, and unhealthy operation.  
-Although there have been many promising analyitcal approaches~\cite{}, widespread deployment is a 
+Although there have been many promising analytical approaches~\cite{}, widespread deployment is a 
 major challenge.  Heterogeneity amongst buildings is pervasive and that diversity is reflected
 in the sensor stock and naming conventions used within and across different buildings.
 
-Researchers have tried to address this non-unformity systematically.
+Researchers have tried to address this non-uniformity systematically.
 Dawson-Haggerty et al.~\cite{boss} and Krioukov et al.~\cite{bas}
 introduce a Building Operating System Service stack, whereby
 the underlying building sensor stock is presented to applications through a driver-based model and 
@@ -123,7 +123,7 @@ Schumann et al~\cite{ibm} develop a probabilistic framework to classify sensor t
 based on the similarity between a building's point names and entries in a manually constructed dictionary. 
 %However, the performance of this method is limited by the coverage and diversity of entries listed in the dictionary, and the dictionary size becomes intractable when there exist a lot of variations of the same type, or conflicting definitions of a dictionary entry in different buildings.
 Hong et al~\cite{cikm} formulate an active learning based approach to iteratively 
-acquire human labels for building sensors and propogate pseudo labels among points.
+acquire human labels for building sensors and propagate pseudo labels among points.
 All prior work is focused on normalization in the context of a single building.  Our work looks to 
 transfer the knowledge from one building to another, leveraging the information about the metadata that
 we learn in each building to improve the model, increase coverage, and maximize performance.
@@ -142,7 +142,7 @@ Because the sensor types in different buildings
 overlap considerably (e.g., all buildings have temperature sensors installed),
 we can leverage the knowledge about the labels in one building to 
 help normalize the labels in another.
-To bridge the gap between naming conventions for differnt buildings, we envison 
+To bridge the gap between naming conventions for different buildings, we envision 
 a system that infers the metadata about sense and control points to construct a normalized 
 common standard.
 %based on the knowledge extracted from existing normalized buildings. 
@@ -178,7 +178,7 @@ Our approach is explicitly designed to \emph{minimize manual labeling} throughou
 %Based on our observation, the transferral of ``knowledge'' is feasible because 
 Fundamentally, transferring type-related ``knowledge'' is achievable because
 features in the actual timeseries data of streams are common 
-across buidlings, even when point names are drastically different. For instance, room temperature 
+across buildings, even when point names are drastically different. For instance, room temperature 
 readings in all buildings are largely in the range of 60-70 Fahrenheit degree while 
 the point names of temperature points can vary substantially, as shown in
 Table~\ref{table:ex}.
@@ -191,6 +191,6 @@ contributions in this paper are:
 
 \begin{itemize}\itemsep1pt \parskip1pt \parsep0pt
 \item We empirically analyze how data and the point names of the streams can be transferred for classification across buildings.
-\item We propose a novel, effective, yet general transfer-learning approach by exploiting domain knowledge learnt from an existing building to help the infer information in another building.
+\item We propose a novel, effective, yet general transfer-learning approach by exploiting domain knowledge learnt from an existing building to help infer information in another building.
 \item We evaluate our proposed solution using real data and metadata from over 20 different sensor types and 3,000 sensors in three different commercial buildings.  Our solution can automatically label at least xx\% of the streams with more than yy\% accuracy without human intervention.
 \end{itemize}

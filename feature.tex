@@ -1,6 +1,6 @@
-\section{Feature Representation and Tranferability}
+\section{Feature Representation and Transferability}
 Two common aspects of the sensor points in a building are the actual data readings and the text string-based point names. Both play an important role for differentiating sensor types.
-In this section, we elaborate the construction of two different sets of feature vectors (i.e., data features and name features) and empirically discuss how each of them transfers across buidlings in classifying sensor \emph{type}.
+In this section, we elaborate the construction of two different sets of feature vectors (i.e., data features and name features) and empirically discuss how each of them transfers across buildings in classifying sensor \emph{type}.
 
 \begin{figure*}[ht!]
 \centering
@@ -40,7 +40,7 @@ In this section, we elaborate the construction of two different sets of feature 
 \end{figure*}
 
 \subsection{Data Features}
-Raw sensor time series\footnote{In this paper, we use the term ``trace'' and ``time series'' \textit{interchangeably}.} usually contain millions of readings which are too many to be useful for type classification. We need to distill the information embedded in the reading patterns.
+Raw sensor time series\footnote{In this paper, we use the term ``trace'' and ``time series'' \textit{interchangeably}.} usually contain millions of readings which are too many to be useful for type classification. We need to distil the information embedded in the reading patterns.
 A signal in the time domain trends the sensor reading and different types of sensor generally occupy distinct amplitude bins, as demonstrated in Figure~\ref{fig:example}. 
 We characterize the distribution of a signal in the time domain with standard statistical features, such as the 50th percentile value (also known as the median) as discriminators. 
 Table~\ref{table:fd} summarizes the statistical features we used to represent each stream. 
@@ -50,7 +50,7 @@ Table~\ref{table:fd} summarizes the statistical features we used to represent ea
 \centering
 \begin{tabular}{r|l|l}
 \hline
-Category                   & Statistical Funciton & \multicolumn{1}{l}{Acronym} \\ \hline\hline
+Category                   & Statistical Function & \multicolumn{1}{l}{Acronym} \\ \hline\hline
 \multirow{2}{*}{Extreme}   & Minimum                 & min                          \\ \cline{3-3} 
                            & Maximum                 & max                          \\ \hline
 \multirow{2}{*}{Average}   & Median                  & emd                          \\ \cline{3-3} 
@@ -67,7 +67,7 @@ Shape                      & Linear Regression Slope & slope                    
 \end{table}
 
 
-We segment each sensor readings into an hour-long windows and extract the above features within each windsow. 
+We segment each sensor readings into an hour-long windows and extract the above features within each window. 
 However, computing features over these short time windows will produce too much information as well as noise; too many feature variables typically degrades classifier performance.
 To succinctly summarize the dynamics of sensor traces, we compute the statistics of the accumulated features from windowed slices as the final feature set. 
 We construct our feature vector as follows: first, each sensor trace is segmented into N non-overlapping one-hour long windows. Second, within each time window, we compute the statistics as in the above table for the trace, producing a vector of each statistical feature after the window slides over the entire trace, such as 
@@ -100,10 +100,10 @@ For example, a set of k-mers \texttt{\{zon, tem, emp, zon\}} will be transformed
 This feature representation of point names will be used for examining classification performance.
 
 \subsection{Transferability}
-Now with the two differet types of features explained, we examine how well both can perform in classifying sensor types when applied across buildings, i.e., learning a classifier based on the features from building A and testing it on building B. 
+Now with the two different types of features explained, we examine how well both can perform in classifying sensor types when applied across buildings, i.e., learning a classifier based on the features from building A and testing it on building B. 
 Intuitively, data features should be more generalizable than point names with respect to differentiating points by types. 
-This is because in general a certain type of sensors will share commonatiliteis in reading amplitude and trend, such as diurnal patterns. 
-For exmaple, temperature readings in a building will be between 60-70 degree with rises in the morning and falls at night.
+This is because in general a certain type of sensors will share commonality in reading amplitude and trend, such as diurnal patterns. 
+For example, temperature readings in a building will be between 60-70 degree with rises in the morning and falls at night.
 In contrast, point name features might not transfer well due to various naming conventions across buildings as shown in Table~\ref{table:ex}.
 Although k-mers can enlarge the size of term dictionary in a building to increase the chance of covering more terms in other buildings, such a technique still cannot fundamentally compensate for the difference in naming conventions.
 
