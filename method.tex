@@ -2,6 +2,107 @@
 In this work, we employ a transfer learning to classify sensor types for a building with the knowledge from another labeled building. Both data features and name features are used to accomplish the classification task: an ensemble of base learners are constructed with data features and applied to the other building because data features transfer across buildings, while the clustering structure on name features in the other building is exploited to help determine which base classifier should contribute more in predictions. 
 To accommodate the variations in point names, we appeal to a non-parametric Bayesian approach to identify the clustering structure.
 
+\subsection{Feature Representation}
+Two common aspects of the sensor points in a building are the actual data readings and the text string-based point names. Both play an important role for differentiating sensor types.
+In this section, we elaborate the construction of two different sets of feature vectors (i.e., data features and name features) and empirically discuss how each of them transfers across buildings in classifying sensor \emph{type}.
+
+\begin{figure*}[ht!]
+\centering
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/co2.eps}
+                \caption{$CO_{2}$}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/rh.eps}
+                \caption{Humidity}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/rmt.eps}
+                \caption{Room Temperature}
+  \end{subfigure}
+  %row2
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/stpt.eps}
+                \caption{Room Temperature Set Point}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/vav.eps}
+                \caption{VAV Air Volume}
+  \end{subfigure}
+  \begin{subfigure}{0.32\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/cwt.eps}
+                \caption{Chilled Water Supply Temperature}
+  \end{subfigure}
+\caption{Different types of sensors occupy different amplitude bins in the time domain with different short term dynamics.}
+\label{fig:example}
+\end{figure*}
+
+\subsubsection{Data Features}
+Raw sensor time series\footnote{In this paper, we use the term ``trace'' and ``time series'' \textit{interchangeably}.} usually contain millions of readings which are too many to be useful for type classification. We need to distil the information embedded in the reading patterns.
+A signal in the time domain trends the sensor reading and different types of sensor generally occupy distinct amplitude bins, as demonstrated in Figure~\ref{fig:example}. 
+We characterize the distribution of a signal in the time domain with standard statistical features, such as the 50th percentile value (also known as the median) as discriminators. 
+Table~\ref{table:fd} summarizes the statistical features we used to represent each stream. 
+
+
+\begin{table}[h]
+\centering
+\begin{tabular}{r|l|l}
+\hline
+Category                   & Statistical Function & \multicolumn{1}{l}{Acronym} \\ \hline\hline
+\multirow{2}{*}{Extreme}   & Minimum                 & min                          \\ \cline{3-3} 
+                           & Maximum                 & max                          \\ \hline
+\multirow{2}{*}{Average}   & Median                  & emd                          \\ \cline{3-3} 
+                           & Root Mean Square        & rms                          \\ \hline
+\multirow{2}{*}{Quartiles} & 1st and 3rd Quartiles   & 1q, 3q                       \\ \cline{3-3} 
+                           & Inter-quartile range    & iqr                          \\ \hline
+\multirow{3}{*}{Moments}   & Variance                & var                          \\ \cline{3-3} 
+                           & Skewness                & skew                         \\ \cline{3-3} 
+                           & Kurtosis                & kurt                         \\ \hline
+Shape                      & Linear Regression Slope & slope                        \\ \hline
+\end{tabular}
+\caption{Statistical features extracted in window level for each time series data.}
+\label{table:fd}
+\end{table}
+
+
+We segment each sensor readings into an hour-long windows and extract the above features within each window. 
+However, computing features over these short time windows will produce too much information as well as noise; too many feature variables typically degrades classifier performance.
+To succinctly summarize the dynamics of sensor traces, we compute the statistics of the accumulated features from windowed slices as the final feature set. 
+We construct our feature vector as follows: first, each sensor trace is segmented into N non-overlapping one-hour long windows. Second, within each time window, we compute the statistics as in the above table for the trace, producing a vector of each statistical feature after the window slides over the entire trace, such as 
+$MIN = \{min^{1}, min^{2}, ..., min^{N}\}$, where N is the number of time windows. Each vector (such as this $MIN$) reflects short term changes but not all the intermediate values are useful for classification. 
+Finally, we compute a statistical summary of these vectors. For each vector we compute the minimum, maximum, median and variance, resulting in a feature vector containing 44 variables:
+\begin{displaymath}
+\begin{split}
+F = \{min(MIN), max(MIN), median(MIN), var(MIN),\\
+...\\
+min(SLOPE), max(SLOPE), median(SLOPE), var(SLOPE)\}
+\end{split}
+\end{displaymath}
+$F$ is the data feature vector for each sensor trace used in our study.
+
+
+\subsubsection{Name Features}
+The sensor point names are short text strings with several concatenated abbreviations, as shown in our motivating example in Table~\ref{table:ex}. 
+To represent the primitive point names as feature vectors for classifier training, we first convert all point names to lower cases and trim out the numerical characters in each point name, resulting in a series of words, e.g., \texttt{Zone Temp 2 RMI204} becomes \texttt{\{zone, temp, rmi\}}. 
+To capture possible variants of abbreviations in point names, e.g., ``tmp'' and ``temp'' for temperature, we adopt $k$-mers \cite{leslie2004mismatch} as our features. 
+The term $k$-mer refers to all the possible substrings of length $k$, which are contained in a string. This feature is popularly used in protein and gene sequence analysis in bioinformatics, and it helps measure sequence similarity without requiring alignment. 
+
+In our case, we limit the k-mers computation only within a word boundary.
+In general, having a too small $k$ will increase the chance for all the k-mers to overlap, making all the points less differentiable.
+Therefore, we compute all k-mers of length 3 and 4 for each point name.
+For example, \texttt{\{zone, temp, rmi\}} will yield a set of k-mers \texttt{\{zon, one, tem, emp, rmi\}} with $k$=3.
+A dictionary of k-mers is constructed with all the k-mers generated from each point name. 
+Each point name is converted into a feature vector based on the frequency of k-mers in it. 
+For example, a set of k-mers \texttt{\{zon, tem, emp, zon\}} will be transformed to a vector
+\texttt{(2,0,1,1,0)} with the dictionary \texttt{\{zon, one, tem, emp, rmi\}}, meaning \texttt{zon} occurs twice, \texttt{one} doesn't appear, and so forth. 
+This feature representation of point names will be used for examining classification performance.
+
 
 \subsection{Knowledge Transfer}
 The use of transfer learning is motivated by the fact that people often have one or only a few buildings labeled of which they want to take advantage to aid the labeling of a new buidling.
@@ -119,20 +220,6 @@ where $\alpha={\alpha}_{c=1}^\infty\sim Stick(\eta)$ represents the proportion o
 
 Because the data density distribution defined in Eq~\eqref{eq_dp_density} only has finite support at the points of $\{\alpha_c, \mu_c\}^k_{c=1}$, we can calculate the posterior distribution of latent cluster labels in each unlabeled instance to discover the clustering structure. Following the sampling scheme proposed in \cite{neal2000markov}, we appeal to a Gibbs sampling method to infer the posterior of cluster membership. Detailed specifications of this sampling algorithm can be found in \cite{neal2000markov}.
 
-\subsubsection{Features for Clustering}
-We use point name features to generate clusters for the new building. In general, point names following the same pattern would not vary too much, which will yield clusters of higher quality than data features.
-Table~\ref{quality} shows the quality of clusters generated by DP with data features and name features measured by rand index~\cite{rand}. Rand index is a standard measure of the similarity between the grouping in clusters and the true labels.
-
-\begin{table}[h]
-\centering
-\begin{tabular}{l|c|c}
-\hline
-                & Data Feature & Name Feature \\ \hline
-Rand Index & 0.34       & 0.75       \\ \hline
-\end{tabular}
-\caption{Quality of clusters generated with different features measure by rand index (in the range [0,1], higher is better).}
-\label{quality}
-\end{table}
 
 {\bf Putting it all together:} Algorithm~\ref{algo} summarizes our transfer learning algorithm for the sensor type classification across buildings. We start from training a few base classifiers with the data features and labels of examples in a source building. We also generate clusters with DP on the name features of examples in the target building. For each example $x$ in the target building, we measure the local similarity score for each base classifier. If the average similarity is significant enough, we compute the weight for each classifier at $x$ by normalizing the similarity score. Finally we calculate the weighted sum of predictions from all base classifier and obtain the label $y$ for $x$.
 
