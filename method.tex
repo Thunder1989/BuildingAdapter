@@ -2,7 +2,7 @@
 In this work, we employ a transfer learning to classify sensor types for a building with the knowledge from another labeled building. Both data features and name features are used to accomplish the classification task: an ensemble of base learners are constructed with data features and applied to the other building because data features transfer across buildings, while the clustering structure on name features in the other building is exploited to help determine which base classifier should contribute more in predictions. 
 To accommodate the variations in point names, we appeal to a non-parametric Bayesian approach to identify the clustering structure.
 
-\subsection{Feature Representation}
+\subsection{Feature Representation}\label{feature}
 Two common aspects of the sensor points in a building are the actual data readings and the text string-based point names. Both play an important role for differentiating sensor types.
 In this section, we elaborate the construction of two different sets of feature vectors (i.e., data features and name features) and empirically discuss how each of them transfers across buildings in classifying sensor \emph{type}.
 
