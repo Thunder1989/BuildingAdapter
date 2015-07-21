@@ -39,35 +39,9 @@ Dezhi Hong$^1$,  Hongning Wang$^1$,  Kamin Whitehouse$^1$, Jorge Ortiz$^2$\\
 
 \maketitle
 \begin{abstract}
-%Buildings consume a large amount of the energy produced in the United States and much of it is wasted. 
-Many sensors/meters are deployed in commercial buildings to monitor and optimize their performance.  
-However, because sensor metadata is inconsistent across buildings, software-based
-solutions are \emph{tightly coupled} to the sensor metadata conventions (i.e. schemas and naming) for each building. 
-% -- used for sensors in each
-% specific building.  It impossible to create widely deployable software-based solutions that run across
-% buildings without significant integration effort.
-% , sometimes even missing, which makes scalable, meaningful large-scale applitions in 
-% buildings impractical.
-Running the same software across buildings requires significant integration effort.
 
-% Metadata normalization is critical for scaling the software deployment process.  It allows us to
-% \emph{decouple} building-specific conventions from the code written for building applications.
-% In this context, normalization is non-trivial and requires a we believe it requires suite of solutions.  We assert that one such component of 
-% that suite should differentiate sensor feeds by \emph{type}.  For example, we should be able to differentiate between sensors measuring 
-% temperature and sensors measuring pressure.  In addition, we should be able to use what we learn from one building and apply
-% it to another.
+TBW
 
-Metadata normalization is critical for scaling the deployment process and allows us to \emph{decouple} building-specific conventions 
-from the code written for building applications.  It also allows us to deal with \emph{missing} metadata.  One important aspect of 
-normalization is to differentiate sensors by the \emph{type}
-of phenomena being observed.
-In this paper, we propose a general, simple, yet effective classification scheme to differentiate sensors in buildings by type.
-We perform ensemble learning on data collected from over 2000 sensor streams in two buildings.
-Our approach is able to achieve more than 92\% accuracy for classification within buildings and more than 82\% accuracy for across buildings. 
-We also introduce a method for identifying potential misclassified streams.  This is important because it allows us to identify opportunities to 
-attain more input from experts -- input that could help improve classification accuracy when ground truth is unavailable.  We show that
- % which can be used to help improve classification accuracy when the ground truth labels are not available. 
-by adjusting a threshold value we are able to identify at least 30\% of the misclassified instances.
 \end{abstract}
 
 \category{C.3}{Special-Purpose And Application-Based Systems}{Real-time and embedded systems}
