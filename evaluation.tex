@@ -1,6 +1,6 @@
 \section{Evaluation}
 To investigate the effectiveness of our method, we evaluate our transfer learning based classification technique on actual data and point names of sensors from three commercial buildings. Extensive experiments demonstrate that our technique is able to accurately classify by type for a considerable portion of examples without human intervention. 
-To further demonstrate what the technique is useful for, we combine the transfer learning with traditional labeling process to accelerate the learning speed.
+To further demonstrate what the usefulness of the technique, we combine transfer learning with the traditional labeling process to accelerate the learning speed.
 
 
 \subsection{Taxonomy and Data Collection}
@@ -12,9 +12,9 @@ To further demonstrate what the technique is useful for, we combine the transfer
 \end{figure}
 
 Figure~\ref{fig:hvac} illustrates a typical heating, ventilation, and air conditioning (HVAC) system deployed in modern commercial buildings. 
-An HVAC system usually uses a combination of hot and cold water pipes in conjunction with
+An HVAC system uses a combination of hot and cold water pipes in conjunction with
 air handler units (AHU) to maintain the appropriate thermal environment within the building.
-An HAVC system usually consists of several AHUs and each AHU is responsible for a physical zone
+An HVAC system typically consists of several AHUs and each AHU is responsible for a spatial \emph{zone}
 in the building. An AHU consists of variable speed drives that supply cold air
 (cooled by the supplied cold water) using ducts to VAV boxes distributed throughout the building.
 The hot water loop is also connected to these VAV boxes using separate pipes. Each VAV box
@@ -22,14 +22,18 @@ controls the amount of air to be let into an HVAC zone using dampers, whose open
 can be programmed. A reheat coil, which uses supplied hot water, is used to heat the air to
 meet the appropriate HVAC settings for each zone.
 
-Table~\ref{table:num} summarizes all the types of sensors evaluated in our analysis in these three buildings and the number of sensors of each type. ``Room temperature'' measures the temperature in room and for a better understanding, all the other temperature measurements on water circulation and air ventilation are illustrated in Figure~\ref{fig:hvac}. For setpoints, we assign only
-one general type which includes all set points for every actuator configured in the building.
+Table~\ref{table:num} summarizes all the types of sensors evaluated in our analysis in these three buildings and the number of sensors of each type. 
+``Room temperature'' measures the temperature in room. The other temperature measurements for water circulation and air ventilation are illustrated in Figure~\ref{fig:hvac}. 
+For setpoints, are grouped together into
+one general type. % which includes all set points for every actuator configured in the building.
 
-Our evaluation data set containing both data and point names of sensor streams is collected from over 2,500 sensors of different types deployed in three commercial buildings. 
+Our evaluation dataset, which contains both data and point names of sensor streams, is collected from over 2,500 sensors of different types deployed in three commercial buildings. 
 We collected a week's worth of data from each building.
-Specifically, Building A is the Rice Hall at the University of Virginia, where the sensing points report to a database by Trane anywhere between every 10 seconds to every 10 minutes.
-Both building B and C are from UC Berkeley: B is the Sutardja Dai Hall with sensors and equipment from KETI\footnote{\url{http://www.keti.re.kr/}} and Siemens, while building C is the Soda Hall that uses an archaic system by Barrington Controls which is no longer in business. 
-Points and sensors in these two buildings transmit data to an archiver~\cite{smap} periodically from anywhere between every 5 seconds to every 10 minutes.
+Building A is Rice Hall at the University of Virginia, where the sense points report to a database component in a Trane BMS, % anywhere between 
+every 10 seconds to 10 minutes.
+Both building B and C are from UC Berkeley: B is Sutardja Dai Hall, which contains sensors and equipment from KETI\footnote{\url{http://www.keti.re.kr/}} and Siemens. 
+Building C is Soda Hall, which that uses an archaic system by Barrington Controls which is no longer in business. 
+Points and sensors in these two buildings transmit data to an sMAP~\cite{smap} archiver periodically between every 5 seconds to 10 minutes.
 
 
 \begin{table}[t]
@@ -67,8 +71,8 @@ Sum & 575 & 1124 & 1166\\ \hline
 \end{table}
 
 
-All of our learning and classification processes are implemented based on the scikit-learn~\cite{scikit} library, which is an open-source machine learning package 
-implemented mostly in Python providing a rich set of APIs.
+All of our learning and classification processes are implemented with the scikit-learn~\cite{scikit} library; an open-source machine learning package 
+implemented in Python. % providing a rich set of APIs.
 
 
 \subsection{Feature Transferability}
