@@ -187,8 +187,9 @@ C & 0.582/0.299/0.421 & 0.393/0.158/0.190 & N/A   \\ \hline
 
 \subsubsection{Base Classifiers and Performance}
 \label{sec:baseline}
-Our transfer learning based approach employs a few base classifiers. Each base classifier will be trained on the same set of data features from the source building in a general way, therefore there is no particular requirement on what classifiers should be selected here.
-Particularly, we employ three base classifiers: random forest, linear regression (LR) and support vector machines (SVM) with RBF kernels.
+Our transfer learning based approach employs a few base classifiers. Each base classifier is trained on the same set of data features from the source building. There is no particular requirement on 
+what classifiers should be selected in this step.  
+We employ three base classifiers: random forest, linear regression (LR) and support vector machines (SVM) with RBF kernels.
 
 
 \begin{table*}[]
@@ -206,26 +207,30 @@ C                 & 0.862/0.862     & 0.864/0.864     & 0.726/0.702      & 0.691
 \end{table*}
 
 For the three buildings, we have three pairs of choices and for each pair the training/testing can be conducted either way; therefore, we have six testing cases.
-The performance of the base classifiers when applied across buildings is shown in Table~\ref{acc_base}, the base classifiers achieve the accuracy anywhere between 0.158 and 0.921.
+The performance of the base classifiers when applied across buildings is shown in Table~\ref{acc_base}.  The base classifiers achieve an accuracy between 0.158 and 0.921.
 On average, random forest performs the best, followed by SVM and LR. 
-We notice the accuracy of learning on building C and testing on building B is substantially worse than the other cases. 
-One reason is because building B contains lots of dynamic temperature setpoints whose values change over the day whereas the setpoints in C are static. The other type is air flow whose reading amplitude is significantly different from the ones in C. These two types contribute to most of the errors in this case.
+Notice, the accuracy of learning on building C and testing on building B is substantially worse than the other cases. 
+One reason is because building B contains many dynamic temperature setpoints whose values change throughout the day, whereas the setpoints in C are static. 
+The other type is air flow, whose reading amplitude is significantly different from the ones in C. These two types contribute to most of the errors. %in this case.
 
 
 \subsubsection{Single Building as the Source}
-We first consider the case where only one building is exploited as the knowledge transfer source, i.e., each base classifier is trained on data from only one building. 
-The overall accuracy of transfer learning for type classification across our three testing buildings are illustrated in Figure~\ref{fig:tl_acc}.
+We first consider the case where only one building is as the source, i.e., each base classifier is trained on data from only one building. 
+The overall accuracy of transfer learning for type classification across our three target buildings are illustrated in Figure~\ref{fig:tl_acc}.
 There is an intrinsic trade-off between the prediction accuracy and the percentage being labeled, as we set a threshold on the average weight of base classifiers. 
-As expected, when we increase the threshold $\delta$ on the average weight for base classifiers, we have labels of better quality with a drop in the percentage of examples being labeled. 
+When we increase the threshold $\delta$ on the average weight for base classifiers, we have labels of better quality -- with a drop in the percentage of examples being labeled. 
 Empirically, we can set the threshold $\delta$ be around 0.4, which strikes a reasonable balance between accuracy and coverage.
 
-On such imbalanced data sets, investigation of accuracy only is not enough. We also measure the weighted macro F1 score of classification for our approach and the baseline. The weighted macro F1 score is an altered version of macro F1 score~\cite{yang}, which calculates the F1 score for each class, where ``one-versus-all'' binary classification is performed, and weight the resulting F1 of each class by support (the number of true instances for each label). 
+On imbalanced data sets, investigation of accuracy alone is not enough. We also measure the weighted macro F1 score of 
+classification for our approach and the baseline. The weighted macro F1 score is an altered version of macro F1 score~\cite{yang}, 
+which calculates the F1 score for each class; where ``one-versus-all'' binary classification is performed and weighs the resulting F1 of each class by support (the number of true instances for each label). 
 
-As a baseline to compare our proposed approach against, we take the subset of examples in the new building that get labeled by the transfer learning process, and apply base classifiers to predict labels on the same population. 
-Particularly, we take the choice of 0.4 for the threshold $\delta$. 
-We repeat 10 times for the experiment in each direction (e.g., A->B) and the average of the resuls is reported in Table~\ref{table:f1}. 
-Each cell contains two numbers: the former is for our approach while the latter is from the {\it best} baseline.
-The case of transferring from C to B is again substantially worse than other cases, this is because the transfer learning algorithm is fundamentally bounded by the performance of base classifiers. Intuitively, if none of the base classifier is able to predict correctly for an instance, no matter how we manipulate the weights will not make a difference.
+As a baseline, we take the subset of examples in the new building that get labeled by the transfer learning process and apply base classifiers to predict labels on the same population. 
+We set $\delta$ to 0.4 and  
+repeat 10 times for the experiment in each direction (e.g., A->B). The average of the resuls is reported in Table~\ref{table:f1}. 
+Each cell contains two numbers: the former is for our approach while the latter is for the {\it best} baseline.
+The case of transferring from C to B is again substantially worse than other cases, this is because the transfer learning algorithm is fundamentally bounded by the performance of base classifiers. 
+Intuitively, if none of the base classifiers is able to predict correctly for an instance, no matter how we manipulate the weights, it will not make a difference in the results.
 Overall, our approach outperforms the best baseline.
 %Paired two sample t-test is performed to validate the statistical significance of improvement from our method over the best-performing baseline. 
 
