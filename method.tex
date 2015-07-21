@@ -156,21 +156,22 @@ We will discuss the choice of data features for classifier training in the evalu
 
 
 \subsection{Locally Weighted Ensemble}
-Different models can be effective at different regions or structures in the new testing building, and no single model can perform well on all examples. 
-Ideally, we want to combine the knowledge in the base models, rather than only using any particular model, to more effectively transfer the knowledge to the new building. 
+The performance of any particular model can vary from building to building.  No single model can perform well on all examples. 
+%Different models can be effective at different regions or structures in a target building, and 
+To minimize this variance we combine the knowledge in across base models.  % rather than only using any particular model, to more effectively transfer the knowledge to the new building. 
 % A natural choice is model averaging that additively combines the predictions of multiple base learners. 
 % However, the existing model averaging methods for traditional supervised learning usually assign global weights to models, which are either uniform (e.g., in Bagging~\cite{bagging}) or proportional to the training accuracy (e.g., in Boosting~\cite{boosting}), or simply relying on a specific model (e.g., single model classification).
 % Such global weighting schemes may not perform well in transfer learning because different testing examples may favor predictions from different base models. 
 % For example, when the base models carry conflicting concepts at a testing example, the optimal choice would be a model that better represents the distribution underlying the example.
-We employ a locally weighted ensemble~\cite{lwe} to weight the predictions from base classifiers. 
+We employ a locally weighted ensemble~\cite{lwe} to weigh the predictions of the base classifiers. 
 The weight is computed per model per example based on the similarity between the model and the local structure of the target example. 
-The similarity is measured by comparing neighborhood graphs which we will explain in the next section. 
-Such local weighting will favor models whose predicted local structure is close to the true local structure of the target example in the new testing domain. 
+Similarity is measured by comparing neighborhood graphs, which we will explain in the next section. 
+Local weights will favor models whose predicted local structure is close to the true local structure of the target example in the testing domain. 
 Let $x$ be the data feature vector of an example in the new building and $y$ be its predicted class label. Given a set of $k$ base models $M_1, \dots, M_k$ and the new testing set $D_T$ represented in the data feature view, the general Bayesian model averaging rule to estimate the posterior distribution of $y$ is,
 \begin{equation}\label{eq_lwe}
 p(y|x)=\sum_{i=1}^k p(y|x,D_T,M_i) p(M_i|D_T)
 \end{equation}
-where $p(y|x,D_T,M_i) = p(y|x,M_i)$ because $x \in D_T$ and $p(y|x,M_i)$ is actually the prediction on $x$ by $M_i$. And $p(M_i|D_T)$ is the probability to choose $M_i$ given the testing set $D_T$. As $x \in D_T$, $p(M_i|D_T)$ equals to $p(M_i|x)$ which is the locally adjusted weight for $M_i$ and Eq.~\ref{eq_lwe} becomes,
+where $p(y|x,D_T,M_i) = p(y|x,M_i)$ because $x \in D_T$ and $p(y|x,M_i)$ is actually $x$ predicted by $M_i$. And $p(M_i|D_T)$ is the probability to choose $M_i$ given the testing set $D_T$. As $x \in D_T$, $p(M_i|D_T)$ equals to $p(M_i|x)$ which is the locally adjusted weight for $M_i$ and Eq.~\ref{eq_lwe} becomes,
 \begin{equation}\label{eq_sum}
 p(y|x)=\sum_{i=1}^k w_{x}^{M_i} p(y|x, M_i)
 \end{equation}
