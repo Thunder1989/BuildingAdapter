@@ -1,6 +1,17 @@
 \section{Transfer Learning}
-In this work, we adopt a transfer learning based approach~\cite{lwe} to classify sensor types for a building with the knowledge from another labeled building. The approach~\cite{lwe} exploits a suite of base classifiers and leverge the consistency between classifier and cluster structure as the weight for each base classifier. 
-We make several changes on the original algorithm based on our problem setting: 1) both data features and name features are employed to accomplish the classification task: an ensemble of base learners are constructed with data features and applied to the other building, while the clustering structure on name features in the other building is exploited to guide which base classifier should gain more weights in predictions; 2) we customize the weight estimation algorithm to our domain and make it more effecitve; 3) to accommodate the variations in point names, we appeal to a non-parametric Bayesian approach to identify the clustering structure.
+In this work, we adopt a transfer learning based approach~\cite{lwe} to classify sensor types 
+in one building and use the learned model to label sensors in another building.
+%for a building with the knowledge from another labeled building. 
+The approach presented in~\cite{lwe} uses a suite of base classifiers and leverges the consistency between classifier and cluster structure 
+to weigh the results of each classifier.
+%as the weight for each base classifier. 
+We make several changes to the original algorithm to address the specific challenges we face: 
+1) both data features and name features are used by our classifier: an 
+ensemble of base learners are constructed with data features and applied to the target building, while the 
+cluster structure on the name features in the target building guides the decision process about how to weigh each classifier; %which base classifier should be weighed
+%more heavily; %should gain more weights in predictions; 
+2) we customize the weight estimation algorithm to improve its performance in our setting; %domain and make it more effecitve; 
+and 3) to handle variations in point names, we use a non-parametric Bayesian approach to identify cluster structure.
 
 \subsection{Feature Representation}\label{feature}
 Two common attributes of the sensor points in a building are the actual data readings and the text string-based point names. Both play an important role for differentiating sensor types.
@@ -44,8 +55,15 @@ In this section, we elaborate the construction of two different sets of feature 
 \end{figure*}
 
 \subsubsection{Data Features}
-A signal\footnote{In this paper, we use the term ``signal'', ``trace'' and ``time series'' \textit{interchangeably}.} in the time domain trends the sensor reading and different types of sensor generally occupy distinct amplitude bins, as demonstrated in Figure~\ref{fig:example}. 
-Similar to Piecewise Aggregated Approximation (PAA~\cite{paa}) where they use the mean in each fixed length window to represent the original timeseries, we characterize a windowed signal in the time domain with standard statistical features which are summarized in Table~\ref{table:fd}.
+A signal\footnote{In this paper, we use the term ``signal'', ``trace'' and ``time series'' \textit{interchangeably}.} in the time domain is a trend of sensor reading. 
+Different types of sensor generally have different amplitudes that can be separated and binned,  
+%occupy distinct amplitude bins, 
+as demonstrated in Figure~\ref{fig:example}. 
+Similar to piecewise aggregated approximation (PAA~\cite{paa}) -- where the mean calculated in a fixed-length window to summarize the original timeseries -- 
+we compress a time window with summary statistics that characterize the behavior of the signal in that window.
+%characterize a windowed signal in the time domain with 
+%standard statistical features which are summarized in .
+Table~\ref{table:fd} shows a summary of the statistics we use to vectorize a time window.
 
 
 \begin{table}[h]
@@ -69,7 +87,10 @@ Shape                      & Linear Regression Slope & slope                    
 \end{table}
 
 
-We segment each sensor readings into an hour-long windows and extract the above features within each window. 
+We segment each timeseries into hour-long windows and extract calculate the given statistics. %the above features within each window. 
+%%%%
+%start editing again from here%
+%%%%%%
 However, computing over features these short time windows will produce too much information as well as noise; 
 therefore we compute the statistics of the accumulated features from windowed slices as the final feature set. 
 We construct our feature vector as follows: first, each sensor trace is segmented into N non-overlapping one-hour long windows. Second, within each time window, we compute the statistics as in the above table for the trace, producing a vector of each statistical feature after the window slides over the entire trace, such as 
