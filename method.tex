@@ -182,17 +182,18 @@ We will next explain how the weight is calculated per example.
 % If $p(y|x)$ is known, we can estimate the weights $w_{x}^{M_i}$ for each model by minimizing the square error between its prediction and the ground truth. 
 % However, in practice the truth value of $p(y|x)$ for a new building is not available a priori . 
 % The main task becomes to properly define the similarity between classifier's predicted structure and the true structure. 
-We quickly summarize the graph-based weight estimation in~\cite{lwe} and describe our two adjustments which are customized for our problem.
-Following the assumption~\cite{cluster} that $p(y|x)$ is not expected to change much in a dense area where $p(x)$ is high, 
+We quickly summarize the graph-based weight estimation technique presented in~\cite{lwe} and describe two adjustments we make to fit our problem.
+Assuming that that $p(y|x)$ does not change much in a dense area where $p(x)$ is high~\cite{cluster}, 
 % which means the decision boundary probably exists in areas with smaller $p(x)$.
-~\cite{lwe} performs clustering on the new testing set and assume the boundaries between clusters represent areas where $p(x)$ is small.
-If the clustering boundary for the region where $x$ locates agrees with the decision boundary of $M_i$, 
+the technique in~\cite{lwe} performs clustering on the new testing set and assumes the boundaries between clusters represent areas where $p(x)$ is small.
+If the clustering boundary for the region where $x$ falls, agrees with the decision boundary of $M_i$, 
 % we assume that $p(y|x,M_i)$ is similar to the true $p(y|x)$ around $x$, which means 
-a larger weight is assigned to $M_i$ at $x$.
-In other words, if the predictions of $M_i$ on the area surrounding $x$ have higher consistency with the clustering results, $M_i$ would have a larger weight at $x$. 
+a larger weight is assigned to $M_i$ at point $x$.
+In other words, if the predictions made by $M_i$ on the area surrounding $x$ has greater consistency with the clustering results, $M_i$ will be assigned
+a larger weight at $x$. 
 
 Based these observations, the weight is estimated with a graph-based algorithm.
-To compute the $w_{x}^{M_i}$ for $M_i$ at example $x$, we construct two neighorhood graphs: 
+To compute the $w_{x}^{M_i}$ for $M_i$ at point $x$, we construct two neighorhood graphs: 
 $G_M = (V, E_M)$ and $G_C = (V, E_C)$, for classification and clustering respectively, 
 where each vertex is an example and $V = D_T$. In $G_M$, an edge exists between two vertices (denoting the two examples are ``neighbors'') if and only if $M_i$ predicts the same label for these two examples. Likewise, in $G_C$, an edge exists between two vertices if and only if these two examples reside in the same cluster.
 If the neighbors of $x$ on both graphs significant overlap, then $M_i$ will be assigned a larger weight.
@@ -201,7 +202,8 @@ So the weight $w_{x}^{M_i}$ for $M_i$ at $x$ is proportional to the similarity o
 w_{x}^{M_i} \propto s(G_M, G_C|x) = \frac {|V_M \cap V_C|} {|V_M \cup V_C|}
 \end{equation}
 where $V_M$ ($V_C$) is the set of neighbors of $x$ on graph $G_M$ ($G_C$), |$\cdot$| is the cardinality of a set, and $s(G_M, G_C|x)$ is the similarity between two graphs. 
-Figure~\ref{fig:graph} illustrates an example of neighborhood graphs for an example $x$ (in grey circle): model 1 has a similarity of 0.75 while model 2 has 0.5.
+Figure~\ref{fig:graph} illustrates an example of neighborhood graphs for an example $x$ (in grey circle): model 1 has a similarity of 0.75 with the cluster graph
+ while model 2 has a similarity of 0.5 with the cluster graph.
 
 \begin{figure}[h]
 \centering
@@ -210,16 +212,20 @@ Figure~\ref{fig:graph} illustrates an example of neighborhood graphs for an exam
 \label{fig:graph}
 \end{figure}
 
-With Eq.~\ref{eq_sim} defined, the weight for each $M_i$ is calculated by normalizing among all similarity scores:
+%With Eq.~\ref{eq_sim} defined, 
+The weight for each $M_i$ is calculated by normalizing among all similarity scores:
 \begin{equation}\label{eq_norm}
 w_{x}^{M_i} = \frac {s(G_{M_i}, G_C|x)} {\sum_{i=1}^k s(G_{M_i}, G_C|x)}
 \end{equation}
-And the final prediction for $x$ is simply $\hat y = argmax_y \enspace p(y|x)$ as $p(y|x)$ is defined in Eq.~\ref{eq_sum}.
+The final prediction for $x$ is simply $\hat y = argmax_y \enspace p(y|x)$ as $p(y|x)$ is defined in Eq.~\ref{eq_sum}.
 
 \subsubsection{Distance-based Adjustment}
-We notice in some cases the original similarity definition can be problematic. Consider the case as shown in Figure~\ref{graph_dist}, there are two neighbors on both of the graphs for the two models and the distance between vertices are marked on the edge. Since the original similarity definition only considers the number of neighbors, both models will be assigned the same weight of 0.5 in this case while obviously model 1 ought to have a higher weight because the neighbors on
-the left graph are closer to the target example.
-To fix the issue, we include the distance between examples into consideration, the adjusted similarity is:
+In some cases the similarity score can be problematic. Consider the case shown in Figure~\ref{graph_dist}. 
+The example show two models where the target example has two neighbord.  The distance between the examples are marked on the edge. 
+Since the original similarity definition only considers the number of neighbors, both models will be assigned the same weight of 0.5. 
+However, the neighbors in model 1 are closer to the target example than those in model 2.  Therefore model 1 should be assigned a higher
+weight.
+To fix the issue we use the distance between examples and the adjust similarity accordingly:
 \begin{equation}\label{d_sim}
 s^\ast(G_M, G_C|x) = 1 - \frac {\sum d_{V_I}/|V_I|} {\sum d_{V_U}/|V_U|}
 \end{equation}
@@ -233,14 +239,15 @@ where $V_I = V_M \cap V_C$, $V_U = V_M \cup V_C$, and $\sum d_{V_I}$ is the sum 
 \end{figure}
 
 \subsubsection{Thresholding-based Adjustment}
-The use of weighted average decision for $x$ among base classifiers is reasonable when at least some of these classifiers perform well on $x$. However, the similarity $s(G_{M_i}, G_C|x)$ for $M_i$ is expected to be small when the predictions of $M_i$ around $x$ conflict with its true local structure. 
-In such a case, still adopting the decision from the classifier might not be a reasonable choice. 
+The use of a \emph{weighted-average decision} for $x$ among base classifiers is reasonable when at least some classifiers perform well on $x$. 
+However, the similarity $s(G_{M_i}, G_C|x)$ for $M_i$ is expected to be small when the predictions of $M_i$ around $x$ conflict with its true local structure. 
+In such a case, using the decision from the classifier might not be a reasonable choice. 
 Since $s(G_{M_i}, G_C|x)$ reflects the consistency between classifier predictions and cluster structure, we use the average similarity score over all $M_i$ on $x$ as a discriminator to limit the usage of these base classifiers.
 As an adjustment before the normalization of similarity scores, we check the average similarity score with,
 \begin{equation}\label{ave_sim}
  \bar s_x = \frac {1}{k}\sum_{i=1}^k s(G_{M_i}, G_C|x)
 \end{equation}
-We will continue with the ensemble prediction only if $\bar s_x$ is larger than a threshold $\delta$, and we will discuss the choice of $\delta$ in the evaluation section.
+We continue with the ensemble prediction only if $\bar s_x$ is larger than a threshold $\delta$, and we will discuss the choice of $\delta$ in the evaluation section.
 
 
 \subsection{Clustering with Non-parametric Bayesian}
