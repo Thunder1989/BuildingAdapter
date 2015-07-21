@@ -59,11 +59,12 @@ A signal\footnote{In this paper, we use the term ``signal'', ``trace'' and ``tim
 Different types of sensor generally have different amplitudes that can be separated and binned,  
 %occupy distinct amplitude bins, 
 as demonstrated in Figure~\ref{fig:example}. 
-Similar to piecewise aggregated approximation (PAA~\cite{paa}) -- where the mean calculated in a fixed-length window to summarize the original timeseries -- 
-we compress a time window with summary statistics that characterize the behavior of the signal in that window.
+Similar to piecewise aggregated approximation (PAA~\cite{paa}) -- where the mean is calculated in a fixed-length window -- 
+we compress the signal by computing a set of summary statistics over fixed-length windows. 
+%we compress a signal in a time window with summary statistics that characterize the behavior of the signal in that window.
 %characterize a windowed signal in the time domain with 
 %standard statistical features which are summarized in .
-Table~\ref{table:fd} shows a summary of the statistics we use to vectorize a time window.
+Table~\ref{table:fd} shows a summary of the statistics we calculate. %we use to vectorize a time window.
 
 
 \begin{table}[h]
@@ -86,25 +87,31 @@ Shape                      & Linear Regression Slope & slope                    
 \label{table:fd}
 \end{table}
 
-
-We segment each timeseries into hour-long windows and extract calculate the given statistics. %the above features within each window. 
-%%%%
-%start editing again from here%
-%%%%%%
-However, computing over features these short time windows will produce too much information as well as noise; 
-therefore we compute the statistics of the accumulated features from windowed slices as the final feature set. 
-We construct our feature vector as follows: first, each sensor trace is segmented into N non-overlapping one-hour long windows. Second, within each time window, we compute the statistics as in the above table for the trace, producing a vector of each statistical feature after the window slides over the entire trace, such as 
-$MIN = \{min^{1}, min^{2}, ..., min^{N}\}$, where N is the number of time windows. Each vector (such as this $MIN$) reflects short term changes but not all the intermediate values are useful for classification. 
-Finally, we compute a statistical summary of these vectors. For each vector we compute the minimum, maximum, median and variance, resulting in a feature vector containing 44 variables:
+Our feature extraction process consists of three steps.
+First, each sensor trace is segmented into N non-overlapping hour-long windows. Second, within each time window, we compute the statistics shown above. 
+%This produces a vector where each component is a a %statistic over the window. %slides over the entire trace, such as 
+For example, the $MIN$ vector is computed as follows: 
+$MIN = \{min^{1}, min^{2}, ..., min^{N}\}$, where N is the number of time windows. We compute a similar vector for each statistic show in the table.
+%Each vector, reflects short term changes that are useful for classification. 
+Third, we compute a statistical summary of these vectors. For each vector we compute the minimum, maximum, median and variance, resulting in a feature 
+vector containing 44 variables:
 \begin{displaymath}
 \begin{split}
-F = \{min(MIN), max(MIN), median(MIN), var(MIN),\\
+F = \{min(MIN), max(MIN), \\ 
+median(MIN), var(MIN),\\
 ...\\
-min(SLOPE), max(SLOPE), median(SLOPE), var(SLOPE)\}
+min(SLOPE), max(SLOPE), \\
+median(SLOPE), var(SLOPE)\}
 \end{split}
 \end{displaymath}
 $F$ is the data feature vector for each sensor trace used in our study.
 
+
+%First, 
+%we segment each timeseries into hour-long windows and calculate the given statistics. %the above features within each window. 
+%Then, we
+%Since computing over features these short time windows will produce too much information as well as noise; 
+%therefore we compute the statistics of the accumulated features from windowed slices as the final feature set. 
 
 \subsubsection{Name Features}
 The sensor point names are short text strings with several concatenated abbreviations, as shown in our motivating example in Table~\ref{table:ex}. 
