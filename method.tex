@@ -115,7 +115,7 @@ $F$ is the data feature vector for each sensor trace used in our study.
 
 \subsubsection{Name Features}
 Sensor point names are short text strings with several concatenated abbreviations, as shown in Table~\ref{table:ex}. 
-To vectorize a point name, we convert all alpha characters to lower case and trim out numerical characters. 
+To vectorize a point name, we convert all alphabetical characters to lower case and trim out numerical characters. 
 For example, \texttt{Zone Temp 2 RMI204} becomes \texttt{\{zone, temp, rmi\}}. 
 %To capture possible variants of abbreviations in point names, e.g., ``tmp'' and ``temp'' for temperature, we adopt $k$-mers \cite{leslie2004mismatch} as our features. 
 We use $k$-mers \cite{leslie2004mismatch} to capture variations in type abbreviations, e.g., ``tmp'' and ``temp'' for temperature.
@@ -136,12 +136,12 @@ This feature representation of point names will be used for examining classifica
 
 \subsection{Knowledge Transfer}
 %The use of transfer learning is motivated by the fact that people often have one or only a few buildings labeled of which they want to take advantage to aid the labeling of a new buidling.
-Transfer learning a useful technique in the building space because the effort it takes to label sensors in a single building is 
+Transfer learning is a useful technique in the building space because the effort it takes to label sensors in a single building is 
 high.  We want to leverage the knowledge gained in one building to quickly label another with minimal effort.  
 Transfer learning uses well-labeled data from one domain\footnote{A ``domain'' particularly refers to a data set  in this paper.}  
 to classify samples in a new, related domain.
 We assume we have well-labeled training set examples but do not have any labeled examples from the testing set. 
-Such knowledge transfer is only possible when the training domain and the test domain have the same set of class labels. 
+Such knowledge transfer is possible when the training domain and the test domain have the same set of class labels. 
 Classical supervised learning techniques are not useful for transferring knowledge across domains in this setting because 
 %The reason that traditional supervised learning techniques is not successful in transferring knowledge across domains in our case is because 
 it requires the training and testing examples to be sampled i.i.d. from the same distribution. This basic requirement does not hold here.
@@ -156,14 +156,14 @@ We will discuss the choice of data features for classifier training in the evalu
 
 
 \subsection{Locally Weighted Ensemble}
-The performance of any particular model can vary from building to building.  No single model can perform well on all examples. 
+The performance of any particular model can vary from building to building, and different models can be effective at different regions or structures in a target building: no single model can perform well on all examples. 
 %Different models can be effective at different regions or structures in a target building, and 
-To minimize this variance we combine the knowledge in across base models.  % rather than only using any particular model, to more effectively transfer the knowledge to the new building. 
+To combine the knowledge across base models,  % rather than only using any particular model, to more effectively transfer the knowledge to the new building. 
 % A natural choice is model averaging that additively combines the predictions of multiple base learners. 
 % However, the existing model averaging methods for traditional supervised learning usually assign global weights to models, which are either uniform (e.g., in Bagging~\cite{bagging}) or proportional to the training accuracy (e.g., in Boosting~\cite{boosting}), or simply relying on a specific model (e.g., single model classification).
 % Such global weighting schemes may not perform well in transfer learning because different testing examples may favor predictions from different base models. 
 % For example, when the base models carry conflicting concepts at a testing example, the optimal choice would be a model that better represents the distribution underlying the example.
-We employ a locally weighted ensemble~\cite{lwe} to weigh the predictions of the base classifiers. 
+we employ a locally weighted ensemble~\cite{lwe} to weigh the predictions of the base classifiers. 
 The weight is computed per model per example based on the similarity between the model and the local structure of the target example. 
 Similarity is measured by comparing neighborhood graphs, which we will explain in the next section. 
 Local weights will favor models whose predicted local structure is close to the true local structure of the target example in the testing domain. 
@@ -171,7 +171,7 @@ Let $x$ be the data feature vector of an example in the new building and $y$ be 
 \begin{equation}\label{eq_lwe}
 p(y|x)=\sum_{i=1}^k p(y|x,D_T,M_i) p(M_i|D_T)
 \end{equation}
-where $p(y|x,D_T,M_i) = p(y|x,M_i)$ because $x \in D_T$ and $p(y|x,M_i)$ is actually $x$ predicted by $M_i$. And $p(M_i|D_T)$ is the probability to choose $M_i$ given the testing set $D_T$. As $x \in D_T$, $p(M_i|D_T)$ equals to $p(M_i|x)$ which is the locally adjusted weight for $M_i$ and Eq.~\ref{eq_lwe} becomes,
+where $p(y|x,D_T,M_i) = p(y|x,M_i)$ because $x \in D_T$ and $p(y|x,M_i)$ is actually the label for $x$ predicted by $M_i$. And $p(M_i|D_T)$ is the probability to choose $M_i$ given the testing set $D_T$. As $x \in D_T$, $p(M_i|D_T)$ equals to $p(M_i|x)$ which is the locally adjusted weight for $M_i$ and Eq.~\ref{eq_lwe} becomes,
 \begin{equation}\label{eq_sum}
 p(y|x)=\sum_{i=1}^k w_{x}^{M_i} p(y|x, M_i)
 \end{equation}
@@ -189,14 +189,14 @@ the technique in~\cite{lwe} performs clustering on the new testing set and assum
 If the clustering boundary for the region where $x$ falls, agrees with the decision boundary of $M_i$, 
 % we assume that $p(y|x,M_i)$ is similar to the true $p(y|x)$ around $x$, which means 
 a larger weight is assigned to $M_i$ at point $x$.
-In other words, if the predictions made by $M_i$ on the area surrounding $x$ has greater consistency with the clustering results, $M_i$ will be assigned
+In other words, if the predictions made by $M_i$ on the area surrounding $x$ have greater consistency with the clustering results, $M_i$ will be assigned
 a larger weight at $x$. 
 
-Based these observations, the weight is estimated with a graph-based algorithm.
+Based on these observations, the weight is estimated with a graph-based algorithm.
 To compute the $w_{x}^{M_i}$ for $M_i$ at point $x$, we construct two neighorhood graphs: 
 $G_M = (V, E_M)$ and $G_C = (V, E_C)$, for classification and clustering respectively, 
 where each vertex is an example and $V = D_T$. In $G_M$, an edge exists between two vertices (denoting the two examples are ``neighbors'') if and only if $M_i$ predicts the same label for these two examples. Likewise, in $G_C$, an edge exists between two vertices if and only if these two examples reside in the same cluster.
-If the neighbors of $x$ on both graphs significant overlap, then $M_i$ will be assigned a larger weight.
+If the neighbors of $x$ on both graphs significantly overlap, then $M_i$ will be assigned a larger weight.
 So the weight $w_{x}^{M_i}$ for $M_i$ at $x$ is proportional to the similarity of the two graphs:
 \begin{equation}\label{eq_sim}
 w_{x}^{M_i} \propto s(G_M, G_C|x) = \frac {|V_M \cap V_C|} {|V_M \cup V_C|}
@@ -221,7 +221,7 @@ The final prediction for $x$ is simply $\hat y = argmax_y \enspace p(y|x)$ as $p
 
 \subsubsection{Distance-based Adjustment}
 In some cases the similarity score can be problematic. Consider the case shown in Figure~\ref{graph_dist}. 
-The example show two models where the target example has two neighbord.  The distance between the examples are marked on the edge. 
+The example shows two models where the target example has two neighbors.  The distance between the examples are marked on the edge. 
 Since the original similarity definition only considers the number of neighbors, both models will be assigned the same weight of 0.5. 
 However, the neighbors in model 1 are closer to the target example than those in model 2.  Therefore model 1 should be assigned a higher
 weight.
