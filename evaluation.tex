@@ -159,6 +159,22 @@ C & 0.582/0.299/0.421 & 0.393/0.158/0.190 & N/A   \\ \hline
 \label{fig:tl_acc}
 \end{figure*}
 
+\begin{figure*}[ht!]
+\centering
+  \begin{subfigure}{0.48\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/cm_multi}
+                \caption{Two Sources}
+  \end{subfigure}
+  \begin{subfigure}{0.48\textwidth}
+                \centering
+    \includegraphics[width=\textwidth]{./fig/cm_single}
+                \caption{Single Source}
+  \end{subfigure}
+\caption{Confusion matrices for the transfer learning classification resuls with two sources and single source: two sources produce higher accuracy by labeling more examples for certain classes. ``rmt'' stands for room temperature, ``stpt'' for setpoint, ``sup'' for supply, ``ret'' for return, ``SAT'' for supply air temperature and ``pos'' for vale position.}
+\label{fig_cm}
+\end{figure*}
+
 
 \subsubsection{Base Classifiers and Performance}
 \label{sec:baseline}
@@ -206,6 +222,7 @@ Overall, our approach outperforms the best baseline.
 
 
 \subsubsection{Multiple Buildings as the Source}
+
 \begin{table}[h]
 \centering
 \begin{tabular}{r|cc|cc}
@@ -214,7 +231,7 @@ Overall, our approach outperforms the best baseline.
  & Acc & Cov & Acc & Cov \\ \hline
 Target A & {\bf 0.863$^\ast$} & {\bf 0.397$^\ast$} & 0.855 & 0.362 \\ \hline
 B & {\bf 0.899$^\ast$} & {\bf 0.458} & 0.874 & 0.455 \\ \hline
-C & 0.963 & {\bf 0.897$^\ast$} & {\bf 0.965} & 0.766 \\ \hline
+C & {\bf 0.980$^\ast$} & {\bf 0.890$^\ast$} & 0.968 & 0.839 \\ \hline
 \end{tabular}
 \\\noindent
 $^\ast p$-value<0.01
@@ -222,10 +239,13 @@ $^\ast p$-value<0.01
 \label{2source}
 \end{table}
 
+
 In practice, it is common to have labels for multiple buildings available and combining them all as the source to transfer knowledge is expected to achieve better performance.
 To investigate the effect of using multiple buildings as the source, we repeat the above experiments (two ways running for each pair with $\delta$=0.4) with two buildings as the training source for the other building. 
 From Table~\ref{2source}, we see that combining multiple buildings as the source is superior to single source, as expected.
-Training with data from multiple buildingsproduces most robust classifier,s and we believe this rule generalizes to more buildings as the traning source.
+Figure~\ref{fig_cm} presents the confusion matrices for classification results for the case of using building C as the target.
+Two sources achieve a higher accraucy and coverage by correcting some of the errors in room temperature as well as labeling more streams of this type.
+Training with data from multiple buildings produces most robust classifiers, and we believe this rule generalizes to more buildings as the traning source.
 
 
 \subsection{Complementing Traditional Labeling}
