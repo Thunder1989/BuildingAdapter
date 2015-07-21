@@ -1,6 +1,14 @@
 \section{Related Work}
 To the best of our knowledge, we are the first to approach the problem of sensor type classification leveraging knowledge across buildings.
 
+Researchers have tried to address the non-uniformity of sensor namings asystematically.
+Dawson-Haggerty et al.~\cite{boss} and Krioukov et al.~\cite{bas}
+introduce a Building Operating System Service stack, whereby
+the underlying building sensor stock is presented to applications through a driver-based model \
+and an application stack provides a fuzzy-query based interface to the namespace exposed 
+through the driver interface.
+Although this architecture has useful properties for easing generalizability across
+buildings, the driver registration process is still done manually. 
 Bhattarcharya et al~\cite{arka} exploit a programming language based solution, 
 where they derive a set of regular expressions from a handful of labeled examples 
 to normalize the point name of sensors. 

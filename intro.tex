@@ -5,29 +5,22 @@ launched the Better Buildings Challenge to make buildings at least 20 percent
 more efficient by 2020~\cite{doe2013better}. To achieve this goal, many organizations 
 are applying data analytics to the thousands of sense and control points in 
 buildings to detect wasteful, incorrect, and unhealthy operation.  
-Although there have been many promising analytical approaches~\cite{}, widespread deployment is a 
-major challenge.  Heterogeneity amongst buildings is pervasive and that diversity is reflected
-in the sensor stock and naming conventions used within and across different buildings.
-
-Researchers have tried to address this non-uniformity systematically.
-Dawson-Haggerty et al.~\cite{boss} and Krioukov et al.~\cite{bas}
-introduce a Building Operating System Service stack, whereby
-the underlying building sensor stock is presented to applications through a driver-based model and 
-an application stack 
-provides a fuzzy-query based interface to the namespace exposed through the driver interface.
-Although this architecture has useful properties  for easing generalizability across
-buildings, the driver registration process is still done manually. This process is tedious, error-prone, 
-and especially difficult to verify and maintain over time.  
+Although there have been many promising analytical approaches~\cite{}, it is essential to apply
+the same analytics to multiple buildings as well as combine multiple analytics engines to
+gain deeper insights for identifying the issues in buildings.
+However, widespread deployment at scale is still a major challenge.
 Analytical processes are \emph{tightly coupled} to the sensors and their naming conventions in each building. 
 Sensor metadata about the type, location, and relationships between the sensing 
 and control units is mostly inconsistent across buildings.
+% Such heterogeneity amongst buildings is pervasive and that diversity is reflected in the sensor stock and naming conventions used within and across different buildings.
 Analytical processes require the correspondence between different naming 
 conventions, so that points can be mapped to the inputs of these processes.
 For instance, if company A wants to execute their 
 control loops on a building contracted by company B, A needs to manually 
 map the points between A and B's system. This process can take weeks and is proportional 
-to the number of points that need to be used by the application. Running the same software across 
-buildings requires significant integration effort.
+to the number of points that need to be used by the application. 
+Running the same software across buildings requires significant integration effort.
+% This process is tedious, error-prone, and especially difficult to verify and maintain over time.  
 
 
 %Non-BOSS/BAS based systems, manual
@@ -70,8 +63,6 @@ buildings requires significant integration effort.
 %normalization nor leverages the knowledge from already labeled buildings.
 
 \subsection{Metadata Heterogeneity}
-
-
 \begin{table}[h]
 \centering
 \begin{tabular}{c|ll}
