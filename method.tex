@@ -114,19 +114,23 @@ $F$ is the data feature vector for each sensor trace used in our study.
 %therefore we compute the statistics of the accumulated features from windowed slices as the final feature set. 
 
 \subsubsection{Name Features}
-The sensor point names are short text strings with several concatenated abbreviations, as shown in our motivating example in Table~\ref{table:ex}. 
-To represent the primitive point names as feature vectors for classifier training, we first convert all point names to lower cases and trim out the numerical characters in each point name, resulting in a series of words, e.g., \texttt{Zone Temp 2 RMI204} becomes \texttt{\{zone, temp, rmi\}}. 
-To capture possible variants of abbreviations in point names, e.g., ``tmp'' and ``temp'' for temperature, we adopt $k$-mers \cite{leslie2004mismatch} as our features. 
-The term $k$-mer refers to all the possible substrings of length $k$, which are contained in a string. This feature is popularly used in protein and gene sequence analysis in bioinformatics, and it helps measure sequence similarity without requiring alignment. 
+Sensor point names are short text strings with several concatenated abbreviations, as shown in Table~\ref{table:ex}. 
+To vectorize a point name, we convert all alpha characters to lower case and trim out numerical characters. 
+For example, \texttt{Zone Temp 2 RMI204} becomes \texttt{\{zone, temp, rmi\}}. 
+%To capture possible variants of abbreviations in point names, e.g., ``tmp'' and ``temp'' for temperature, we adopt $k$-mers \cite{leslie2004mismatch} as our features. 
+We use $k$-mers \cite{leslie2004mismatch} to capture variations in type abbreviations, e.g., ``tmp'' and ``temp'' for temperature.
+The term $k$-mer refers to all the possible substrings of length $k$, which are contained in a string. This feature is often used in protein and gene sequence analysis and 
+it helps measure sequence similarity without requiring alignment. 
 
-In our case, we limit the k-mers computation only within a word boundary.
-In general, having a too small $k$ will increase the chance for all the k-mers to overlap, making all the points less differentiable.
+We limit the k-mers computation within a word boundary.
+In general, having too small a value for $k$ will increase the chance for all the k-mers to overlap, making points less differentiable.
 Therefore, we compute all k-mers of length 3 and 4 for each point name.
-For example, \texttt{\{zone, temp, rmi\}} will yield a set of k-mers \texttt{\{zon, one, tem, emp, rmi\}} with $k$=3.
+For example, \texttt{\{zone, temp, rmi\}} yields a set of k-mers \texttt{\{zon, one, tem, emp, rmi\}} when $k$=3.
 A dictionary of k-mers is constructed with all the k-mers generated from each point name. 
 Each point name is converted into a feature vector based on the frequency of k-mers in it. 
 For example, a set of k-mers \texttt{\{zon, tem, emp, zon\}} will be transformed to a vector
-\texttt{(2,0,1,1,0)} with the dictionary \texttt{\{zon, one, tem, emp, rmi\}}, meaning \texttt{zon} occurs twice, \texttt{one} doesn't appear, and so forth. 
+\texttt{(2,0,1,1,0)} with the dictionary \texttt{\{zon, one, tem, emp, rmi\}}, meaning \texttt{zon} occurs twice, \texttt{one} does 
+not appear, and so forth. 
 This feature representation of point names will be used for examining classification performance.
 
 
