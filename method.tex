@@ -1,10 +1,10 @@
 \section{Transfer Learning}
-In this work, we employ a transfer learning to classify sensor types for a building with the knowledge from another labeled building. Both data features and name features are used to accomplish the classification task: an ensemble of base learners are constructed with data features and applied to the other building because data features transfer across buildings, while the clustering structure on name features in the other building is exploited to help determine which base classifier should contribute more in predictions. 
-To accommodate the variations in point names, we appeal to a non-parametric Bayesian approach to identify the clustering structure.
+In this work, we adopt a transfer learning based approach~\cite{lwe} to classify sensor types for a building with the knowledge from another labeled building. The approach~\cite{lwe} exploits a suite of base classifiers and leverge the consistency between classifier and cluster structure as the weight for each base classifier. 
+We make several changes on the original algorithm based on our problem setting: 1) both data features and name features are employed to accomplish the classification task: an ensemble of base learners are constructed with data features and applied to the other building, while the clustering structure on name features in the other building is exploited to guide which base classifier should gain more weights in predictions; 2) we customize the weight estimation algorithm to our domain and make it more effecitve; 3) to accommodate the variations in point names, we appeal to a non-parametric Bayesian approach to identify the clustering structure.
 
 \subsection{Feature Representation}\label{feature}
-Two common aspects of the sensor points in a building are the actual data readings and the text string-based point names. Both play an important role for differentiating sensor types.
-In this section, we elaborate the construction of two different sets of feature vectors (i.e., data features and name features) and empirically discuss how each of them transfers across buildings in classifying sensor \emph{type}.
+Two common attributes of the sensor points in a building are the actual data readings and the text string-based point names. Both play an important role for differentiating sensor types.
+In this section, we elaborate the construction of two different sets of feature vectors, i.e., data features and name features.
 
 \begin{figure*}[ht!]
 \centering
@@ -44,10 +44,8 @@ In this section, we elaborate the construction of two different sets of feature 
 \end{figure*}
 
 \subsubsection{Data Features}
-Raw sensor time series\footnote{In this paper, we use the term ``trace'' and ``time series'' \textit{interchangeably}.} usually contain millions of readings which are too many to be useful for type classification. We need to distil the information embedded in the reading patterns.
-A signal in the time domain trends the sensor reading and different types of sensor generally occupy distinct amplitude bins, as demonstrated in Figure~\ref{fig:example}. 
-We characterize the distribution of a signal in the time domain with standard statistical features, such as the 50th percentile value (also known as the median) as discriminators. 
-Table~\ref{table:fd} summarizes the statistical features we used to represent each stream. 
+A signal\footnote{In this paper, we use the term ``signal'', ``trace'' and ``time series'' \textit{interchangeably}.} in the time domain trends the sensor reading and different types of sensor generally occupy distinct amplitude bins, as demonstrated in Figure~\ref{fig:example}. 
+Similar to Piecewise Aggregated Approximation (PAA~\cite{paa}) where they use the mean in each fixed length window to represent the original timeseries, we characterize a windowed signal in the time domain with standard statistical features which are summarized in Table~\ref{table:fd}.
 
 
 \begin{table}[h]
@@ -72,8 +70,8 @@ Shape                      & Linear Regression Slope & slope                    
 
 
 We segment each sensor readings into an hour-long windows and extract the above features within each window. 
-However, computing features over these short time windows will produce too much information as well as noise; too many feature variables typically degrades classifier performance.
-To succinctly summarize the dynamics of sensor traces, we compute the statistics of the accumulated features from windowed slices as the final feature set. 
+However, computing over features these short time windows will produce too much information as well as noise; 
+therefore we compute the statistics of the accumulated features from windowed slices as the final feature set. 
 We construct our feature vector as follows: first, each sensor trace is segmented into N non-overlapping one-hour long windows. Second, within each time window, we compute the statistics as in the above table for the trace, producing a vector of each statistical feature after the window slides over the entire trace, such as 
 $MIN = \{min^{1}, min^{2}, ..., min^{N}\}$, where N is the number of time windows. Each vector (such as this $MIN$) reflects short term changes but not all the intermediate values are useful for classification. 
 Finally, we compute a statistical summary of these vectors. For each vector we compute the minimum, maximum, median and variance, resulting in a feature vector containing 44 variables:
@@ -112,19 +110,24 @@ Such knowledge transfer is possible when the training domain and the test domain
 The reason that traditional supervised learning techniques is not successful in transferring knowledge across domains in our case is because it usually requires training and the testing examples sampled i.i.d. from the same distribution, which is not the case for our problem.
 
 %For example, the classiers can be trained from several relevant domains or built using different learning algorithms on the same domain.
-Based on the observation in Section x.x that classifiers constructed with data features perform better than name features when applied across buildings, we construct a few classifiers with different learning algorithms on the same set of data features from an existing building. 
+To encapsulate the information from one labeled building and transfer across buildings, we construct a few classifiers with different learning algorithms on the same set of data features from an existing building. 
 Each different classifier usually contains a different perspective of the knowledge on the building, due to the inductive bias of the specific learning model. 
 We refer to these different classifiers as {\it base} models\footnote{We use the term ``model'' and ``classifier'' {\it interchangeably} in this paper.} and will combine them for classification on the new building.
+We will discuss about the choice of data features for classifier training in the evaluation.
+
 
 \subsection{Locally Weighted Ensemble}
 Different models can be effective at different regions or structures in the new testing building, and no single model can perform well on all examples. 
-Ideally, we want to combine the knowledge in the base models, rather than only using any particular model, to more effectively transfer the knowledge to the new building. A natural choice is model averaging that additively combines the predictions of multiple base learners. 
-However, the existing model averaging methods for traditional supervised learning usually assign global weights to models, which are either uniform (e.g., in Bagging~\cite{bagging}) or proportional to the training accuracy (e.g., in Boosting~\cite{boosting}), or simply relying on a specific model (e.g., single model classification).
-Such global weighting schemes may not perform well in transfer learning because different testing examples may favor predictions from different base models. 
-For example, when the base models carry conflicting concepts at a testing example, the optimal choice would be a model that better represents the distribution underlying the example.
-
+Ideally, we want to combine the knowledge in the base models, rather than only using any particular model, to more effectively transfer the knowledge to the new building. 
+% A natural choice is model averaging that additively combines the predictions of multiple base learners. 
+% However, the existing model averaging methods for traditional supervised learning usually assign global weights to models, which are either uniform (e.g., in Bagging~\cite{bagging}) or proportional to the training accuracy (e.g., in Boosting~\cite{boosting}), or simply relying on a specific model (e.g., single model classification).
+% Such global weighting schemes may not perform well in transfer learning because different testing examples may favor predictions from different base models. 
+% For example, when the base models carry conflicting concepts at a testing example, the optimal choice would be a model that better represents the distribution underlying the example.
 We employ a locally weighted ensemble~\cite{lwe} to weight the predictions from base classifiers. 
-The weight is computed per model per example based on the similarity between the model and the local structure of the target example. The similarity is measured by comparing neighborhood graphs which we will explain in the next section. Such local weighting will favor models whose predicted local structure is close to the true local structure of the target example in the new testing domain. Let $x$ be the data feature vector of an example in the new building and $y$ be its predicted class label. Given a set of $k$ base models $M_1, \dots, M_k$ and the new testing set $D_T$ represented in the data feature view, the general Bayesian model averaging rule to estimate the posterior distribution of $y$ is,
+The weight is computed per model per example based on the similarity between the model and the local structure of the target example. 
+The similarity is measured by comparing neighborhood graphs which we will explain in the next section. 
+Such local weighting will favor models whose predicted local structure is close to the true local structure of the target example in the new testing domain. 
+Let $x$ be the data feature vector of an example in the new building and $y$ be its predicted class label. Given a set of $k$ base models $M_1, \dots, M_k$ and the new testing set $D_T$ represented in the data feature view, the general Bayesian model averaging rule to estimate the posterior distribution of $y$ is,
 \begin{equation}\label{eq_lwe}
 p(y|x)=\sum_{i=1}^k p(y|x,D_T,M_i) p(M_i|D_T)
 \end{equation}
@@ -136,16 +139,19 @@ where $w_{x}^{M_i} = p(M_i|x)$ and intuitively, a model $M_i$ should have higher
 We will next explain how the weight is calculated per example.
 
 \subsection{Graph-based Weight Estimation}\label{sec:gwe}
-If $p(y|x)$ is known, we can estimate the weights $w_{x}^{M_i}$ for each model by minimizing the square error between its prediction and the ground truth. 
-However, in practice the truth value of $p(y|x)$ for a new building is not available a priori . 
-The main task becomes to properly define the similarity between classifier's predicted structure and the true structure. 
-Based on the clustering assumption~\cite{cluster} that $p(y|x)$ is not expected
-to change much in a dense area where $p(x)$ is high, which means the decision boundary probably exists in areas with smaller $p(x)$.
-Therefore, we perform clustering on the new testing set and assume the boundaries between clusters represent areas where $p(x)$ is small.
-If the clustering boundary for the region where $x$ locates agrees with the decision boundary of $M_i$, we assume that $p(y|x,M_i)$ is similar to the true $p(y|x)$ around $x$, which means we can assign a larger weight to $M_i$ at $x$. 
+% If $p(y|x)$ is known, we can estimate the weights $w_{x}^{M_i}$ for each model by minimizing the square error between its prediction and the ground truth. 
+% However, in practice the truth value of $p(y|x)$ for a new building is not available a priori . 
+% The main task becomes to properly define the similarity between classifier's predicted structure and the true structure. 
+We quickly summarize the graph-based weight estimation in~\cite{lwe} and describe our two adjustments which are customized for our problem.
+Following the assumption~\cite{cluster} that $p(y|x)$ is not expected to change much in a dense area where $p(x)$ is high, 
+% which means the decision boundary probably exists in areas with smaller $p(x)$.
+~\cite{lwe} performs clustering on the new testing set and assume the boundaries between clusters represent areas where $p(x)$ is small.
+If the clustering boundary for the region where $x$ locates agrees with the decision boundary of $M_i$, 
+% we assume that $p(y|x,M_i)$ is similar to the true $p(y|x)$ around $x$, which means 
+a larger weight is assigned to $M_i$ at $x$.
 In other words, if the predictions of $M_i$ on the area surrounding $x$ have higher consistency with the clustering results, $M_i$ would have a larger weight at $x$. 
 
-Following these observations, we employ a graph-based algorithm to compute the weight.
+Based these observations, the weight is estimated with a graph-based algorithm.
 To compute the $w_{x}^{M_i}$ for $M_i$ at example $x$, we construct two neighorhood graphs: 
 $G_M = (V, E_M)$ and $G_C = (V, E_C)$, for classification and clustering respectively, 
 where each vertex is an example and $V = D_T$. In $G_M$, an edge exists between two vertices (denoting the two examples are ``neighbors'') if and only if $M_i$ predicts the same label for these two examples. Likewise, in $G_C$, an edge exists between two vertices if and only if these two examples reside in the same cluster.
@@ -164,7 +170,7 @@ Figure~\ref{fig:graph} illustrates an example of neighborhood graphs for an exam
 \label{fig:graph}
 \end{figure}
 
-With Eq.~\ref{eq_sim} defined, we can compute the weight for each $M_i$ by normalizing among all similarity scores:
+With Eq.~\ref{eq_sim} defined, the weight for each $M_i$ is calculated by normalizing among all similarity scores:
 \begin{equation}\label{eq_norm}
 w_{x}^{M_i} = \frac {s(G_{M_i}, G_C|x)} {\sum_{i=1}^k s(G_{M_i}, G_C|x)}
 \end{equation}
