@@ -76,11 +76,14 @@ implemented in Python. % providing a rich set of APIs.
 
 
 \subsection{Feature Transferability}
-As the two different types of features explained in Section~\ref{feature}, we first examine how well both can perform in classifying sensor types when applied across buildings, i.e., learning a classifier based on the features from building A and testing it on building B. 
-Intuitively, data features should be more generalizable than point names with respect to differentiating points by types. 
-This is because in general a certain type of sensors will share commonality in reading amplitude and trend, such as diurnal patterns. 
-For example, temperature readings in a building will be between 60-70 degree with rises in the morning and falls at night.
-In contrast, point name features might not transfer well due to various naming conventions across buildings as shown in Table~\ref{table:ex}.
+We examine how the two different types of features explained in Section~\ref{feature} can perform in classifying sensor types when applied across buildings, i.e., learning a classifier based on the features from building A and testing it on building B. 
+We expect data features to be more generalizable than point names since 
+building environments are conditioned similarly and therefore similar sensors 
+share commonality in amplitude and trend.  For example, diurnal patterns are common across streams of similar type and 
+%with respect to differentiating points by types. 
+%This is because in general a certain type of sensors will , such as diurnal patterns. 
+temperature readings in a building will be usually fall between 60-70 degree; rising in the morning and falling at night.
+In contrast, point name features might not transfer well due to various naming conventions as shown in Table~\ref{table:ex}.
 Although k-mers can enlarge the size of term dictionary in a building to increase the chance of covering more terms in other buildings, such a technique still cannot fundamentally compensate for the difference in naming conventions.
 
 
@@ -97,11 +100,11 @@ B-\textgreater A & 0.612       & 0.328       \\ \hline
 \end{table}
 
 
-To empirically examine how well each type of feature transfers, we perform type classification across buildings with both features in separate. 
-As an example, with either set of features from building A, we train a random forest and apply it to building B on the same type of feature, or vice versa. 
-Table~\ref{table:clf} summarizes the results and choosing a different classifier does not affect the pattern observed here.
-We see that data features do transfer better than name features as expected, but the results from data features still contain significant errors making them far from being usable. 
-The question remains how to better leverage these two sources of information from one building and transfer them to another.
+To examine how well each type of feature transfers, we perform type classification across buildings with both features, separately.   
+As an example, with either set of features from building A, we train a random forest and apply it to building B on the same type of feature, and vice versa. 
+Table~\ref{table:clf} summarizes the results. Choosing a different classifier does not affect the pattern observed.
+Indeed, data features transfer better than name features but the results from data features contain significant errors. 
+The question remains, how do we leverage these two sources of information effectively?
 We will discuss the idea of transfer learning in next section.
 
 
