@@ -50,13 +50,14 @@ In this section, we elaborate the construction of two different sets of feature 
     \includegraphics[width=\textwidth]{./fig/cwt.eps}
                 \caption{Chilled Water Supply Temperature}
   \end{subfigure}
-\caption{Different types of sensors occupy different amplitude bins in the time domain with different short term dynamics.}
+%\caption{Different types of sensors occupy different amplitude bins in the time domain with different short term dynamics.}
+\caption{Different types of sensor generally have different amplitudes that can be separated and binned for clustering.}
 \label{fig:example}
 \end{figure*}
 
 \subsubsection{Data Features}
 A signal\footnote{In this paper, we use the term ``signal'', ``trace'' and ``time series'' \textit{interchangeably}.} in the time domain is a trend of sensor reading. 
-Different types of sensor generally have different amplitudes that can be separated and binned,  
+Different types of sensors generally have different amplitudes that can be separated and binned,  
 %occupy distinct amplitude bins, 
 as demonstrated in Figure~\ref{fig:example}. 
 Similar to piecewise aggregated approximation (PAA~\cite{paa}) -- where the mean is calculated in a fixed-length window -- 
@@ -72,7 +73,7 @@ Table~\ref{table:fd} shows a summary of the statistics we calculate. %we use to 
 \begin{tabular}{r|l|l}
 \hline
 Category                   & Statistical Function & \multicolumn{1}{l}{Acronym} \\ \hline\hline
-\multirow{2}{*}{Extreme}   & Minimum                 & min                          \\ \cline{3-3} 
+\multirow{2}{*}{Extrema}   & Minimum                 & min                          \\ \cline{3-3} 
                            & Maximum                 & max                          \\ \hline
 \multirow{2}{*}{Average}   & Median                  & emd                          \\ \cline{3-3} 
                            & Root Mean Square        & rms                          \\ \hline
@@ -88,9 +89,9 @@ Shape                      & Linear Regression Slope & slope                    
 \end{table}
 
 Our feature extraction process consists of three steps.
-First, each sensor trace is segmented into N hour-long windows with 50\% overlap between two consecutive ones. Second, within each time window, we compute the statistics shown above. 
+First, each sensor trace is segmented into N hour-long windows with 50\% overlap between consecutive windows. Second, for each time window, we compute the statistics shown above. 
 %This produces a vector where each component is a a %statistic over the window. %slides over the entire trace, such as 
-For example, the $MIN$ vector is computed as follows: 
+For example, the vector for $MIN$ is computed as follows: 
 $MIN = \{min^{1}, min^{2}, ..., min^{N}\}$, where N is the number of time windows. We compute a similar vector for each statistic show in the table.
 %Each vector, reflects short term changes that are useful for classification. 
 Third, we compute a statistical summary of these vectors. For each vector we compute the minimum, maximum, median and variance, resulting in a feature 
@@ -171,11 +172,12 @@ Let $x$ be the data feature vector of an example in the new building and $y$ be 
 \begin{equation}\label{eq_lwe}
 p(y|x)=\sum_{i=1}^k p(y|x,D_T,M_i) p(M_i|D_T)
 \end{equation}
-where $p(y|x,D_T,M_i) = p(y|x,M_i)$ because $x \in D_T$ and $p(y|x,M_i)$ is actually the label for $x$ predicted by $M_i$. And $p(M_i|D_T)$ is the probability to choose $M_i$ given the testing set $D_T$. As $x \in D_T$, $p(M_i|D_T)$ equals to $p(M_i|x)$ which is the locally adjusted weight for $M_i$ and Eq.~\ref{eq_lwe} becomes,
+where $p(y|x,D_T,M_i) = p(y|x,M_i)$ because $x \in D_T$ and $p(y|x,M_i)$ is the label for $x$ predicted by $M_i$ and $p(M_i|D_T)$ is the probability of choosing $M_i$ given the testing set $D_T$. 
+Since $x \in D_T$, $p(M_i|D_T)$ equals $p(M_i|x)$, which is the locally adjusted weight for $M_i$ and Eq.~\ref{eq_lwe} becomes,
 \begin{equation}\label{eq_sum}
 p(y|x)=\sum_{i=1}^k w_{x}^{M_i} p(y|x, M_i)
 \end{equation}
-where $w_{x}^{M_i} = p(M_i|x)$ and intuitively, a model $M_i$ should have higher weights for $x$ if $M_i$ predicts a similar local structure of $x$ to the true one.
+where $w_{x}^{M_i} = p(M_i|x)$.  A model $M_i$ should have higher weights for $x$ if $M_i$ predicts a similar local structure of $x$ to the true one.
 We will next explain how the weight is calculated per example.
 
 \subsection{Graph-based Weight Estimation}\label{sec:gwe}
