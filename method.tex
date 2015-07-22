@@ -88,7 +88,7 @@ Shape                      & Linear Regression Slope & slope                    
 \end{table}
 
 Our feature extraction process consists of three steps.
-First, each sensor trace is segmented into N non-overlapping hour-long windows. Second, within each time window, we compute the statistics shown above. 
+First, each sensor trace is segmented into N hour-long windows with 50\% overlap between two consecutive ones. Second, within each time window, we compute the statistics shown above. 
 %This produces a vector where each component is a a %statistic over the window. %slides over the entire trace, such as 
 For example, the $MIN$ vector is computed as follows: 
 $MIN = \{min^{1}, min^{2}, ..., min^{N}\}$, where N is the number of time windows. We compute a similar vector for each statistic show in the table.
@@ -138,8 +138,8 @@ This feature representation of point names will be used for examining classifica
 %The use of transfer learning is motivated by the fact that people often have one or only a few buildings labeled of which they want to take advantage to aid the labeling of a new buidling.
 Transfer learning is a useful technique in the building space because the effort it takes to label sensors in a single building is 
 high.  We want to leverage the knowledge gained in one building to quickly label another with minimal effort.  
-Transfer learning uses well-labeled data from one domain\footnote{A ``domain'' particularly refers to a data set  in this paper.}  
-to classify samples in a new, related domain.
+One category of transfer learning uses well-labeled data from one domain\footnote{A ``domain'' particularly refers to a data set in this paper.}  
+to classify examples in a new, related domain.
 We assume we have well-labeled training set examples but do not have any labeled examples from the testing set. 
 Such knowledge transfer is possible when the training domain and the test domain have the same set of class labels. 
 Classical supervised learning techniques are not useful for transferring knowledge across domains in this setting because 
@@ -225,7 +225,7 @@ The example shows two models where the target example has two neighbors.  The di
 Since the original similarity definition only considers the number of neighbors, both models will be assigned the same weight of 0.5. 
 However, the neighbors in model 1 are closer to the target example than those in model 2.  Therefore model 1 should be assigned a higher
 weight.
-To fix the issue we use the distance between examples and the adjust similarity accordingly:
+To fix the issue we include into consideration the distance between examples and then adjust similarity accordingly:
 \begin{equation}\label{d_sim}
 s^\ast(G_M, G_C|x) = 1 - \frac {\sum d_{V_I}/|V_I|} {\sum d_{V_U}/|V_U|}
 \end{equation}

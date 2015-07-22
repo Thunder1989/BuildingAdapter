@@ -1,6 +1,6 @@
 \section{Evaluation}
 To investigate the effectiveness of our method, we evaluate our transfer learning based classification technique on actual data and point names of sensors from three commercial buildings. Extensive experiments demonstrate that our technique is able to accurately classify by type for a considerable portion of examples without human intervention. 
-To further demonstrate what the usefulness of the technique, we combine transfer learning with the traditional labeling process to accelerate the learning speed.
+To further demonstrate the usefulness of the technique, we combine transfer learning with the traditional labeling process to accelerate the learning speed.
 
 
 \subsection{Taxonomy and Data Collection}
@@ -108,11 +108,11 @@ Table~\ref{table:clf} summarizes the results. Choosing a different classifier do
 Indeed, data features transfer better than name features but the results from data features contain significant errors. 
 % The question remains, how do we leverage these two sources of information effectively?
 % We will discuss the idea of transfer learning in next section.
-Therefore, we use data features to train base classifiers that transfer the knowledge across buildings.
+Based on these observations, we use data features to train base classifiers that transfer the knowledge across buildings.
 
 \subsection{Features for Clustering}
 As shown in Algorithm~\ref{algo}, to perform classification on a target building we need to generate clusters among the points.
-These clusters are employed to determine the weights of base classifiers. Therefore, it is ideal to have points in the same clusters 
+These clusters are employed to guide the weighting of base classifiers. Therefore, it is ideal to have points in the same clusters 
 well aligned with their true class lables: the higher quality of clusters, the more accurate the weights will be on base classifiers.
 
 
@@ -204,7 +204,7 @@ Source A                 & N/A      & N/A     & 0.943/0.934      & 0.936/0.931  
 B                 & 0.897/0.875     & 0.932/0.913     & N/A      & N/A     & 0.950/0.952      & 0.939/0.937     \\ \hline
 C                 & 0.862/0.862     & 0.864/0.864     & 0.726/0.702      & 0.691/0.726     & N/A     & N/A     \\ \hline
 \end{tabular}
-\caption{Accuracy and F1 score of transfer learning and the best baseline with $\delta$=0.4. Each cell contains two numbers for our approach and the baseline respectively. Overall, our approach outperforms the baseline.}
+\caption{Accuracy and F1 score of transfer learning and the best base classifier with $\delta$=0.4. Each cell contains two numbers for our approach and the baseline respectively. Overall, our approach outperforms the baseline.}
 \label{table:f1}
 \end{table*}
 
@@ -230,7 +230,7 @@ which calculates the F1 score for each class; where ``one-versus-all'' binary cl
 As a baseline, we take the subset of examples in the new building that get labeled by the transfer learning process and apply base classifiers to predict labels on the same population. 
 We set $\delta$ to 0.4 and  
 repeat 10 times for the experiment in each direction (e.g., A->B). The average of the resuls is reported in Table~\ref{table:f1}. 
-Each cell contains two numbers: the former is for our approach while the latter is for the {\it best} baseline.
+Each cell contains two numbers: the former is for our approach while the latter is for the {\it best} base classifier.
 The case of transferring from C to B is again substantially worse than other cases, this is because the transfer learning algorithm is fundamentally bounded by the performance of base classifiers. 
 Intuitively, if none of the base classifiers is able to predict correctly for an instance, no matter how we manipulate the weights, it will not make a difference in the results.
 Overall, our approach outperforms the best baseline.
@@ -261,11 +261,11 @@ Using multiple buildings, we repeat the above experiments (two ways running for 
 We set $\delta$ to 0.4 and use two buildings as the training source. %for the other building. 
 From Table~\ref{2source}, we see that combining multiple buildings as the source is superior to single source.  %, as expected.
 Figure~\ref{fig_cm} presents the confusion matrices for classification results for the case of using building C as the target.
-The numbers below the predicted labels on the x-axis denote the percentage each type of streams take in that building, while the numbers below the true labels on the left denote the percentage being labeled for each type.
+The numbers below the predicted labels on the x-axis denote the percentage each type of streams takes in that building, while the numbers below the true labels on the left denote the percentage being labeled by our technique for each type.
 
 Two sources achieve a higher accuracy and coverage by correcting some of the errors in room temperature as well as labeling more streams of this type.
 Training with data from multiple buildings produces the most robust classifiers and we believe performance improves as you combine data from more
-buildings into a single source.
+buildings as the training source.
 %this rule generalizes to more buildings as the traning source.
 
 
@@ -279,7 +279,7 @@ For brevity, we refer interested reader to~\cite{cikm} for the detail of the alg
 
 On each testing building, we split the set into 10 folds and run the active learning (AL) and active learning combined with transfer learning (AL+TL), respectively, on nine folds while testing on the remaining one fold.
 For the case of AL+TL, we start from the automatic labeling process with a $\delta$ = 0.6 to ensure we have the minimal number of wrong automatic labels. Then we switch to the AL algorithm from~\cite{cikm} where we acquire one manual label per iteration.
-We perform 10-fold cross validation for AL and AL+PL and the average of 10 runs are demonstrated in Figure~\ref{fig:comp}. We see that AL+TL help reduce the number of manual labels to achieve the same peformance as AL.
+We perform 10-fold cross validation for AL and AL+TL and the average of 10 runs are demonstrated in Figure~\ref{fig:comp}. We see that AL+TL help reduce the number of manual labels to achieve the same peformance as AL.
 For example, it takes AL+TL 65 iterations to reach 85\% percent while AL takes 80.
 
 

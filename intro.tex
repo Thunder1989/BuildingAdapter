@@ -3,7 +3,7 @@
 To incentivize the reduction of building energy consumption, the U.S. government 
 launched the Better Buildings Challenge to make buildings at least 20 percent 
 more efficient by 2020~\cite{doe2013better}. To achieve this goal, many organizations 
-are applying data analytics to the thousands of sense and control points in 
+are applying data analytics to the thousands of sensing and control points in 
 buildings to detect wasteful, incorrect, and unhealthy operation.  
 Although there have been many promising analytical approaches~\cite{}, it is essential to apply
 the same analytics to multiple buildings as well as combine multiple analytics engines to
@@ -124,9 +124,9 @@ we learn in each building to improve the model, increase coverage, and maximize 
 
 
 \subsection{Learning from Well-Labeled Buildings}
-Manual normalization of the metadata in buildings is intractable due to 
-the scale of the problem. However, newer buildings tend to have very well-labled, consistent
-naming for their points.
+%Manual normalization of the metadata in buildings is intractable due to 
+%the scale of the problem. However, newer buildings tend to have very well-labled, consistent
+%naming for their points.
 %What we often have is one or a few fully 
 %labeled/normalized buildings. 
 Because the sensor types in different buildings 
@@ -134,10 +134,10 @@ overlap considerably (e.g., all buildings have temperature sensors installed),
 we can leverage the knowledge about the labels in one building to 
 help normalize the labels in another.
 To bridge the gap between naming conventions for different buildings, we envision 
-a system that infers the metadata about sense and control points to construct a normalized 
+a system that infers the metadata about sensing and control points to construct a normalized 
 common standard.
 %based on the knowledge extracted from existing normalized buildings. 
-This would allow the fast deployment of analytics/control applications and enable
+This would allow faster deployment of analytics/control applications and enable
 %to quickly connect 
 %to and analyze the data 
 %from a commercial building. Such a system would not only dramatically save time 
@@ -159,7 +159,7 @@ of analytic engines and smarter management techniques.
 
 In this work, we take another step towards automatic normalization of building 
 sensor metadata that requires minimal human intervention. We focus on a key category 
-of metadata: sensor `type' inference. In contrast to the aforementioned work, 
+of metadata: sensor {\it type} inference. In contrast to the aforementioned work, 
 where the normalization process is restricted to a single building, 
 we use techniques in transfer learning and present a customized version for transferring 
 ``knowledge'' about the type-labels in one building to quickly learn the type-labels in another.
@@ -184,4 +184,5 @@ contributions in this paper are:
 \item We empirically analyze how data and the point names of the streams can be transferred for classification across buildings.
 \item We propose a novel, effective, yet general transfer-learning approach by exploiting domain knowledge learnt from an existing building to help infer information in another building.
 \item We evaluate our proposed solution using real data and metadata from over 20 different sensor types and 3,000 sensors in three different commercial buildings.  Our solution can automatically label at least xx\% of the streams with more than yy\% accuracy without human intervention.
+\item We further demonstrate how much our transfer learning based approach can accelerate traditional labeling technique for a single building.
 \end{itemize}
