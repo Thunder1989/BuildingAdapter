@@ -94,8 +94,12 @@ Although k-mers can enlarge the size of term dictionary in a building to increas
 \begin{tabular}{l|c|c}
 \hline
                 & Data Feature & Name Feature \\ \hline
-A-\textgreater B & 0.778       & 0.341       \\
-B-\textgreater A & 0.612       & 0.328       \\ \hline
+A-\textgreater B & 0.778       & 0.400       \\
+B-\textgreater A & 0.612       & 0.254       \\ \hline
+B-\textgreater C & 0.521       & 0.030       \\
+C-\textgreater B & 0.399       & 0.302       \\ \hline
+A-\textgreater C & 0.922       & 0.021       \\
+C-\textgreater A & 0.584       & 0.399       \\ \hline
 \end{tabular}
 \caption{Type classification accuracy between two buildings with different sets of features: data features transfer better than point name features of sensors.}
 \label{table:clf}
@@ -121,7 +125,9 @@ well aligned with their true class lables: the higher quality of clusters, the m
 \begin{tabular}{l|c|c}
 \hline
                 & Data Feature & Name Feature \\ \hline
-Rand Index & 0.34       & 0.75       \\ \hline
+A & 0.21       & 0.58       \\
+B & 0.34       & 0.75       \\
+C & 0.32       & 0.78       \\ \hline
 \end{tabular}
 \caption{Quality of clusters generated with different features measure by rand index (in the range [0,1], higher is better).}
 \label{quality}
@@ -258,7 +264,6 @@ $^\ast p$-value<0.01
 \label{2source}
 \end{table}
 
-
 In practice, it is common to have labels for multiple buildings.  Combining them as a single source should allow us to achieve better performance.
 Using multiple buildings, we repeat the above experiments (two ways running for each pair).
 We set $\delta$ to 0.4 and use two buildings as the training source. %for the other building. 
@@ -266,8 +271,8 @@ From Table~\ref{2source}, we see that combining multiple buildings as the source
 
 The improvements for two sources in Table~\ref{2source} come from more examples being labeled for some already labeled classes as in the case of single source, rather than from examples in some unlabled classes. 
 % by correcting some of the errors in room temperature as well as labeling more streams of this type.
-Training with data from multiple buildings produces the most robust classifiers and we believe performance improves as you combine data from more buildings as the training source.
-%this rule generalizes to more buildings as the traning source.
+Training with data from multiple buildings produces more robust classifiers and as hundreds of buildings are normalized, this approach will become even more powerful. 
+In contrast, existing approaches scale only linearly with the number of buildings being normalized since they all require manual labelling and only apply to a single building.
 
 
 \subsection{Complementing Traditional Labeling}

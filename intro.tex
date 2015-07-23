@@ -1,27 +1,46 @@
 \section{Introduction}
 
-To incentivize the reduction of building energy consumption, the U.S. government 
-launched the Better Buildings Challenge to make buildings at least 20 percent 
-more efficient by 2020~\cite{doe2013better}. To achieve this goal, many organizations 
-are applying data analytics to the thousands of sensing and control points in 
-buildings to detect wasteful, incorrect, and unhealthy operation.  
-There have been many promising analytical approaches~\cite{} and it would be more effective to apply
-the same analytics to multiple buildings as well as combine multiple analytics engines to
-gain deeper insights for identifying the issues in buildings.
-However, widespread deployment at scale is still a major challenge.
-Analytical processes are \emph{tightly coupled} to the database schema and the metadata conventions in the buildings for which they were desgined, but the metadata about the type, location, and relationships between the sensing 
+To incentivize the reduction of building energy consumption, the U.S. government
+launched the Better Buildings Challenge to make buildings at least 20 percent
+more efficient by 2020~\cite{doe2013better}. To achieve this goal, many organizations
+are applying data analytics to the thousands of sensing and control points in
+buildings to detect wasteful, incorrect, and unhealthy operation.
+There have been many promising analytical approaches~\cite{}, and increasing research attention has been paid to generalize
+analytics across multiple buildings as well as integrate multiple analytic engines to gain deeper insights
+for identifying the issues in buildings.
+However, existing analytical processes are \emph{tightly coupled} to the database schema and the metadata conventions in the buildings for which they were desgined, but the metadata about the type, location, and relationships between the sensing
 and control units is not presented consistently across different buildings.
 % Such heterogeneity amongst buildings is pervasive and that diversity is reflected in the sensor stock and naming conventions used within and across different buildings.
-% Analytical processes require the correspondence between different naming 
+% Analytical processes require the correspondence between different naming
 % conventions, so that points can be mapped to the inputs of these processes.
-For instance, if company A wants to execute their 
-control loops on a building contracted by company B, A needs to manually 
-map the points between A and B's system. This process can take weeks and is proportional 
-to the number of points that need to be used by the application. 
-Running the same software across buildings requires significant integration effort.
-% This process is tedious, error-prone, and especially difficult to verify and maintain over time.  
+For instance, if company A wants to execute their
+control loops on a building contracted by company B, A needs to manually
+map the point names between A and B's system. This process can take weeks and is proportional
+to the number of points that need to be used by the application.
+Hence, sensor metadata normalization is essential for scaling up the analytical solutions.
+% This process is tedious, error-prone, and especially difficult to verify and maintain over time.
 
-
+In a building management system, a sensing or control ``point'' is a sensor,
+a controller, or a software value, e.g., a temperature sensor
+installed in an office room. The metadata about the point indicates the physical
+location, the type of sensor or controller, how the sensor or controller relates
+to the mechanical systems, and other important contextual information. Such information is often encoded as short
+text strings with several concatenated abbreviations in a point name. Table~\ref{table:ex} lists
+a few point names of sensors in three different building management systems
+(Trane\footnote{\url{http://www.trane.com/}}, Siemens\footnote{\url{http://www.siemens.com/}}
+and Barrington Controls\footnote{The company is no longer in business.}).
+For example, the point name \texttt{SODA1R300\_\_ART} is constructed as a
+concatenation of the building name (\texttt{SOD}), the air handler unit
+identifier (\texttt{A1}), the room number (\texttt{R300}) and the sensor type
+(\texttt{ART}, area room temperature). As the name indicates, this point measures
+the temperature in a particular room; and it also indicates the control unit that
+can affect the temperature in this room. Clearly different naming conventions --
+generally guided by the equipment, vendor, manufacturer,
+and contractor --
+are used in these buildings. For example, the notion of {\em room temperature} is encoded
+with a different abbreviation in each of the three buildings: \texttt{Temp}, \texttt{RMT} and \texttt{ART}.
+Such variations across different buildings impose great difficulty in quickly deploying automated analytic
+solutions.
 % \subsection{Metadata Heterogeneity}
 \begin{table}[h]
 \centering
@@ -40,76 +59,54 @@ Building & Point Name & \\
 \label{table:ex}
 \end{table}
 
-
-A sensing or control ``point'' is a sensor,
-a controller, or a software value, e.g., a temperature sensor
-installed in an office room. The metadata about the point indicates the physical
-location, the type of sensor or controller, how the sensor or controller relates
-to the mechanical systems, and other important contextual information. A portion of
-the metadata is often encoded in the
-``point name'' as short
-text string with several concatenated abbreviations. Table~\ref{table:ex} lists 
-a few point names of sensors in three different building management systems 
-(Trane\footnote{\url{http://www.trane.com/}}, Siemens\footnote{\url{http://www.siemens.com/}} 
-and Barrington Controls\footnote{The company is no longer in business.}). 
-The point name \texttt{SODA1R300\_\_ART} is constructed as a
-concatenation of the building name (\texttt{SOD}), the air handler unit
-identifier (\texttt{A1}), the room number (\texttt{R300}) and the sensor type
-(\texttt{ART}, area room temperature). As the name conveys, this point measures 
-the temperature in a particular room; and it also indicates the control unit that 
-can affect the temperature in this room. Different naming conventions -- 
-generally guided by the equipment, vendor, manufacturer, 
-and contractor --
-are used in across buildings. As shown in the table, the notion of {\em room temperature} is encoded 
-with a different abbreviation in each of the three buildings: \texttt{Temp}, \texttt{RMT} and \texttt{ART}.
-Such variations across different buildings impose great difficulty on quickly deploying any software-based
-solution.
-
-Several researchers have started addressing this challenge using a variety of techniques.
-Bhattarcharya et al~\cite{arka} use a programming language based solution, 
-where they derive a set of regular expressions from a handful of labeled examples 
-to normalize the sensor point names. 
-%This approach assumes a consistent format for all point names, which is not the case in practice, as shown in Table~\ref{table:ex}. 
-Schumann et al~\cite{ibm} develop a probabilistic framework to classify sensor types 
-based on the similarity between a building's point names and entries in a manually constructed dictionary. 
+Several solutions have been proposed using a variety of techniques.
+Bhattarcharya et al~\cite{arka} use a programming language based solution,
+where they derive a set of regular expressions from a handful of labeled examples
+to normalize the sensor point names.
+%This approach assumes a consistent format for all point names, which is not the case in practice, as shown in Table~\ref{table:ex}.
+Schumann et al~\cite{ibm} develop a probabilistic framework to classify sensor types
+based on the similarity between a building's point names and entries in a manually constructed dictionary.
 %However, the performance of this method is limited by the coverage and diversity of entries listed in the dictionary, and the dictionary size becomes intractable when there exist a lot of variations of the same type, or conflicting definitions of a dictionary entry in different buildings.
-Hong et al~\cite{cikm} formulate an active learning based approach to iteratively 
-acquire human labels for building sensors and propagate pseudo labels among points.
+Hong et al~\cite{cikm} formulate an active learning based approach to iteratively
+acquire human labels for building point names and propagate the acquired labels among similar points in the same building. All prior work is focused on approaches that require manual labeling, which 
+% still seriously limits the feasibility of existing analytic solutions at scale. 
+continues to be scaling bottleneck;
+% \textbf{We need some explanation of this inefficiency.}
+even if the sensor data was all publicly available on the Internet, it would still take years if not decades of manual metadata normalization before a new analytics engine could be applied to the 5.6 million commercial buildings in the U.S.
 
-All prior work is focused on approaches that require manual intervention by a human, which continues to be scaling bottleneck; even if the sensor data were all publicly available on the Internet, it would still take years if not decades of manual metadata normalization before a new analytics engine could be applied to the 5.6 million commercial buildings in the U.S.
-In this paper, we present new techniques to automatically infer metadata in a building with {\it no} manual labelling. 
+In this work, we take another step towards automatic normalization of building
+sensor metadata that requires minimal human intervention. 
+We focus on a key category of metadata: sensor {\it type} inference, and our technique can automatically infer the type information for a considerable portion for a new building. 
 The basic idea is to learn the structure of the streams in a fully normalized building, and transfer that structure to an unnormalized building. 
-Specifically, we encapsulate the information in the data from different perspectives, and apply the information to help predict on a new building, guided by the local structure in the point names.
-For example, sensors typically have two attributes: names and data. The names often capture the meaning and relationships of sensors in a building, but this structure is not easily gleaned from other buildings due to their different naming conventions. 
-The data contains no such structure, but is more likely to be similar across multiple buildings; the temperature in an office is often very similar, no matter in which building. 
+The insight that guides our solution is that: a sensor typically have two attributes -- its name in text strings and numerical readings generated over time; and these two attributes have different characteristics to be explored for effective knowledge transfer. 
+In particular, the name strings have strong regularity and dependency with the sensor types, e.g., in the same building only one or a few abbreviations will be used to denote a particular type of sensors, but such regularity varies across buildings. 
+On the other hand, the dependency between the actual data and sensor types is more likely to be similar across buildings, but its regularity might be weaker, e.g., the same pattern in the data might be observed in different sensor streams. 
+Following this insight, we estimate a set of statistical sensor type classifiers based on the sensor streams in a fully annotated building, transfer them to an unannotated building, and ensemble their output based on the prediction consistency with sensor name strings in the new building. 
+To our knowledge, this is the first transfer learning based approach used in this domain.
+%Following this insight, we use transfer learning to transfer ``knowledge'' about the type-labels in one building to quickly learn the type-labels in another.
+%The algorithm constructs a few classifiers to learn the knowledge from labelled buildings, and apply them to another building for predictions where the decision of each classifier is weighted locally for each example.
+%We customize the algorithm by leveraging the information from both the data and the names of streams, and refine the weighting method for classifiers to imporve the performance for our problem.
+%Our solution is explicitly designed to \emph{eliminate} manual labeling throughout the normalization process.
 % \subsection{Learning from Well-Labeled Buildings}
-% Because the sensor types in different buildings 
+% Because the sensor types in different buildings
 % overlap considerably (e.g., all buildings have temperature sensors installed),
-% we can leverage the knowledge about the labels in one building to 
+% we can leverage the knowledge about the labels in one building to
 % help normalize the labels in another.
-% To bridge the gap between naming conventions for different buildings, we envision 
-% a system that infers the metadata about sensing and control points to construct a normalized 
+% To bridge the gap between naming conventions for different buildings, we envision
+% a system that infers the metadata about sensing and control points to construct a normalized
 % common standard.
 % This would allow faster deployment of analytics/control applications and enable
-% building managers to more easily experiment with many different kinds 
-% of analytic engines and smarter management techniques. 
+% building managers to more easily experiment with many different kinds
+% of analytic engines and smarter management techniques.
 
-Following these observations, we use transfer learning to transfer ``knowledge'' about the type-labels in one building to quickly learn the type-labels in another.
-The algorithm constructs a few classifiers to learn the knowledge from labelled buildings, and apply them to another building for predictions where the decision of each classifier is weighted locally for each example.
-We customize the algorithm by leveraging the information from both the data and the names of streams, and refine the weighting method for classifiers to imporve the performance for our problem.
-Our solution is explicitly designed to \emph{eliminate} manual labeling throughout the normalization process.
-% Fundamentally, transferring type-related ``knowledge'' is achievable because features in the actual timeseries data of streams are common across buildings, even when point names are drastically different. 
+% Fundamentally, transferring type-related ``knowledge'' is achievable because features in the actual timeseries data of streams are common across buildings, even when point names are drastically different.
 % For instance, room temperature readings in all buildings are largely in the range of 60-70 Fahrenheit degree while the point names of temperature points can vary substantially, as shown in Table~\ref{table:ex}.
-We demonstrate that complementary strengths of both the names and the data can be combined to 
+With extensive experimentation, we demonstrate that complementary strengths of both the names and the data can be combined to
 transfer the knowledge from one building to another, leveraging the information about the metadata that
-we learn in each building to improve the model, increase coverage, and maximize performance.
-
-In this work, we take another step towards automatic normalization of building 
-sensor metadata that requires minimal human intervention. 
-To our knowledge, this is the first transfer learning-based approach used in this domain.  
-We focus on a key category of metadata: sensor {\it type} inference, and our techinique can automatically infer the type information for a considerable portion for a new building. We also demonstrate that the performance can be further boosted as we increase the amount of learning sources. 
-The labeled subset by our technique could provide a base for other techniques as a warm start. 
-For example, our technique can complement the traditional labeling technique for a single building. 
+we learn in each building to improve the model, increase coverage, and maximize performance. 
+The performance can be further boosted as we increase the amount of learning sources.
+The labeled subset by our technique could provide a base for other techniques as a warm start.
+For example, our technique can complement the traditional labeling technique for a single building.
 We summarizes the main contributions in this paper as forllows:
 \begin{itemize}\itemsep1pt \parskip1pt \parsep0pt
 \item We propose a novel, effective, yet general transfer-learning approach by exploiting domain knowledge learnt from an existing building to help infer information in another building.

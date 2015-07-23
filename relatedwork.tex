@@ -1,5 +1,5 @@
 \section{Related Work}
-To the best of our knowledge, we are the first to approach the problem of sensor type classification leveraging knowledge across buildings.
+To the best of our knowledge, we are the first to approach the problem of sensor type classification leveraging knowledge across buildings with transfer learning.
 
 Researchers have tried to address the non-uniformity of sensor namings asystematically.
 Dawson-Haggerty et al.~\cite{boss} and Krioukov et al.~\cite{bas}
@@ -21,9 +21,26 @@ acquire human labels for the building and propogate pseudo labels among points.
 However, none of these prior work addresses the scalability issue of metadata 
 normalization nor leverages the knowledge from already labeled buildings.
 
-There are several categories of tranfer learning as comprehensively surveyed in~\cite{transfer1}. We only briefly summarizes the differences. Inductive transfer learning~\cite{transfer2} assumes the set of class labels in the target domain is different from the source domain, no matter the feature spaces are the same or not. Multi-task learning~\cite{multitask} has a similar setting, but inductive transfer learning only aims at achieving high performance in the target task by
-transferring knowledge from the source task while multitask learning tries to learn the target and source task simultaneously. Transductive transfer learning~\cite{transfer3} assumes the source and the target have the same set of labels no matter the feature spaces are the same or not; our problem setting falls into this category. There has also been active research on how to construct an ensemble of classifiers and some assign local weights
+The use of transfer learning is motivated by the fact that people often have one or a few well labeled buildings of which they want to take advantage to assist the labeling of a new buidling.
+There are several categories of tranfer learning as comprehensively surveyed in~\cite{transfer1}. 
+% We only briefly summarizes the differences. 
+Inductive transfer learning~\cite{transfer2} assumes the set of class labels in the target domain is different from the source domain, no matter the feature spaces are the same or not. 
+Multi-task learning~\cite{multitask} has a similar setting, but inductive transfer learning only aims at achieving high performance in the target task by transferring knowledge from the source task while multitask learning tries to learn the target and source task simultaneously. 
+Transductive transfer learning~\cite{transfer3} assumes the source and the target have the same set of labels no matter the feature spaces are the same or not; our problem setting falls into this category. 
+We assume we have well-labeled training examples but do not have any labeled examples from the testing set.
+% Such knowledge transfer is possible when the training domain and the test domain have the same set of class labels.
+Classical supervised learning techniques are not useful for transferring knowledge across domains in this setting because it requires the training and testing examples to be sampled i.i.d. from the same distribution. This basic requirement does not hold here.
+There has also been active research on how to construct an ensemble of classifiers and some assign local weights
 locally~\cite{ensem1,ensem2}. However, these local weights are decided only based on the training data.
 Instance-based local weighting~\cite{weight1,weight2,weight3} has also been well studied, but these work assumed that the training and testing distributions differ only in $p(x)$ but not in $p(y|x)$.
 
 %Timeseries Representation~\cite{sax,shapelet1,shapelet2}
+
+% The use of transfer learning is motivated by the fact that people often have one or a few buildings labeled of which they want to take advantage to aid the labeling of a new buidling.
+% Transfer learning is a useful technique in the building space because the effort it takes to label sensors in a single building is high.
+% We want to leverage the knowledge gained in one building to quickly label another with minimal effort.
+% One category of transfer learning uses well-labeled data from one domain\footnote{A ``domain'' particularly refers to a data set in this paper.}
+% to classify examples in a new, related domain.
+% Classical supervised learning techniques are not useful for transferring knowledge across domains in this setting because
+% The reason that traditional supervised learning techniques is not successful in transferring knowledge across domains in our case is because
+% it requires the training and testing examples to be sampled i.i.d. from the same distribution. This basic requirement does not hold here.
