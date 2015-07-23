@@ -1,7 +1,7 @@
 \section{Related Work}
 To the best of our knowledge, we are the first to approach the problem of sensor type classification leveraging knowledge across buildings with transfer learning.
 
-Researchers have tried to address the non-uniformity of sensor namings asystematically.
+Researchers have tried to address the non-uniformity of point namings systematically.
 Dawson-Haggerty et al.~\cite{boss} and Krioukov et al.~\cite{bas}
 introduce a Building Operating System Service stack, whereby
 the underlying building sensor stock is presented to applications through a driver-based model \
@@ -29,7 +29,7 @@ Multi-task learning~\cite{multitask} has a similar setting, but inductive transf
 Transductive transfer learning~\cite{transfer3} assumes the source and the target have the same set of labels no matter the feature spaces are the same or not; our problem setting falls into this category. 
 We assume we have well-labeled training examples but do not have any labeled examples from the testing set.
 % Such knowledge transfer is possible when the training domain and the test domain have the same set of class labels.
-Classical supervised learning techniques are not useful for transferring knowledge across domains in this setting because it requires the training and testing examples to be sampled i.i.d. from the same distribution. This basic requirement does not hold here.
+Classical supervised learning techniques are not useful for transferring knowledge across domains in this setting because it requires the training and testing examples to be sampled i.i.d. from the same distribution, which does not hold here.
 There has also been active research on how to construct an ensemble of classifiers and some assign local weights
 locally~\cite{ensem1,ensem2}. However, these local weights are decided only based on the training data.
 Instance-based local weighting~\cite{weight1,weight2,weight3} has also been well studied, but these work assumed that the training and testing distributions differ only in $p(x)$ but not in $p(y|x)$.

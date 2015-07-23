@@ -246,7 +246,8 @@ Overall, our approach outperforms the best baseline.
 %Paired two sample t-test is performed to validate the statistical significance of improvement from our method over the best-performing baseline. 
 
 
-\subsection{Future Directions: Training on Multiple Buildings}
+\subsection{Future Directions}
+\subsubsection{Training on Multiple Buildings}
 
 \begin{table}[h]
 \centering
@@ -264,30 +265,32 @@ $^\ast p$-value<0.01
 \label{2source}
 \end{table}
 
-In practice, it is common to have labels for multiple buildings.  Combining them as a single source should allow us to achieve better performance.
-Using multiple buildings, we repeat the above experiments (two ways running for each pair).
+In practice, it is common to have labels for multiple buildings.  
+Combining them as a single source should allow us to achieve better performance.
 We set $\delta$ to 0.4 and use two buildings as the training source. %for the other building. 
+We repeat 10 times for the experiment on each target building and the average of ten runs is reported.
 From Table~\ref{2source}, we see that combining multiple buildings as the source is superior to single source.  %, as expected.
 
 The improvements for two sources in Table~\ref{2source} come from more examples being labeled for some already labeled classes as in the case of single source, rather than from examples in some unlabled classes. 
 % by correcting some of the errors in room temperature as well as labeling more streams of this type.
-Training with data from multiple buildings produces more robust classifiers and as hundreds of buildings are normalized, this approach will become even more powerful. 
+Training with data from multiple buildings produces more robust classifiers and as hundreds of buildings are normalized, this approach will become even more promising. 
 In contrast, existing approaches scale only linearly with the number of buildings being normalized since they all require manual labelling and only apply to a single building.
 
 
-\subsection{Complementing Traditional Labeling}
+\subsubsection{Complementing Traditional Labeling}
 Another important question we want to answer is how much our transfer learning based approach can expedite traditional labeling techniques. 
 %Because our method is designed to complement the traditional labeling techniques, rather then replacing them.
-A considerable percentage can be automatically labeled by our technique as a first step. The labeling process of a new building can be significantly accelerated.
+Since our technique automatically labels a considerable percentage as a first step, the labeling process of a new building can be accelerated.
 We adopt the technique developed in~\cite{cikm} and examine how much our technique can accelerate the labeling process.
 %~\cite{cikm} formulates a clustering-based active learning approach to iteratively label the type of sensors, where they acquire human label for a ``representative'' example in each iteration and propagate the label to adjacent examples.
 For brevity, we refer interested reader to~\cite{cikm} for the detail of the algorithm.
 
-On each testing building, we split the set into 10 folds and run the active learning (AL) and active learning combined with transfer learning (AL+TL), respectively, on nine folds while testing on the remaining one fold.
+On the testing building, we split the set into 10 folds and run the active learning (AL) and active learning combined with transfer learning (AL+TL), respectively, on nine folds while testing on the remaining one fold.
 For the case of AL+TL, we start from the automatic labeling process with a $\delta$ = 0.6 to ensure we have the minimal number of wrong automatic labels. Then we switch to the AL algorithm from~\cite{cikm} where we acquire one manual label per iteration.
-We perform 10-fold cross validation for AL and AL+TL and the average of 10 runs are demonstrated in Figure~\ref{fig:comp}. We see that AL+TL help reduce the number of manual labels to achieve the same peformance as AL.
+We take the case of transferring from A to B and perform 10-fold cross validation for AL and AL+TL, and the average of 10 runs are demonstrated in Figure~\ref{fig:comp}. 
+We see that AL+TL help reduce the number of manual labels to achieve the same peformance as AL.
 For example, it takes AL+TL 65 iterations to reach 85\% percent while AL takes 80.
-
+As we discussed earlier, more training sources could further boost the transfer learning performance, which we also expect to significantly expedite traditional labelling technique for a single building.
 
 \begin{figure}[t]
 \centering
