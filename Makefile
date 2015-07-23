@@ -1,4 +1,4 @@
-DOC=buildsys
+DOC=draft
 
 all:
 	pdflatex $(DOC).tex
