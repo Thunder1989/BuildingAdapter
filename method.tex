@@ -1,4 +1,4 @@
-\section{Methodology}
+\section{Overview: The Building Adapter}
 In this work, we adopt a transfer learning based approach proposed in \cite{lwe} to learn a set of statistical classification models based on features extracted from sensor stream readings from
 one building, and transfer the learned models to label sensors in another building.
 The approach presented in~\cite{lwe} uses a suite of base classifiers and leverges the consistency between classifier and cluster structure
@@ -124,7 +124,7 @@ For example, a set of k-mers \texttt{\{zon, tem, emp, zon\}} will be transformed
 not appear, and so forth.
 This feature representation of point names will be used for examining classification performance.
 
-\subsection{Transfer Learning for Cross-Building Sensor Type Classification}
+%\subsection{Transfer Learning for Cross-Building Sensor Type Classification}
 %The use of transfer learning is motivated by the fact that people often have one or only a few buildings labeled of which they want to take advantage to aid the labeling of a new buidling.
 %Transfer learning is a useful technique in the building space because the effort it takes to label sensors in a single building is high.
 %We want to leverage the knowledge gained in one building to quickly label another with minimal effort.
@@ -137,15 +137,20 @@ This feature representation of point names will be used for examining classifica
 %it requires the training and testing examples to be sampled i.i.d. from the same distribution. This basic requirement does not hold here.
 
 %For example, the classiers can be trained from several relevant domains or built using different learning algorithms on the same domain.
-To encapsulate the information from one labeled building and transfer it across buildings, we construct a few classifiers with different
-learning algorithms, using the same set of data features from the source building\footnote{the building we learn from is the ``source'', all others are ``targets''}.
-Each classifier contains a different ``perspective'' for that building, due to the inductive bias of the underlying model.
-We refer to these classifiers as {\it base} models\footnote{We use the term ``model'' and ``classifier'' {\it interchangeably} in this paper.} and combine them for
-classification in the target building.
-We will discuss the choice of data features for classifier training in the evaluation.
 
 
-\subsection{Locally Weighted Ensemble}
+\subsection{Locally Weighted Ensembles}
+
+To encapsulate the information from one labeled building and transfer it across
+buildings, we construct a few classifiers with different learning algorithms,
+using the same set of data features from the source building\footnote{the
+  building we learn from is the ``source'', all others are ``targets''}.  Each
+classifier contains a different ``perspective'' for that building, due to the
+inductive bias of the underlying model.  We refer to these classifiers as {\it
+  base} models\footnote{We use the term ``model'' and ``classifier'' {\it
+    interchangeably} in this paper.} and combine them for type classification in the
+target building.  
+
 The performance of any particular model can vary from building to building, and different models can be effective at different regions or structures in a target building: no single model can perform well on all examples.
 %Different models can be effective at different regions or structures in a target building, and
 To combine the knowledge across base models,
