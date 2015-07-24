@@ -1,10 +1,10 @@
 DOC=draft
 
 all:
-	pdflatex $(DOC).tex
+	pdflatex -t letter $(DOC).tex
 	bibtex $(DOC)
-	pdflatex $(DOC).tex
-	pdflatex $(DOC).tex
+	pdflatex -t letter $(DOC).tex
+	pdflatex -t letter $(DOC).tex
 
 clean:
 	rm -f $(DOC).blg $(DOC).bbl $(DOC).aux $(DOC).log $(DOC).pdf
