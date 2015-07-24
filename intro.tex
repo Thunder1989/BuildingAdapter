@@ -20,7 +20,7 @@ a technician visiting the building to visually inspect the equipment
 installation. It can take days or weeks and is a key obstacle to the widespread
 use of building analytics.
 
-Several solutions have been proposed to facilitate the point mapping problem.
+Several solutions have been proposed to facilitate the mapping problem.
 Bhattarcharya et al~\cite{arka} use a programming language based solution,
 where they derive a set of regular expressions from a handful of labeled examples
 to normalize the sensor point names.
@@ -35,9 +35,39 @@ Hong et al~\cite{cikm} formulate an active learning based approach to
 iteratively acquire human labels for building point names and propagate the
 acquired labels among similar points in the same building.  These approaches can
 significantly reduce the time required for each new building, but they all still
-require manual labeling. As such, 
+require some manual labeling, one building at a time.
 
-  do not eliminate it
+Additionally, the mapping problem cannot be solved simply by throwing more
+person hours at the problem. Even after a building is fully mapped, a new
+analytics engine may be developed that requires a different kind of metadata,
+e.g. which devices are on the northern side of the building, or which sensors
+are affected by a given air handler unit. These and other types of metadata may
+never even have been encoded in the original databases at all. Thus, as energy
+models and building analytics engines become more nuanced, the mapping problem
+will become increasingly important.
+
+In this paper, we envision a technology that would enable any new building
+analytics engine to quickly be applied to the 10's of millions of commercial
+buildings across the globe. Doing so would enable a new market where boutique
+analytics could quickly be matched with the buildings they would benefit the
+most. The key to this vision will be to infer the building's metadata structure
+without any manual intervention at all, removing human attention from the
+scalability equation. This end result would not need to be a perfect mapping; it
+must only do a first pass that is good enough to flag the right buildings for a
+more detailed, manual mapping process.
+
+In this work, we take a first step in the direction of this vision by proposing....
+
+The key insight is that, although they are all
+different, there is significant commonality between commercial buildings and the
+structure in one building can be used to understand the structure in
+another. Even if a building has no exact twin, structure may be infered from a
+combination of other buildings.
+
+
+
+
+many
 
 All prior work is focused on approaches that require manual labeling, which 
 % still seriously limits the feasibility of existing analytic solutions at scale. 
@@ -45,75 +75,9 @@ continues to be scaling bottleneck;
 % \textbf{We need some explanation of this inefficiency.}
 even if the sensor data was all publicly available on the Internet, it would still take years if not decades of manual metadata normalization before a new analytics engine could be applied to the 5.6 million commercial buildings in the U.S.
 
-
-In this paper, 
-
-
-The manual This problem called {\em metadata
-  normalization}.  is essential for scaling up the analytical solutions.
-
-% This process is tedious, error-prone, and especially difficult to verify and maintain over time.
-
-even if the sensor data was all publicly available on the Internet, it would still take years if not decades of manual metadata normalization before a new analytics engine could be applied to the 5.6 million commercial buildings in the U.S.
-
-In modern commericial buildings,
-% a sensing or control ``point'' is a sensor, a controller, or a software value, e.g., a temperature sensor installed in an office room. The metadata about the point indicates the physical location, the type of sensor or controller, how the sensor or controller relates to the mechanical systems, and other important contextual information.
-% Such information
-metadata is often expressed as short
-text strings with several concatenated abbreviations in a point name. Table~\ref{table:ex} lists
-a few point names of sensors in three different building management systems
-(Trane\footnote{\url{http://www.trane.com/}}, Siemens\footnote{\url{http://www.siemens.com/}}
-and Barrington Controls\footnote{The company is no longer in business.}).
-For example, the point name \texttt{SODA1R300\_\_ART} is constructed as a
-concatenation of the building name (\texttt{SOD}), the air handler unit
-identifier (\texttt{A1}), the room number (\texttt{R300}) and the sensor type
-(\texttt{ART}, area room temperature). As the name indicates, this point measures
-the temperature in a particular room; and it also indicates the control unit that
-can affect the temperature in this room. Clearly different naming conventions --
-generally guided by the equipment, vendor, manufacturer,
-and contractor --
-are used in these buildings. For example, the notion of {\em room temperature} is encoded
-with a different abbreviation in each of the three buildings: \texttt{Temp}, \texttt{RMT} and \texttt{ART}.
-Such variations across different buildings impose great difficulty in quickly deploying automated analytic
-solutions.
-
-% \subsection{Metadata Heterogeneity}
-\begin{table}[h]
-\centering
-\begin{tabular}{c|ll}
-\cline{1-2}
-Building & Point Name & \\
-\cline{1-2}
-\multirow{2}{*}{\texttt{A}}  & \texttt{Zone Temp 2 RMI204} &  \\
-					& \texttt{spaceTemperature 1st Floor Area1} &  \\ \cline{1-2}
-\multirow{2}{*}{\texttt{B}} & \texttt{SDH\_SF1\_R282\_RMT} &  \\
-                     & \texttt{SDH\_S1-01\_ROOM\_TEMP} &  \\ \cline{1-2}
-\multirow{2}{*}{\texttt{C}}  & \texttt{SODA1R300\_\_ART} &  \\
-					  & \texttt{SODA1R410B\_ART} &  \\ \cline{1-2}
-\end{tabular}
-\caption{Example point names for temperature sensors from three different buildings.}
-\label{table:ex}
-\end{table}
-
 In this paper, we present new techniques to automatically infer metadata in a building {\it without} manual labelling. 
 The basic idea is to learn the structure of the streams in a fully normalized building, and transfer that structure to an unnormalized one. 
 The insight that guides our solution is that: a sensor typically have two attributes -- its name in text strings and numerical readings generated over time; and these two attributes have different characteristics to be explored for effective knowledge transfer. 
-
-To address this heterogeneity, several solutions have been proposed using a variety of techniques.
-Bhattarcharya et al~\cite{arka} use a programming language based solution,
-where they derive a set of regular expressions from a handful of labeled examples
-to normalize the sensor point names.
-%This approach assumes a consistent format for all point names, which is not the case in practice, as shown in Table~\ref{table:ex}.
-Schumann et al~\cite{ibm} develop a probabilistic framework to classify sensor types
-based on the similarity between a building's point names and entries in a manually constructed dictionary.
-%However, the performance of this method is limited by the coverage and diversity of entries listed in the dictionary, and the dictionary size becomes intractable when there exist a lot of variations of the same type, or conflicting definitions of a dictionary entry in different buildings.
-Hong et al~\cite{cikm} formulate an active learning based approach to iteratively
-acquire human labels for building point names and propagate the acquired labels among similar points in the same building. All prior work is focused on approaches that require manual labeling, which
-% still seriously limits the feasibility of existing analytic solutions at scale.
-continues to be scaling bottleneck;
-% \textbf{We need some explanation of this inefficiency.}
-even if the sensor data was all publicly available on the Internet, it would still take years if not decades of manual metadata normalization before a new analytics engine could be applied to the 5.6 million commercial buildings in the U.S.
-
 
 In this paper, we present some new techniques to automatically infer metadata in a building {\it without} manual labelling.
 % The basic idea is to learn the structure of the streams in a fully normalized building, and transfer that structure to an unnormalized one.
