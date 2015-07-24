@@ -149,7 +149,7 @@ Source A & N/A   & 0.754/0.496/0.510 & 0.921/0.766/0.538 \\ \hline
 B & 0.614/0.228/0.362 & N/A   & 0.513/0.247/0.258 \\ \hline
 C & 0.582/0.299/0.421 & 0.393/0.158/0.190 & N/A   \\ \hline
 \end{tabular}
-\caption{Base classifier performance across buildings on data features. The three numbers are the accuracy for random forest, logistic regression and SVM respectively.}
+\caption{Base classifier performance across buildings on data features. In each cell, the three numbers are the accuracy for random forest, logistic regression and SVM, respectively.}
 \label{acc_base}
 \end{table*}
 
@@ -216,7 +216,7 @@ Empirically, we can set the threshold $\delta$ be around 0.4, which strikes a re
 % \centering
 %   \begin{subfigure}{0.48\textwidth}
                 \centering
-    \includegraphics[width=0.5\textwidth]{./fig/cm_single}
+    \includegraphics[width=0.45\textwidth]{./fig/cm_single}
   % \end{subfigure}
   % \begin{subfigure}{0.48\textwidth}
   %               \centering
@@ -269,7 +269,7 @@ C & {\bf 0.980$^\ast$} & {\bf 0.890$^\ast$} & 0.968 & 0.809 \\ \hline
 \end{tabular}
 \\\noindent
 $^\ast p$-value<0.01
-\caption{Combining the knowledge from multiple buildings to infer on the new one is superior to exploiting one source building.}
+\caption{Combining the knowledge from multiple buildings to infer on a new one is superior to exploiting one source building in both accuracy (Acc) and coverage (Cov).}
 \label{2source}
 \end{table}
 
@@ -302,7 +302,7 @@ As illustrated earlier, more training sources could further boost the performanc
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.4\textwidth]{./fig/tl_al.eps}
+\includegraphics[width=0.38\textwidth]{./fig/tl_al.eps}
 \caption{Our transfer learning based approach can complement traditional labeling technique to achieve better acccuracy with the same amount of labels.}
 \label{fig:comp}
 \end{figure}
