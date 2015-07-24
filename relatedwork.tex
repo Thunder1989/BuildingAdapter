@@ -1,4 +1,45 @@
-\section{Related Work}
+\section{Background and Related Work}
+
+In modern commericial buildings,
+% a sensing or control ``point'' is a sensor, a controller, or a software value, e.g., a temperature sensor installed in an office room. The metadata about the point indicates the physical location, the type of sensor or controller, how the sensor or controller relates to the mechanical systems, and other important contextual information.
+% Such information
+metadata is often expressed as short
+text strings with several concatenated abbreviations in a point name. Table~\ref{table:ex} lists
+a few point names of sensors in three different building management systems
+(Trane\footnote{\url{http://www.trane.com/}}, Siemens\footnote{\url{http://www.siemens.com/}}
+and Barrington Controls\footnote{The company is no longer in business.}).
+For example, the point name \texttt{SODA1R300\_\_ART} is constructed as a
+concatenation of the building name (\texttt{SOD}), the air handler unit
+identifier (\texttt{A1}), the room number (\texttt{R300}) and the sensor type
+(\texttt{ART}, area room temperature). As the name indicates, this point measures
+the temperature in a particular room; and it also indicates the control unit that
+can affect the temperature in this room. Clearly different naming conventions --
+generally guided by the equipment, vendor, manufacturer,
+and contractor --
+are used in these buildings. For example, the notion of {\em room temperature} is encoded
+with a different abbreviation in each of the three buildings: \texttt{Temp}, \texttt{RMT} and \texttt{ART}.
+Such variations across different buildings impose great difficulty in quickly deploying automated analytic
+solutions.
+
+% \subsection{Metadata Heterogeneity}
+\begin{table}[h]
+\centering
+\begin{tabular}{c|ll}
+\cline{1-2}
+Building & Point Name & \\
+\cline{1-2}
+\multirow{2}{*}{\texttt{A}}  & \texttt{Zone Temp 2 RMI204} &  \\
+					& \texttt{spaceTemperature 1st Floor Area1} &  \\ \cline{1-2}
+\multirow{2}{*}{\texttt{B}} & \texttt{SDH\_SF1\_R282\_RMT} &  \\
+                     & \texttt{SDH\_S1-01\_ROOM\_TEMP} &  \\ \cline{1-2}
+\multirow{2}{*}{\texttt{C}}  & \texttt{SODA1R300\_\_ART} &  \\
+					  & \texttt{SODA1R410B\_ART} &  \\ \cline{1-2}
+\end{tabular}
+\caption{Example point names for temperature sensors from three different buildings.}
+\label{table:ex}
+\end{table}
+
+
 To the best of our knowledge, we are the first to develop transfer learning based solutions to address the problem of sensor type classification across buildings.
 
 Researchers have tried to systematically address the problem of point name normalization.
