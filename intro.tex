@@ -6,12 +6,11 @@ more efficient by 2020~\cite{doe2013better}. To achieve this goal, many
 organizations are applying data analytics to the thousands of sensing and
 control points\footnote{A sensing or control ``point'' is a sensor, a
   controller, or a software value.} in buildings to detect wasteful, incorrect,
-and inefficient operation.  Many promising analytical approaches have been
-created that demonstrate promise for substantial energy savings~\cite{find}.
-However, these analytic engines are \emph{tightly coupled} to the database
-schemas and metadata conventions in the buildings for which they were desgined
-and cannot easily be applied to different buildings in which the type, location,
-and relationships between are represented differently. Unfortunately, most
+and inefficient operations. Many promising analytical approaches have been
+created that demonstrate promise for substantial energy savings~\cite{mpc, comfy}.
+However, these analytic engines are \emph{tightly coupled} to the database schemata and metadata conventions in the buildings for which they were designed
+and thus cannot easily be applied to different buildings where the type, location,
+and relationships between sensors are represented differently. In practice, unfortunately, most
 buildings use different metadata conventions depending on the type of equipment
 in the building, the vendors of the equipment, and the contractors who
 originally installed it. The process of {\em mapping} a new building to the
@@ -38,12 +37,12 @@ acquired labels among similar points in the same building.  These approaches can
 significantly reduce the time required for each new building, but they all still
 require some manual mapping, one building at a time.
 
-Additionally, the mapping problem cannot be solved simply by throwing more
+Additionally, the mapping problem cannot be solved simply by investing more
 person hours at the problem. Even after a building is fully mapped, a new
 analytics engine may be developed that requires a different kind of metadata,
 e.g. which devices are on the northern side of the building, or which sensors
-are affected by a given air handler unit. These and other types of metadata may
-never even have been encoded in the original databases at all. Thus, as energy
+are affected by a given air handler unit. These and other types of metadata may even
+never have been encoded in the original databases at all. Thus, as energy
 models and building analytics engines become more nuanced, the mapping problem
 will become increasingly important.
 
@@ -53,44 +52,29 @@ buildings across the globe. Doing so would enable a new market where boutique
 analytics could quickly be matched with the buildings they would benefit the
 most. The key to this vision is to perform all mapping operations automatically
 and to remove the human from the scalability equation entirely. Any such system
-would not need to do perfect mapping; it must only do a first pass that is good
+would not need to perform perfect mapping; it must only do a first pass that is good
 enough to flag the right buildings for a more detailed, manual mapping process.
 
-In this work, we take a first step towards scalable building analytics by
-developing new techniques to automatically infer metadata in a building {\em
+As our contribution, we take a first step towards scalable building analytics by
+developing new techniques to automatically infer the {\it sensor type} information in a building {\em
   without} manual labelling. The insight that guides our solution is that a
-sensor typically has two attributes -- its name (a text string) and its
-numerical readings generated over time. The names are likely to be good
-indicators of metadata structure but are not consistent across buidlings, while
-the readings are likely to be poor indicators of metadata but are more
-consistent across buildings. Our techniques combine the complementary strengths
-of these two attributes to automatically create metadata for one building based
-on another building. More specifically, our approach comprises three steps. 1) we start
-with a fully labeled building and train multiple classifiers o label new points
-based on the data associated with them. These classifiers model the metadata of a
-sensor based on the raw data, e.g. air temperature sensors have different values
-and change more slowly than light or $CO_2$ sensors. 2) We take a different,
-unlabeled building and cluster its points based on their names. The clustering
-algorithm tries to group the sensors based on patterns in their names such as
-the phrases ``temp'' or ``occ''. 3) We use the classifiers from the first
-building to label the points in the second building, weighting them based on how
-consistent their labels are with the name clustering. Thus, our approach builds
-on and improves upon techniques from {\em transfer learning}~\cite{lwe}: it
-learns a model of the metadata from a labeled building and modifies that model
-so it can be applied to another, unlabeled building.
+sensor typically has two attributes -- its recorded name (a text string) and its numerical readings generated over time. In particular, the sensor names are likely to be good
+indicators of metadata structure but might not be consistent across buildings, while the sensor readings are more consistent across buildings but are likely to be poor indicators of sensor types. Our techniques combine the complementary strengths
+of these two attributes to automatically recognize sensor types in one building based on another building. More specifically, our approach comprises three steps. 1) We start
+with a fully labeled building and train multiple statistical classifiers based on the sensor stream data. These classifiers predict sensor types based on the raw data, e.g., readings from air temperature sensors are different and change more slowly than those generated by light or $CO_2$ sensors. 2) In an
+unlabeled building, we cluster the points based on patterns in their names such as the phrases ``temp'' or ``occ''. 3) We ensemble the classifiers from the first building to label the points in the second building, and assign higher weights to classifiers whose predictions on an instance's neighborhood in the target building are more consistent with the name feature defined clusters.
+%Our approach builds on and improves upon techniques from {\em transfer learning}~\cite{lwe}: it learns a model of the metadata from a labeled building and modifies that model so it can be applied to another, unlabeled building.
 
-To evaluate this approach, we use a dataset with 7 days of data from over 3,000
+To evaluate our solution, we use a dataset with 7 days of data from over 2,500
 sensors located in 3 commercial buildings across 2 different college
-campuses. Metadata was created manually for all buildings. Then, we applied our
-techniques on each building to automatically infer the metadata of the other 2
-buildings. The results indicate that this approach can automatically label at
+campuses. True sensor type information was created manually for all buildings. Then, we applied our
+techniques on each building to automatically infer the sensor type information for the other 2
+buildings. The results indicate that the proposed solution can automatically label at
 least 36\% of the points with more than 85\% accuracy, and in some cases labels
 up to 81\% of the points with 96\% accuracy. In contrast, training classifiers
-on one building and applying directly to another building without reweighting
+on one building and applying them directly to another building 
 achieves only 63\% label accuracy on average. Our technique does not label all
-points, but those that are labeled have high label accuracy. Thus, it will only
-support a fraction of analytics algorithms, depending on which sensors they
-process. Before concluding, we present two techniques that are showing promise
+points, but those that are labeled have high label accuracy. %Thus, it will only support a fraction of analytics algorithms, depending on which sensors they process.
+Before concluding, we present two techniques that are showing promise
 to improve this coverage and expand support for a larger fraction of analytics
 algorithms.
-

@@ -1,5 +1,5 @@
 \section{Background and Related Work}
-In modern commericial buildings,
+In modern commercial buildings,
 % a sensing or control ``point'' is a sensor, a controller, or a software value, e.g., a temperature sensor installed in an office room. The metadata about the point indicates the physical location, the type of sensor or controller, how the sensor or controller relates to the mechanical systems, and other important contextual information.
 % Such information
 metadata is often expressed as short
@@ -47,24 +47,25 @@ introduce a Building Operating System Service stack, whereby
 the underlying building sensor stock is presented to applications through a driver-based model \
 and an application stack provides a fuzzy-query based interface to the namespace exposed
 through the driver interface.
-Although this architecture has useful properties for easing generalizability across
-buildings, the driver registration process is still done manually.
-Bhattarcharya et al.~\cite{arka} exploit a programming language based solution,
+Although this architecture has some useful properties for easing generalizability across
+buildings, the driver registration process is still performed manually. Bhattarcharya et al.~\cite{arka} exploit a programming language based solution,
 where they derive a set of regular expressions from a handful of labeled examples
 to normalize the point name of sensors.
-This approach assumes a consistent format for all point names across buildings, which might not be true in practice.
+This approach assumes a consistent format for all point names across buildings, which might not be true in practice (as shown in Table \ref{table:ex}).
 Schumann et al.~\cite{ibm} develop a probabilistic framework to classify sensor types
 based on the similarity of a raw point name to the entries in a manually constructed dictionary.
 However, the performance of this method is limited by the coverage and diversity of entries listed in the dictionary, and the dictionary size becomes intractable when there exist a lot of variations of the same type, or conflicting definitions of a dictionary entry in different buildings.
 Hong et al~\cite{cikm} formulate an active learning based approach to iteratively
-acquire human labels for the target building and propogate pseudo labels among points.
+acquire human labels for the target building and propagate pseudo labels among points.
 However, all of those existing work depend on manual annotations, and thus none of them address the scalability issue of metadata
-normalization across buildings nor leverages the knowledge from already labeled buildings.
+normalization across buildings nor leverage the knowledge from already labeled buildings.
 
-Transfer learning saves extra effort in manual annotation by exploiting the labels in the already well annotated buildings.
-There are several categories of tranfer learning, e.g., inductive, transductive, and multi-task transfer learning as comprehensively surveyed in~\cite{transfer1}.
+Applying transfer learning for cross building sensor type classification saves extra effort in manual annotation by exploiting the labels in the already well annotated buildings.
+There are several categories of transfer learning, e.g., inductive, transductive, and multi-task transfer learning as comprehensively surveyed in~\cite{transfer1}.
 % We only briefly summarizes the differences.
-Inductive transfer learning~\cite{transfer2} assumes the set of class labels in the target domain is different from the source domain, and aims at achieving high performance in the target domain by transferring knowledge from the source domain. Multi-task transfer learning \cite{multitask} has a similar setting, but tries to learn from the target and source domains simultaneously. Transductive transfer learning~\cite{transfer3} assumes the source and target domains have the same set of labels, but different marginal distribution of features (i.e., $p(x)$) or conditional distribution of labels (i.e., $p(y|x)$). This breaks down the basic identical and independent assumption in classical supervised learning techniques and makes them inept. Typical solutions in transductive transfer learning is to reweight the source domain trained classifiers' predictions in target domain, e.g., instance-based local weighting~\cite{weight1,weight2,weight3}. But these solutions usually assume that only the marginal distribution of features differ in source and target domain. Ensemble methods are therefore explored to assign different weights to a set of classifiers to accommodate the varying conditional probabilities of labels in the target domain \cite{ensem1,ensem2}. Our problem setting falls into this category: we assume we have well-labeled instances in one building, i.e., the source domain, but do not have any labeled instances in the target building, i.e., the target domain. Beyond ensemble-based transfer learning, we explore two types of attributes of a sensor: the features extracted from sensor reading streams are used to estimate a set of different classifiers in source domain; sensor name strings are used to generate clusters in the target domain, and those clusters are then used to assign weights to the source domain trained classifiers when integrating their predictions.
+Inductive transfer learning~\cite{transfer2} assumes the set of class labels in the target domain is different from those in the source domain, and aims at achieving high classification performance in the target domain by transferring knowledge from the source domain. Multi-task transfer learning \cite{multitask} has a similar setting, but tries to learn from the target and source domains simultaneously. Transductive transfer learning~\cite{transfer3} assumes the source and target domains have the same set of labels, but different marginal distribution of features (i.e., $p(x)$) or conditional distribution of labels (i.e., $p(y|x)$). This breaks the basic identical and independent assumption in classical supervised learning models and makes them inept. Typical solutions in transductive transfer learning reweight the source domain trained classifiers' predictions in target domain, e.g., instance-based local weighting~\cite{weight1,weight2,weight3}. But these solutions usually assume that only the marginal distribution of features differ in the source and target domain. Ensemble methods are therefore explored to assign different weights to a set of classifiers to accommodate the varying conditional probabilities of labels in the target domain \cite{ensem1,ensem2}. Our problem setting falls into this category: we assume we have well-labeled instances in one building, but do not have any labeled instances in the target building. We exploit different properties of a sensor point to perform the transfer learning: sensor's  data is utilized to estimate a diverse set of classifiers to transfer knowledge from the source building to target building; sensor names in the target building are used to compute the ensemble weight of classifiers during knowledge transfer.
+To the best of our knowledge, we are the first to explore multiple types of features in transfer learning.
+% Beyond ensemble-based transfer learning, we explore two types of attributes of a sensor: the features extracted from sensor reading streams are used to estimate a set of different classifiers in source domain; sensor name strings are used to generate clusters in the target domain, and those clusters are then used to assign weights to the source domain trained classifiers when integrating their predictions.
 % Such knowledge transfer is possible when the training domain and the test domain have the same set of class labels.
 
 

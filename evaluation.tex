@@ -1,38 +1,37 @@
 \section{Evaluation}
-To investigate the effectiveness of our method, we evaluate our transfer learning based classification technique on the data and the point names of sensors from three commercial buildings. Extensive experiments demonstrate that our technique is able to accurately classify by type for a considerable portion of examples without human intervention. With more training sourcs, the performance of our technique can be further enhanced.
-To further demonstrate the usefulness of the technique, we combine transfer learning with the traditional labeling process to accelerate the learning speed.
+To investigate the effectiveness of our solution, we evaluate our transfer learning based classification technique on the sensor reading data and the point names of sensors from three commercial buildings. Extensive experiments demonstrate that our technique is able to accurately classify sensor types for a considerable fraction of the examples without human intervention. With more training data, the performance of our technique can be further enhanced.
+To demonstrate the promising usage of the technique, we combine transfer learning with the traditional labeling process to accelerate the learning efficiency.
 
 
 \subsection{Taxonomy and Data Collection}
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.38\textwidth]{./fig/hvac}
+\includegraphics[width=0.36\textwidth]{./fig/hvac}
 \caption{A typical HVAC system consisting of an air handler unit (AHU), several variable air volume boxes (VAV), water-based heating/cooling pipes and air circulation ducts. (Figure used with permission from the authors of~\cite{sentinel}.)}
 \label{fig:hvac}
 \end{figure}
 
-Figure~\ref{fig:hvac} illustrates a typical heating, ventilation, and air conditioning (HVAC) system deployed in modern commercial buildings. 
-An HVAC system uses a combination of hot and cold water pipes in conjunction with
-air handler units (AHU) to maintain the appropriate thermal environment within the building.
-An HVAC system typically consists of several AHUs and each AHU is responsible for a spatial \emph{zone}
-in the building. An AHU consists of variable speed drives that supply cold air
-(cooled by the supplied cold water) using ducts to VAV boxes distributed throughout the building.
-The hot water loop is also connected to these VAV boxes using separate pipes. Each VAV box
-controls the amount of air to be let into an HVAC zone using dampers, whose opening angle
-can be programmed. A reheat coil, which uses supplied hot water, is used to heat the air to
-meet the appropriate HVAC settings for each zone.
+% Figure~\ref{fig:hvac} illustrates a typical heating, ventilation, and air conditioning (HVAC) system deployed in modern commercial buildings.
+% An HVAC system uses a combination of hot and cold water pipes in conjunction with
+% air handler units (AHU) to maintain the appropriate thermal environment within the building.
+% An HVAC system typically consists of several AHUs and each AHU is responsible for a spatial \emph{zone}
+% in the building. An AHU consists of variable speed drives that supply cold air
+% (cooled by the supplied cold water) using ducts to VAV boxes distributed throughout the building.
+% The hot water loop is also connected to these VAV boxes using separate pipes. Each VAV box
+% controls the amount of air to be let into an HVAC zone using dampers, whose opening angle
+% can be programmed. A reheat coil, which uses supplied hot water, is used to heat the air to
+% meet the appropriate HVAC settings for each zone.
 
-Table~\ref{table:num} summarizes all the types of sensors evaluated in our analysis in these three buildings and the number of sensors of each type. 
-``Room temperature'' measures the temperature in room. The other temperature measurements for water circulation and air ventilation are illustrated in Figure~\ref{fig:hvac}. 
-For setpoints, are grouped together into
+Table~\ref{table:num} summarizes all the sensor types evaluated in our experiments in these three buildings and the number of sensors under each type. For example, ``room temperature'' measures the temperature in room, and the other temperature measurements for water circulation and air ventilation are illustrated in Figure~\ref{fig:hvac}.
+Setpoints are grouped together into
 one general type. % which includes all set points for every actuator configured in the building.
 
-Our evaluation dataset, which contains both data and point names of sensor streams, is collected from over 2,500 sensors of different types deployed in three commercial buildings. 
-We collected a week's worth of data from each building.
-Building A is Rice Hall at the University of Virginia, where the sense points report to a database component in a Trane BMS, % anywhere between 
+Our evaluation dataset, which contains both sensor reading data and point names of sensor streams, is collected from over 2,500 sensors of different types deployed in three commercial buildings.
+We collected a week's sensor reading data from each building.
+Building A is Rice Hall at the University of Virginia, where the sense points report to a database component in a Trane BMS, % anywhere between
 every 10 seconds to 10 minutes.
-Both building B and C are from UC Berkeley: B is Sutardja Dai Hall, which contains sensors and equipment from KETI\footnote{\url{http://www.keti.re.kr/}} and Siemens. 
-Building C is Soda Hall, which that uses an archaic system by Barrington Controls which is no longer in business. 
+Both building B and C are from UC Berkeley: B is Sutardja Dai Hall, which contains sensors and equipment from KETI\footnote{\url{http://www.keti.re.kr/}} and Siemens.
+Building C is Soda Hall, which that uses an archaic system by Barrington Controls which is no longer in business.
 Points and sensors in these two buildings transmit data to an sMAP~\cite{smap} archiver periodically between every 5 seconds to 10 minutes.
 
 
@@ -71,22 +70,23 @@ Sum & 575 & 1124 & 1166\\ \hline
 \end{table}
 
 
-All of our learning and classification processes are implemented with the scikit-learn~\cite{scikit} library; an open-source machine learning package 
+All of our learning and classification processes are implemented with the scikit-learn~\cite{scikit} library; an open-source machine learning package
 implemented in Python. % providing a rich set of APIs.
 
 
 \subsection{Feature Transferability}
-We examine how the two different types of features explained in Section~\ref{feature} can perform in classifying sensor types when applied across buildings, i.e., learning a classifier based on the features from building A and testing it on building B. 
-We expect data features to be more generalizable than point names since 
-building environments are conditioned similarly and therefore similar sensors 
-share commonality in amplitude and trend.
-For example, diurnal patterns are common across streams of similar type and 
-%with respect to differentiating points by types. 
-%This is because in general a certain type of sensors will , such as diurnal patterns. 
-temperature readings in a building will usually fall between 60-70 degree; 
+We first examine how well the two different types of features explained in Section~\ref{feature} perform in classifying sensor types when applied across buildings, i.e., learning a classifier based on the features from one building and testing it on another.
+We expect data features to be more generalizable than point names since
+building environments are conditioned similarly while the sensor naming conventions could be different.
+% and therefore similar sensors share commonality in amplitude and trend.
+For example,
+% diurnal patterns are common across streams of similar type and
+%with respect to differentiating points by types.
+%This is because in general a certain type of sensors will , such as diurnal patterns.
+temperature readings in a room will usually fall between 60-70 degrees, no matter in which building.
 % rising in the morning and falling at night.
 In contrast, point name features might not transfer well due to various naming conventions as shown in Table~\ref{table:ex}.
-Although k-mers can enlarge the size of term dictionary in a building to increase the chance of covering more terms in other buildings, such a technique still cannot fundamentally compensate for the difference in naming conventions.
+%Although k-mers can enlarge the size of term dictionary in a building to increase the chance of covering more terms in other buildings, such a technique still cannot fundamentally compensate for the difference in naming conventions.
 
 
 \begin{table}[h]
@@ -101,24 +101,20 @@ C-\textgreater B & 0.399       & 0.302       \\ \hline
 A-\textgreater C & 0.922       & 0.021       \\
 C-\textgreater A & 0.584       & 0.399       \\ \hline
 \end{tabular}
-\caption{Type classification accuracy between two buildings with different sets of features: data features transfer better than point name features of sensors.}
+\caption{Type classification accuracy between two buildings (denoted as X->Y) with different sets of features: data features transfer better than point name features of sensors.}
 \label{table:clf}
 \end{table}
 
 
-To examine how well each type of feature transfers, we perform type classification across buildings with both features, separately.   
-As an example, with either set of features from building A, we train a random forest and apply it to building B on the same type of feature, and vice versa. 
-Table~\ref{table:clf} summarizes the results. Choosing a different classifier does not affect the pattern observed.
-Indeed, data features transfer better than name features but the results from data features contain significant errors. 
+To examine how well each type of features can be used for knowledge transfer, we perform sensor type classification across buildings with each type of features separately.
+For example, with data features from building A, we train a random forest and apply it to building B on the same type of feature, and vice versa.
+Table~\ref{table:clf} summarizes the results, from which we can conclude that data features are more useful to build a classifier across buildings than name features, but the resulting performance is not perfect. We also performed this experiment with other statistical classifiers, but the choice of classifiers does not affect the conclusion.
 % The question remains, how do we leverage these two sources of information effectively?
 % We will discuss the idea of transfer learning in next section.
-Based on these observations, we use data features to train base classifiers that transfer the knowledge across buildings.
+These observations confirm our assumption that data feature is preferable to train statistic classifiers across buildings.
 
 \subsection{Features for Clustering}
-As shown in Algorithm~\ref{algo}, to perform classification on a target building we need to generate clusters among the points.
-These clusters are employed to guide the weighting of base classifiers. Therefore, it is ideal to have points in the same clusters 
-well aligned with their true class lables: the higher quality of clusters, the more accurate the weights will be on base classifiers.
-
+As shown in Algorithm~\ref{algo}, to perform classification in a target building we need to generate clusters for the points in it. These clusters are employed to compute the weighting of base classifiers. Therefore, it is preferred to have points in the same clusters well aligned with their true class labels: the higher quality of clusters is, the more accurate the weights will be given to the base classifiers.
 
 \begin{table}[h]
 \centering
@@ -129,15 +125,13 @@ A & 0.21       & 0.58       \\
 B & 0.34       & 0.75       \\
 C & 0.32       & 0.78       \\ \hline
 \end{tabular}
-\caption{Quality of clusters generated with different features measure by rand index (in the range [0,1], higher is better).}
+\caption{Quality of clusters generated on three buildings with different features measure by rand index (in the range [0,1], higher is better).}
 \label{quality}
 \end{table}
 
-
-In general, point names following the same pattern are not expected to vary too much, which means name features will produce clusters of higher quality than data features.
-Table~\ref{quality} shows the quality of clusters generated by with our non-parameric Bayesian method on data features and name features. 
-Quality is measured by rand index~\cite{rand}, which is a standard measure of the similarity between the grouping in clusters and the true labels.
-Based on the results, we choose to use point name features to generate clusters for the new building. 
+%In general, point names following the same pattern are not expected to vary too much, which means name features will produce clusters of higher quality than data features.
+Table~\ref{quality} shows the quality of clusters generated by our non-parametric Bayesian method on data features and name features.
+Clustering quality is measured by rand index~\cite{rand}, which is a standard measure of the similarity between the grouping in clusters and the true labels. From the results we can clearly observe that clusters constructed by name features are more consistent with their true sensor type labels than those generated by data features. This confirms our assumption about using name features to estimate local clustering structures in target buildings.
 
 
 \begin{table*}[]
@@ -177,16 +171,15 @@ C & 0.582/0.299/0.421 & 0.393/0.158/0.190 & N/A   \\ \hline
 
 \subsection{Base Classifier Performance}
 \label{sec:baseline}
-Our transfer learning based approach employs a few base classifiers. Each base classifier is trained on the same set of data features from the source building. There is no particular requirement on 
-what classifiers should be selected in this step.  
-We employ three base classifiers: random forest, linear regression (LR) and support vector machines (SVM) with RBF kernels.
+Our transfer learning based approach employs a few base classifiers. Each base classifier is trained on the same set of data features from the source building. There is no restriction about what classifiers should be selected in this step.
+We employ three base classifiers: random forest, logistic regression (LR) and support vector machines (SVM) with RBF kernels.
 
 
 \begin{table*}[]
 \centering
 \begin{tabular}{r|c|c|c|c|c|c}
 \hline
-\multirow{2}{*}{} & \multicolumn{2}{c|}{Target A} & \multicolumn{2}{c|}{B} & \multicolumn{2}{c}{C} \\ \cline{2-7} 
+\multirow{2}{*}{} & \multicolumn{2}{c|}{Target A} & \multicolumn{2}{c|}{B} & \multicolumn{2}{c}{C} \\ \cline{2-7}
                   & Acc        & F1        & Acc        & F1        & Acc        & F1        \\ \hline\hline
 Source A                 & N/A      & N/A     & 0.943/0.934      & 0.936/0.931     & 0.977/0.970      & 0.981/0.971     \\ \hline
 B                 & 0.897/0.875     & 0.932/0.913     & N/A      & N/A     & 0.950/0.952      & 0.939/0.937     \\ \hline
@@ -196,20 +189,19 @@ C                 & 0.862/0.862     & 0.864/0.864     & 0.726/0.702      & 0.691
 \label{table:f1}
 \end{table*}
 
-For the three buildings, we have three pairs of choices and for each pair the training/testing can be conducted either way; therefore, we have six testing cases.
-The performance of the base classifiers when applied across buildings is shown in Table~\ref{acc_base}.  The base classifiers achieve an accuracy between 0.158 and 0.921.
-On average, random forest performs the best, followed by SVM and LR. 
-Notice, the accuracy of learning on building C and testing on building B is substantially worse than the other cases. 
-One reason is because building B contains many dynamic temperature setpoints whose values change throughout the day, whereas the setpoints in C are static. 
-The other type is air flow, whose reading amplitude is significantly different from the ones in C. These two types contribute to most of the errors. %in this case.
+For the three buildings, we create six cross building training and testing pairs, and the corresponding classification performance is shown in Table~\ref{acc_base}. The base classifiers achieve an accuracy between 0.158 and 0.921 in this cross building evaluation scenario.
+On average, random forest performed the best, followed by SVM and LR.
+We should note that the accuracy of learning on building C and testing on building B is substantially worse than the other cases.
+One reason is because building B contains many dynamic temperature setpoints whose values change throughout the day, whereas the setpoints in C are static.
+Anther major source of error is the type of air flow, whose reading amplitude is significantly different from the ones in C. %These two types contribute to most of the errors. %in this case.
 
 
 \subsection{Transfer Learning Performance}
 
-We first consider the case where only one building is exploited as the source, i.e., each base classifier is trained on data from only one building. 
-The overall accuracy of transfer learning for type classification across our three target buildings are illustrated in Figure~\ref{fig:tl_acc}.
-There is an intrinsic trade-off between the prediction accuracy and the percentage being labeled, as we set a threshold on the average weight of base classifiers. 
-When we increase the threshold $\delta$ on the average weight for base classifiers, we have labels of better quality -- with a drop in the percentage of examples being labeled. 
+We first consider the case where only one building is exploited as the source, i.e., all base classifiers are trained on data from only one building.
+The overall accuracy of transfer learning for type classification across our three target buildings is illustrated in Figure~\ref{fig:tl_acc}.
+There is an intrinsic trade-off between the prediction accuracy and the percentage being labeled, as we set a threshold on the average weight of base classifiers.
+When we increase the threshold $\delta$ on the average weight for base classifiers, we have labels of better quality -- with a drop in the percentage of examples being labeled.
 Empirically, we can set the threshold $\delta$ be around 0.4, which strikes a reasonable balance between accuracy and coverage.
 
 \begin{figure}[ht!]
@@ -223,32 +215,31 @@ Empirically, we can set the threshold $\delta$ be around 0.4, which strikes a re
   %   \includegraphics[width=\textwidth]{./fig/cm_single}
   %               \caption{Single Source}
   % \end{subfigure}
-\caption{Confusion matrices for the transfer learning classification resuls for transferring from A to C. ``rmt'' stands for room temperature, ``stpt'' for setpoint, ``sup'' for supply, ``ret'' for return, and ``SAT'' for supply air temperature.
+\caption{Confusion matrix for the transfer learning classification resuls for transferring from A to C. ``rmt'' stands for room temperature, ``stpt'' for setpoint, ``sup'' for supply, ``ret'' for return, and ``SAT'' for supply air temperature.
  % and ``pos'' for vale position.
  }
 \label{fig_cm}
 \end{figure}
 
-Figure~\ref{fig_cm} presents the confusion matrices for classification results for the case of transferring from A to C.
-The numbers below the predicted labels on the x-axis denote the percentage each type of streams takes in that building, while the numbers below the true labels on the left denote the percentage being labeled by our technique for each type.
+As an example, Figure~\ref{fig_cm} presents a confusion matrix for classification results for the case of transferring from building A to building C. The numbers below the predicted labels on the x-axis denote the percentage of each type of sensor streams in that building, while the numbers below the true labels on the left denote the percentage of points being labeled by our technique in each sensor type.
 
-On imbalanced data sets, investigation of accuracy alone is not enough. We also measure the weighted macro F1 score of 
-classification for our approach and the baseline. The weighted macro F1 score is an altered version of macro F1 score~\cite{yang}, 
-which calculates the F1 score for each class; where ``one-versus-all'' binary classification is performed and weighs the resulting F1 of each class by support (the number of true instances for each label). 
+On imbalanced data sets, investigation of accuracy alone is not enough. We also measure the weighted macro F1 score of
+classification for our approach and the baseline. The weighted macro F1 score is an altered version of macro F1 score~\cite{yang},
+which calculates the F1 score for each class; where ``one-versus-all'' binary classification is performed and weighs the resulting F1 of each class by support (the number of true instances for each label).
 
-As a baseline, we take the subset of examples in the new building that get labeled by the transfer learning process and apply base classifiers to predict labels on the same population. 
-We set $\delta$ to 0.4 and  
-repeat 10 times for the experiment in each direction (e.g., A->B). The average of the resuls is reported in Table~\ref{table:f1}. 
-Each cell contains two numbers: the former is for our approach while the latter is for the {\it best} base classifier.
-The case of transferring from C to B is again substantially worse than other cases, this is because the transfer learning algorithm is fundamentally bounded by the performance of base classifiers. 
-Intuitively, if none of the base classifiers is able to predict correctly for an instance, no matter how we manipulate the weights, it will not make a difference in the results.
+As a baseline, we take the subset of examples in the new building that get labeled by the transfer learning process and apply base classifiers to predict labels on the same population.
+We set $\delta$ to 0.4 and
+repeat 10 times for the experiment in each direction (e.g., A->B). The average performance is reported in Table~\ref{table:f1}.
+Each cell contains two results: the former is from our approach while the latter is from the {\it best} base classifier.
+The case of transferring from C to B is again substantially worse than other cases, this is because the transfer learning algorithm is bounded by the performance of base classifiers.
+Intuitively, if none of the base classifiers is able to correctly predict an instance, no matter how we manipulate the weights, it will not make a difference in the results.
 Overall, our approach outperforms the best baseline.
-%Paired two sample t-test is performed to validate the statistical significance of improvement from our method over the best-performing baseline. 
+%Paired two sample t-test is performed to validate the statistical significance of improvement from our method over the best-performing baseline.
 
 
 \section{Future Directions}
 
-The results above indicate that this approach can label a fraction of
+The results above indicate our proposed solution can label a fraction of
 the points in a commercial building with no human intervention. As
 such, it will serve some but not all forms of building analytics,
 depending on which sensing points they need. In this section, we
@@ -261,7 +252,7 @@ larger fraction of the building points.
 \centering
 \begin{tabular}{r|cc|cc}
 \hline
-\multirow{2}{*}{} & \multicolumn{2}{c|}{Two Sources} & \multicolumn{2}{c}{Single Source} \\ \cline{2-5} 
+\multirow{2}{*}{} & \multicolumn{2}{c|}{Two Sources} & \multicolumn{2}{c}{Single Source} \\ \cline{2-5}
  & Acc & Cov & Acc & Cov \\ \hline\hline
 Target A & {\bf 0.863$^\ast$} & {\bf 0.397$^\ast$} & 0.855 & 0.362 \\ \hline
 B & {\bf 0.899$^\ast$} & {\bf 0.458} & 0.874 & 0.455 \\ \hline
@@ -273,49 +264,45 @@ $^\ast p$-value<0.01
 \label{2source}
 \end{table}
 
-In practice, it is common to have labels for multiple buildings.  
-Combining them as a single source should allow us to achieve better performance.
-We set $\delta$ to 0.4 and use two buildings as the training source. %for the other building. 
+In practice, it is common to have labels for multiple buildings. Combining them as a single source will allow us to achieve better performance. We set $\delta$ to 0.4 and use two buildings as the training source. %for the other building.
 We repeat 10 times for the experiment on each target building and the average of ten runs is reported.
 From Table~\ref{2source}, we see that combining multiple buildings as the source is superior to single source.  %, as expected.
 
-The improvements for two sources in Table~\ref{2source} come from more examples being labeled for some already labeled classes as in the case of single source, rather than from examples in some unlabled classes. 
+Upon further inspection of the model predictions, compared with the case of single source, we observe that the improvements for integrating multiple sources in transfer learning mostly come from labeling more examples of the same classes, rather than capturing more new classes.
 % by correcting some of the errors in room temperature as well as labeling more streams of this type.
-Training with data from multiple buildings produces more robust classifiers and as hundreds of buildings are normalized, this approach will become even more promising. 
+Training with labeled data from multiple buildings produces more robust classifiers and as hundreds of buildings are normalized, this approach will become even more promising.
 In contrast, existing approaches scale only linearly with the number of buildings being normalized since they all require manual labelling and only apply to a single building.
 
 
-\subsection{Complementing Traditional Labeling}
-Another important question we want to answer is how much our transfer learning based approach can expedite traditional labeling techniques. 
+\subsection{Complementing Manual Labeling}
+Another important question we want to answer is how much our transfer learning based approach can expedite traditional labeling techniques.
 %Because our method is designed to complement the traditional labeling techniques, rather then replacing them.
-Since our technique automatically labels a considerable percentage as a first step, the labeling process of a new building can be accelerated.
-We adopt the technique developed in~\cite{cikm} and examine how much our technique can accelerate the labeling process.
+Since our technique automatically labels a considerable percentage of sensor points in a building as a first step, the manual labeling process in this new building can be accelerated.
+We adopt the active learning technique developed in~\cite{cikm} and examine how much our technique can accelerate the labeling process.
 %~\cite{cikm} formulates a clustering-based active learning approach to iteratively label the type of sensors, where they acquire human label for a ``representative'' example in each iteration and propagate the label to adjacent examples.
 For brevity, we refer interested reader to~\cite{cikm} for the detail of the algorithm.
 
-On the testing building, we split the set into 10 folds and run the active learning (AL) and active learning combined with transfer learning (AL+TL), respectively, on nine folds while testing on the remaining one fold.
-For the case of AL+TL, we start from the automatic labeling process with a $\delta$ = 0.6 to ensure we have the minimal number of wrong automatic labels. Then we switch to the AL algorithm from~\cite{cikm} where we acquire one manual label per iteration.
-We take the case of transferring from A to B and perform 10-fold cross validation for AL and AL+TL, and the average of 10 runs are demonstrated in Figure~\ref{fig:comp}. 
-We see that AL+TL help reduce the number of manual labels to achieve the same peformance as AL.
-For example, it takes AL+TL 65 iterations to reach 85\% percent while AL takes 80.
-As illustrated earlier, more training sources could further boost the performance of transfer learning, which we expect would also significantly expedite traditional labelling technique for a single building.
+In the target building, we split all the testing instances into 10 folds. We run the active learning method (AL) and active learning combined with transfer learning method (AL+TL), respectively, on nine folds while testing on the remaining one fold.
+For the case of AL+TL, we start from the automatic labeling process with a $\delta$ = 0.6 to minimize the amount of inaccurate labels from transfer learning. Then we switch to the AL algorithm developed in~\cite{cikm} where we acquire one manual label per iteration. Due to space limit, we only show the results from  transferring from building A to building B in Figure~\ref{fig:comp}.
+We can clearly observe that AL+TL helps reduce the number of manual labels to achieve the same performance as AL.
+For example, given the same amount of manual labels, AL+TL can always outperform AL. As illustrated earlier, more training sources could further boost the performance of transfer learning, which we expect would also significantly expedite traditional labelling technique for a single building.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.38\textwidth]{./fig/tl_al.eps}
-\caption{Our transfer learning based approach can complement traditional labeling technique to achieve better acccuracy with the same amount of labels.}
+\includegraphics[width=0.36\textwidth]{./fig/tl_al.eps}
+\caption{Our transfer learning based approach can complement traditional labeling technique to achieve better accuracy with the same amount of labels.}
 \label{fig:comp}
 \end{figure}
 
 
-\section{Discussion}
-%\paragraph{Unlabeled Streams}
-%With a threshold on the average weight of base classifiers, our transfer learning based technique is able to label a portion of the streams in the new building, which leaves many unlabeled.
-%The coverage might be increased by searching for the nearest neighbors in a certain radius to those unlabeled and combine them.
-\paragraph{Minority Classes} In general, it is difficult for our approach to label examples correctly for small classes in the target building. One straightforward reason is the scarcity of training examples; another reason is that usually these small classes are measuring building-specific facilities, for example, cooling tower entering water temperature, which totally depends on how the cooling facility is designed.
+% \section{Discussion}
+% %\paragraph{Unlabeled Streams}
+% %With a threshold on the average weight of base classifiers, our transfer learning based technique is able to label a portion of the streams in the new building, which leaves many unlabeled.
+% %The coverage might be increased by searching for the nearest neighbors in a certain radius to those unlabeled and combine them.
+% \noindent \textbf{Minority Classes.} In general, it is difficult for our approach to label examples correctly for small classes in the target building. One major reason is the sparsity of training examples in those classes; another reason is that usually these small classes are measuring building-specific facilities, for example, cooling tower entering water temperature, which totally depends on how the cooling facility is designed.
 
-\paragraph{Better Features for Classifiers} The performance of transfer learning and classification processes in our work is bounded by the base classifiers which rely only on a set of general features. The line of work to represent time series with discretized symbols (e.g., the SAX~\cite{sax}) or primitive ``shapes'' (e.g., the ``shapelets''~\cite{shapelet1, shapelet2}) doesn't work well for our problem due to the variability in ``shapes'' and unpredictable ``noises''. We wish to explore how using external or domain-specific knowledge could help improve the classification accuracy. 
+% \noindent \textbf{Better Features for Classifiers.} The performance of transfer learning and classification processes in our work is bounded by the base classifiers which rely only on a set of general features. The line of work to represent time series with discretized symbols (e.g., the SAX~\cite{sax}) or primitive ``shapes'' (e.g., the ``shapelets''~\cite{shapelet1, shapelet2}) doesn't work well for our problem due to the variability in ``shapes'' and unpredictable ``noises''. We wish to explore how using external or domain-specific knowledge could help improve the classification accuracy.
 
-\paragraph{Number of Clusters}
-In this work, we do not need to tune the number of clusters generated on the target building because we appeal to a non-parametric Bayesion method in our algorithm to indentify the cluster struture. However, the transfer learning performance is sentitive to the number of clusters generated.
-Too few clusters will incorrectly put more different true classes into the same cluster, while on the contrary, too many clusters will lead to insufficient members in each clsuter, both of which will make the weight estimation inaccrurate.
+% \paragraph{Number of Clusters}
+% In this work, we do not need to tune the number of clusters generated on the target building because we appeal to a non-parametric Bayesion method in our algorithm to indentify the cluster struture. However, the transfer learning performance is sentitive to the number of clusters generated.
+% Too few clusters will incorrectly put more different true classes into the same cluster, while on the contrary, too many clusters will lead to insufficient members in each clsuter, both of which will make the weight estimation inaccrurate.

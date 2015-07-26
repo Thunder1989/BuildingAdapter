@@ -20,36 +20,37 @@
 \newcommand{\mt}{\mathsf{T}}
 
 \begin{document}
-\conferenceinfo{BuildSys'15,} {November 3-4, 2015, Seoul, Korea} 
-\CopyrightYear{2015} 
-\crdata{978-1-4503-2431-1/13/11} 
-\clubpenalty=10000 
+\conferenceinfo{BuildSys'15,} {November 3-4, 2015, Seoul, Korea}
+\CopyrightYear{2015}
+\crdata{978-1-4503-2431-1/13/11}
+\clubpenalty=10000
 \widowpenalty = 10000
 
 %\title{Sensor Type Classification\\ with Transfer Learning Across Buildings}
 \title{The Building Adapter: Towards Quickly Applying\\ Building Analytics at Scale}
 
-\numberofauthors{1} 
+\numberofauthors{1}
 \author{
 \alignauthor
 Dezhi Hong$^1$,  Hongning Wang$^1$,  Kamin Whitehouse$^1$, Jorge Ortiz$^2$\\
 	\affaddr{$^1$Department of Computer Science, University of Virginia, VA USA}\\
 	\affaddr{$^2$IBM T.J. Watson Research Center, Yorktown Heights, NY USA}\\
-	\email{\{hong, hongning, whitehouse\}@virginia.edu, jjortiz@us.ibm.com}
+	\email{\{hong, hw5x, whitehouse\}@virginia.edu, jjortiz@us.ibm.com}
 }
 
 \maketitle
 \begin{abstract}
 Building analytics can produce substantial energy savings in commercial
-buildings by automatically detecting wasteful or incorrect operation.  However,
-the process of {\em mapping} a new building to the inputs of an analytics engine
-is highly manual process and a key obstacle to the scalability of building
+buildings by automatically detecting wasteful or incorrect operations.  However,
+the process of {\em mapping} a new building's sensing and
+control points to the inputs of an analytics engine
+is a highly manual process and a key obstacle to the scalability of building
 analytics. In this paper, we present new techniques to perform automatic
 mapping without any manual intervention. Our approach builds on and improves
-upon techniques from {\em transfer learning}: it learns a model of the metadata
-from a labeled building and modifies that model so it can be applied to another,
-unlabeled building, even if the two buildings are very different. We evaluate
-this approach using 7 days of data from over 3,000 sensors located in 3
+upon techniques from {\em transfer learning}: it learns a set of statistic classification models of the metadata
+from a labeled building and adaptively integrates those models to another,
+unlabeled building, even if the two buildings have very different metadata conventions. We evaluate
+this approach using 7 days' data from over 2,500 sensors located in 3
 commercial buildings. Results indicate that this approach can automatically
 label at least 36\% of the points with more than 85\% accuracy, while the
 best baseline achieves only 63\% label accuracy on average. These techniques
@@ -59,14 +60,12 @@ buildings across the globe, without the need for manual mapping on a
 per-building basis.
 \end{abstract}
 
-\category{C.3}{Special-Purpose And Application-Based Systems}{Real-time and embedded systems}
-\terms{Performance, Experimentation, Verification}
+%\category{C.3}{Special-Purpose And Application-Based Systems}{Real-time and embedded systems}
+%\terms{Performance, Experimentation, Verification}
 \keywords{Building, Sensor Type, Transfer Learning}
 
 % \newpage
 \input{intro}
-
-%\input{feature}
 
 \input{relatedwork}
 
@@ -82,8 +81,8 @@ per-building basis.
 %\section{Acknowledgements}
 %Thanks to our shepherd, Kin Cheong Sou, and the anonymous reviewers for helpful comments. Thanks to Albert Goto, for making the first author's stay at UC Berkeley comfortable. Sincere gratitude goes to Kamin and David, for letting this collaboration happen. This work was partly funded by the NSF grants EFRI-1038271 and CPS-1239552.
 \bibliographystyle{abbrv}
-%\small
-\scriptsize
+\small
+%\scriptsize
 \bibliography{buildsys}
 
 %\balancecolumns
