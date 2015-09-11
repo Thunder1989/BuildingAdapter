@@ -1,51 +1,52 @@
 \section{The Building Adapter}
-Based on the insight that sensor reading data and sensor names characterize different properties of a sensor stream, we develop a transfer learning based approach to exploit features extracted from both to perform the knowledge transfer. Specifically, we construct classifiers\footnote{We use the term ``classifier'', ``model'' and ``learner'' {\it interchangeably}.} based on data features because they are more likely to be consistent across buildings.
+Based on the insight that sensor readings and sensor names characterize different properties of a sensor stream, we develop a transfer learning based approach to exploit features extracted from both the sensor data and the point names to perform the knowledge transfer. Specifically, we construct classifiers\footnote{We use the term ``classifier'', ``model'' and ``learner'' {\it interchangeably}.} based on data features because they are more likely to be consistent across buildings.
 %why ensemble
-However, a single supervised learner might not perform well on all examples in the new building due to the inductive bias inherent in classifier training. Hence, we employ an ensemble of classifiers, where each classifier captures a different ``perspective'' in predicting the sensor type.
+However, a single supervised learner might not perform well on all examples in the new building due to the inductive bias inherent in classifier training. Hence, we employ an ensemble of classifiers, where each classifier will carry a different ``perspective'' in predicting the sensor type.
 %then we need local weight
-When applied to a new target building, since different classifiers might be effective in predicting different instances, we appeal to the instance-specific local weighting method proposed in~\cite{lwe} to weight those different classifiers while ensemble.
-In our solution, the weight is derived based on the consistency between a model's predictions and the instance's local clustering structure, which is estimated on the sensor names in the target building.
+When applied to a new building, since different classifiers might be effective in predicting different instances, we appeal to the instance-specific local weighting method proposed in~\cite{lwe} to weigh those different classifiers while ensemble.
+In our solution, the weighting is based on the consistency between a model's predictions and the instance's local clustering structure, which is estimated by the sensor names in the target building.
 % In particular, we first estimate a set of statistical classification models based on features extracted from the sensor data from one building, and transfer the learned models to label sensors in another building.
 % We weight the models for each instance in the target building by measuring the consistency between a model's predictions and the instance's local structure that is approximated by clustering: classifiers with higher consistency would be assigned a larger weight.
 % while name features are more suitable for discovering unsupervised neighborhood with clustering.
+We will further quantitatively justify the choice of data features for classification and name features for clustering in the evaluation section.
 In the rest of the section, we first elaborate how we construct the two different types of features and then concentrate on the proposed transfer learning method.
 
 
 \subsection{Feature Representation}\label{feature}
-Our solution exploits two common attributes of the sensor points in a building - the actual sensor reading data and the text string-based point names, both of which play an important role in differentiating sensor types.
+Our solution exploits two common attributes of the sensor points in a building - the actual sensor reading data and the text string-based point names, both of which play an important role for differentiating sensor types.
 In this section, we describe the construction of two different sets of features, i.e., data features and name features.
 
 \begin{figure*}[ht!]
 \centering
   \begin{subfigure}{0.32\textwidth}
                 \centering
-    \includegraphics[width=\textwidth]{./fig/co2.pdf}
+    \includegraphics[width=\textwidth]{./fig/co2.eps}
                 \caption{$CO_{2}$}
   \end{subfigure}
   \begin{subfigure}{0.32\textwidth}
                 \centering
-    \includegraphics[width=\textwidth]{./fig/rh.pdf}
+    \includegraphics[width=\textwidth]{./fig/rh.eps}
                 \caption{Humidity}
   \end{subfigure}
   \begin{subfigure}{0.32\textwidth}
                 \centering
-    \includegraphics[width=\textwidth]{./fig/rmt.pdf}
+    \includegraphics[width=\textwidth]{./fig/rmt.eps}
                 \caption{Room Temperature}
   \end{subfigure}
   %row2
   \begin{subfigure}{0.32\textwidth}
                 \centering
-    \includegraphics[width=\textwidth]{./fig/stpt.pdf}
+    \includegraphics[width=\textwidth]{./fig/stpt.eps}
                 \caption{Room Temperature Set Point}
   \end{subfigure}
   \begin{subfigure}{0.32\textwidth}
                 \centering
-    \includegraphics[width=\textwidth]{./fig/vav.pdf}
+    \includegraphics[width=\textwidth]{./fig/vav.eps}
                 \caption{VAV Air Volume}
   \end{subfigure}
   \begin{subfigure}{0.32\textwidth}
                 \centering
-    \includegraphics[width=\textwidth]{./fig/cwt.pdf}
+    \includegraphics[width=\textwidth]{./fig/cwt.eps}
                 \caption{Chilled Water Supply Temperature}
   \end{subfigure}
 \caption{Different types of sensor generally have different amplitudes that can be separated and binned to characterize the data.}
@@ -53,12 +54,12 @@ In this section, we describe the construction of two different sets of features,
 \end{figure*}
 
 \subsubsection{Data Features}
-A signal\footnote{In this paper, we use the term ``signal'', ``trace'' and ``time-series'' \textit{interchangeably}.} in the time domain is a trend of sensor reading.
+A signal\footnote{In this paper, we use the term ``signal'', ``trace'' and ``time series'' \textit{interchangeably}.} in the time domain is a trend of sensor reading.
 Different types of sensors generally have different amplitudes that can be separated and binned,
 as demonstrated in Figure~\ref{fig:example}.
 Similar to piecewise aggregated approximation (PAA~\cite{paa}) -- where the mean is calculated in a fixed-length window --
 we compress the signal by computing a set of summary statistics over fixed-length windows.
-Table~\ref{table:fd} summarizes the statistics we calculate as data features.
+Table~\ref{table:fd} shows a summary of the statistics we calculate as data features.
 
 
 \begin{table}[h]
@@ -77,15 +78,15 @@ Category                   & Statistical Function & \multicolumn{1}{l}{Acronym} 
                            & Kurtosis                & kurt                         \\ \hline
 Shape                      & Linear Regression Slope & slope                        \\ \hline
 \end{tabular}
-\caption{Statistical functions applied to each time-series on window level.}
+\caption{Statistical features extracted in window level for each time series data.}
 \label{table:fd}
 \end{table}
 
 Our feature extraction process consists of three steps.
 First, each sensor trace is segmented into $N$ hour-long windows with 50\% overlap between consecutive windows. Second, for each time window, we compute the statistics shown above.
 For example, the vector for $MIN$ is computed as follows:
-$MIN = \{min^{1}, min^{2}, ..., min^{N}\}$, where $N$ is the number of time windows. We compute a similar vector for each statistic shown in the table.
-Third, we compute a statistical summary of these vectors. For each vector we compute the {\em minimum}, {\em maximum}, {\em median} and {\em variance}, resulting in a feature
+$MIN = \{min^{1}, min^{2}, ..., min^{N}\}$, where $N$ is the number of time windows. We compute a similar vector for each statistic show in the table.
+Third, we compute a statistical summary of these vectors. For each vector we compute the minimum, maximum, median and variance, resulting in a feature
 vector containing 44 variables:
 \begin{displaymath}
 \begin{split}
@@ -96,23 +97,22 @@ min(SLOPE), max(SLOPE), \\
 median(SLOPE), var(SLOPE)\}
 \end{split}
 \end{displaymath}
-$F$ is the data feature representation of each sensor stream used in our study.
+$F$ is the data feature vector for each sensor stream used in our study.
 
 \subsubsection{Name Features}
 Sensor point names are short text strings with several concatenated abbreviations, as shown in Table~\ref{table:ex}.
-To extract features from a point name, we first convert all alphabetical characters to lower cases and trim out numerical characters.
+To extract features from a point name, we convert all alphabetical characters to lower cases and trim out numerical characters.
 For example, \texttt{Zone Temp 2 RMI204} becomes \texttt{\{zone, temp, rmi\}}.
-Next we compute $k$-mers~\cite{leslie2004mismatch}, which helps measure sequence similarity without requiring alignment, to capture variations in type abbreviations.
-For example, the type of ``temperature'' might be encoded as ``tmp'' or ``temp'' and only considering the bag-of-words will miss the similarity within a word boundary, leaving these two strings far in the vector space after transformation.
-Therefore, we adopt k-mers, which refers to all the possible substrings of length $k$ in a given string. 
-This feature representation is widely used in protein and gene sequence analysis and we limit our k-mers computation within a word boundary.
-For example, for a string ``ABCDEF'', the 3-mers (k=3) generated would be \texttt{\{ABC, BCD, CDE, DEF\}}.
+We use $k$-mers \cite{leslie2004mismatch} to capture variations in type abbreviations, e.g., ``tmp'' and ``temp'' for temperature.
+The term $k$-mer refers to all the possible substrings of length $k$ in a given string. This feature is often used in protein and gene sequence analysis and
+it helps measure sequence similarity without requiring alignment.
 
+We limit the k-mers generation within a word boundary.
 In general, a smaller $k$ will increase the overlapping between the generated k-mers, making points less differentiable.
 Therefore, we compute all k-mers of length 3 and 4 for each point name.
 For example, \texttt{\{zone, temp, rmi\}} yields a set of k-mers \texttt{\{zon, one, tem, emp, rmi\}} when $k$=3.
 A dictionary of k-mers is constructed with all the k-mers generated from each point name.
-Each point name is transformed into a feature vector based on the frequency of k-mers in it.
+Each point name is converted into a feature vector based on the frequency of k-mers in it.
 For example, a set of k-mers \texttt{\{zon, tem, emp, zon\}} will be transformed to a vector
 \texttt{(2,0,1,1,0)} with the dictionary \texttt{\{zon, one, tem, emp, rmi\}}, meaning \texttt{zon} occurs twice, \texttt{one} does
 not appear, and so forth.
@@ -121,7 +121,7 @@ This feature representation of point names will be used for clustering on the ne
 
 \subsection{Locally Weighted Ensembles for Knowledge Transfer}
 To effectively encapsulate and transfer knowledge from one labeled building to another,
-we construct a set of different classifiers, including support vector machines \cite{suykens1999least}, logistic regression \cite{hosmer2004applied} and random forest \cite{RF},
+we construct a set of different classifiers, including support vector machines \cite{suykens1999least}, logistic regression \cite{hosmer2004applied} and random forest \cite{liaw2002classification},
 using the same set of data features from the source building.
 Each classifier presents a different ``perspective'' for recognizing sensor types in the source building, due to the inductive bias of the underlying model.  We refer to these classifiers as {\it base} models in this paper, which will be combined for type classification in the target building.
 
@@ -137,16 +137,16 @@ Therefore, to combine the knowledge in base models,
 % Such global weighting schemes may not perform well in transfer learning because different testing examples may favor predictions from different base models.
 % For example, when the base models carry conflicting concepts at a testing example, the optimal choice would be a model that better represents the distribution underlying the example.
 we employ the method from~\cite{lwe} to locally weigh each classifier and combine the predictions from different base classifiers in the target building.
-The weight is computed per model per example based on the consistency between a base model's predictions and the local clustering structure of the target example.
+The weight is computed per model per example based on the consistency between the base models' predictions and the local clustering structure of the target example.
 % The consistency is measured by comparing neighborhood graphs constructed by the name features. The construction of this neighborhood graph will be explained later.
 Intuitively, the estimated local weights will favor models whose predictions are consistent with the estimated local structure of the target example in the target building.
 
-Formally, let $x$ be the data feature vector of an instance in the target building and $y$ be its predicted class label. Given a set of $k$ base models $M_1, \dots, M_k$ and the new testing set $D_T$ encoded with the data features, the general Bayesian model averaging rule estimates the posterior distribution of $y$ in $x$ as,
+Formally, let $x$ be the data feature vector of an instance in the target building and $y$ be its predicted class label. Given a set of $k$ base models $M_1, \dots, M_k$ and the new testing set $D_T$ encoded with the data features, the general Bayesian model averaging rule estimates the posterior distribution of $y$ as,
 \begin{equation}\label{eq_lwe}
 p(y|x)=\sum_{i=1}^k p(y|x,D_T,M_i) p(M_i|D_T)
 \end{equation}
 where $p(y|x,D_T,M_i) = p(y|x,M_i)$, because $x \in D_T$ and $p(y|x,M_i)$ is the label for $x$ predicted by $M_i$ and $p(M_i|D_T)$ is the probability of choosing $M_i$ given the testing set $D_T$.
-Since $x \in D_T$, $p(M_i|D_T)$ equals to $p(M_i|x)$, which is the locally adjusted weight for $M_i$, and Eq.~\ref{eq_lwe} becomes,
+Since $x \in D_T$, $p(M_i|D_T)$ is equal to $p(M_i|x)$, which is the locally adjusted weight for $M_i$, and Eq.~\ref{eq_lwe} becomes,
 \begin{equation}\label{eq_sum}
 p(y|x)=\sum_{i=1}^k w_{x}^{M_i} p(y|x, M_i)
 \end{equation}
@@ -156,37 +156,33 @@ We will next explain how the weight is calculated per example.
 \subsection{Graph-based Weight Estimation}\label{sec:gwe}
 % If $p(y|x)$ is known, we can estimate the weights $w_{x}^{M_i}$ for each model by minimizing the square error between its prediction and the ground truth.
 % However, in practice the truth value of $p(y|x)$ for a new building is not available a priori .
-Ideally a larger weight should be assigned to the model whose predicted neighborhood structure of a testing instance in the target building is most consistent with its true neighborhood. To locally weight the models in such a manner, we appeal to
+Ideally a larger weight should be assigned to the model whose predicted neighborhood structure of a testing instance is most consistent with its true neighborhood. To locally weight the models in such a manner, we appeal to
 % We quickly summarize the graph-based weight estimation technique presented in~\cite{lwe} and describe two adjustments we make to fit our problem.
 %Assuming that $p(y|x)$ does not change much in a dense area where $p(x)$ is high~\cite{cluster},
 % which means the decision boundary probably exists in areas with smaller $p(x)$.
-the technique proposed in~\cite{lwe}: it performs clustering on the new testing set in the target domain and assumes if the clustering boundary for the region where $x$ falls, agrees with the decision boundary of $M_i$,
+the technique proposed in~\cite{lwe}: it performs clustering on the testing set in target domain and assumes the boundaries between clusters represent areas where $p(x)$ is small; if the clustering boundary for the region where $x$ falls, agrees with the decision boundary of $M_i$,
 % we assume that $p(y|x,M_i)$ is similar to the true $p(y|x)$ around $x$, which means
-a larger weight should be assigned to $M_i$ at point $x$.
+a larger weight is assigned to $M_i$ at point $x$.
 In other words, if the predictions made by $M_i$ on the area surrounding $x$ have greater consistency with the clustering results, $M_i$ will be assigned
 a larger weight at $x$.
 
 Based on these assumptions, the weight can be estimated with a graph-based algorithm.
 To compute the $w_{x}^{M_i}$ for $M_i$ at point $x$, we construct two neighborhood graphs:
-$G_M = (V, E_M)$ and $G_C = (V, E_C)$, for classification and clustering results respectively,
-where each vertex is an example in the target domain $D_T$. 
-The neighborhood graph describes whether different examples belong to the same class/cluster. 
-In the graph constructed for model $M_i$, i.e., $G_{M_i}$, an edge exists between two vertices (denoting the two examples are ``neighbors'') if and only if $M_i$ assigns the same label for these two examples. 
-Likewise, in $G_C$, an edge exists between two vertices if and only if these two examples reside in the same cluster.
-If the neighbors of $x$ on both graphs significantly overlap, meaning the structure predicted by classifier is consistent with the cluster structure, then $M_i$ will be assigned a larger weight in the ensemble.
+$G_M = (V, E_M)$ and $G_C = (V, E_C)$, by classification and clustering results respectively,
+where each vertex is an instance in the target domain $D_T$. In the graph constructed by model $M_i$, i.e., $G_{M_i}$, an edge exists between two vertices (denoting the two examples are ``neighbors'') if and only if $M_i$ assigns the same label for these two examples. Likewise, in $G_C$, an edge exists between two vertices if and only if these two examples reside in the same cluster.
+If the neighbors of $x$ on both graphs significantly overlap, then $M_i$ will be assigned a larger weight in ensemble.
 So the weight $w_{x}^{M_i}$ for $M_i$ at $x$ is proportional to the similarity of the two graphs:
 \begin{equation}\label{eq_sim}
 w_{x}^{M_i} \propto s(G_M, G_C|x) = \frac {|V_M \cap V_C|} {|V_M \cup V_C|}
 \end{equation}
-where $V_M$ ($V_C$) is the set of neighbors of $x$ on graph $G_M$ ($G_C$), $|X|$ is the cardinality of set $X$, and $s(G_M, G_C|x)$ denotes the similarity between two graphs.
-Figure~\ref{fig:graph} illustrates an example of neighborhood graphs for an example $x$ (in grey circle):
-two different models predict different examples (in white circles) as neighbors to the target example (in grey circles), 
-where model 1 has a similarity of 0.75 with the cluster graph while model 2 has a similarity of 0.5 with the cluster graph.
+where $V_M$ ($V_C$) is the set of neighbors of $x$ on graph $G_M$ ($G_C$), $|X|$ is the cardinality of set $X$, and $s(G_M, G_C|x)$ is the similarity between two graphs.
+Figure~\ref{fig:graph} illustrates an example of neighborhood graphs for an example $x$ (in grey circle): model 1 has a similarity of 0.75 with the cluster graph
+ while model 2 has a similarity of 0.5 with the cluster graph.
 
 \begin{figure}[h]
 \centering
     \includegraphics[width=0.4\textwidth]{./fig/lwe_graph}
-\caption{An example of local neighborhood graphs of $x$ (in grey circle): two different models predict different examples as neighbors to the target example, where model 1's prediction is more similar than model 2's to the cluster structure.}
+\caption{An example of local neighborhood graphs of $x$ (in grey circle).}
 \label{fig:graph}
 \end{figure}
 
@@ -200,10 +196,10 @@ The final prediction for $x$ is simply $\hat y = argmax_y \enspace p(y|x)$ as $p
 \subsubsection{Distance-based Adjustment}
 In some cases the similarity score defined in Eq~\ref{eq_norm} can be problematic. Consider the case shown in Figure~\ref{graph_dist}.
 The example shows two models where the target example has two neighbors.  The distance between the examples are marked on the edge.
-Since the original similarity definition only considers the number of neighbors, both models will be assigned the same weight of 0.5.
+Since the original similarity definition only considers the number of neighbors, both models will be assigned with the same weight of 0.5.
 However, the neighbors in model 1 are closer to the target example than those in model 2.  Therefore model 1 should be assigned a higher
 weight.
-To fix the issue we include the distance between examples into consideration and adjust similarity score as,
+To fix the issue we include into consideration the distance between examples and then adjust similarity accordingly:
 \begin{equation}\label{d_sim}
 s^\ast(G_M, G_C|x) = 1 - \frac {\sum d_{V_I}/|V_I|} {\sum d_{V_U}/|V_U|}
 \end{equation}
@@ -212,15 +208,15 @@ where $V_I = V_M \cap V_C$, $V_U = V_M \cup V_C$, and $\sum d_{V_I}$ is the sum 
 \begin{figure}[h]
 \centering
     \includegraphics[width=0.4\textwidth]{./fig/lwe_d_graph}
-\caption{An example of local neighborhood graphs of $x$ with the distance between examples into consideration.}
+\caption{An example of local neighborhood graphs of $x$ with distance into consideration.}
 \label{graph_dist}
 \end{figure}
 
 \subsubsection{Thresholding-based Adjustment}
 The use of a \emph{weighted-average decision} for $x$ among base classifiers is reasonable when at least some classifiers perform well on $x$.
 However, the similarity $s(G_{M_i}, G_C|x)$ for $M_i$ is expected to be small when the predictions of $M_i$ around $x$ conflict with its true local structure.
-In such a case, using the decision from this classifier might be misleading.
-Since $s(G_{M_i}, G_C|x)$ reflects the consistency between $M_i$'s predictions and the testing instance $x$'s local clustering structure, we use the average similarity score over all $M_i$ on $x$ as a discriminator to limit the usage of these base classifiers.
+In such a case, using the decision from the classifier might be misleading.
+Since $s(G_{M_i}, G_C|x)$ reflects the consistency between classifier predictions and cluster structure, we use the average similarity score over all $M_i$ on $x$ as a discriminator to limit the usage of these base classifiers.
 As an adjustment before the normalization of similarity scores, we check the average similarity score with,
 \begin{equation}\label{ave_sim}
  \bar s_x = \frac {1}{k}\sum_{i=1}^k s(G_{M_i}, G_C|x)
@@ -231,10 +227,10 @@ We continue with the ensemble of predictions only if $\bar s_x$ is larger than a
 \subsection{Non-parametric Bayesian Clustering}
 \label{sec_clustering}
 In our transfer learning based approach, clustering structure for instances in target building is exploited to approximate the true local structure of an example.
-However, if employing clustering algorithms such as Gaussian Mixture Model (GMM)~\cite{zivkovic2004improved}, we need to manually specify the number of clusters for a given input data set; and the clustering results are very sensitive to this setting. 
+However, if employing clustering algorithms such as k-means or Gaussian Mixture Model (GMM), we need to manually specify the number of clusters for a given input data set; and the clustering results are very sensitive to this setting. 
 More importantly, in our study, usually there is more than one pattern in the point names even for the same type of sensors; therefore we cannot assume a class has only one cluster. 
 It is impossible for us to pre-specify the optimal number of clusters. 
-To make clustering feasible on the new target building, we use a non-parametric Bayesian solution as in~\cite{cikm} - Dirichlet Process with GMM, which automatically decides the number and structure of clusters.
+To make clustering feasible on the new target building, we use a non-parametric Bayesian solution - Dirichlet Process with GMM~\cite{zivkovic2004improved}, a partitional clustering algorithm, to automatically decide the number of clusters as well as perform the clustering.
 In particular, name feature distribution $p(x)$ is exploited via its latent clustering structure.
 
 In GMM, the cluster label for every instance is treated as a latent variable, which is drawn from a multinomial distribution $p(c)$, i.e., $p(c)\propto\alpha_c$, where $\forall c, \alpha_c\ge0$ and $\sum_c\alpha_c=1$. In any given cluster $c$, the conditional data likelihood of an instance $x$ is specified by a multivariate Gaussian distribution. To reduce the number of parameters to estimate, we choose the isotropic Gaussian in our solution,
@@ -256,8 +252,8 @@ where $\alpha={\alpha}_{c=1}^\infty\sim Stick(\eta)$ represents the proportion o
 Because the data density distribution defined in Eq~\eqref{eq_dp_density} only has finite support at the points of $\{\alpha_c, \mu_c\}^k_{c=1}$, we can calculate the posterior distribution of latent cluster labels in each unlabeled instance to discover the clustering structure. Following the sampling scheme proposed in \cite{neal2000markov}, we use a Gibbs sampling method to infer the posterior of cluster membership. Detailed specifications of this sampling algorithm can be found in \cite{neal2000markov}.
 
 
-{\bf Putting it all together:} Algorithm~\ref{algo} summarizes our transfer learning algorithm for the problem of sensor type classification across buildings.
-We start by training a few base classifiers with the data features and labeled examples in a source building. Then we generate clusters using GMM with DP priors on the name features of examples in the target building. For each example $x$ in the target building, we measure the local similarity score for each base classifier. If the average similarity is large enough, we compute the weight for each classifier at $x$ by normalizing the similarity score. Finally we calculate the weighted sum of predictions from all base classifier and obtain the label $y$ for $x$.
+{\bf Putting it all together:} Algorithm~\ref{algo} summarizes our transfer learning algorithm for the sensor type classification across buildings.
+We start by training a few base classifiers with the data features and labeled examples in a source building. Then we generate clusters using GMM with DP priors on the name features of examples in the target building. For each example $x$ in the target building, we measure the local similarity score for each base classifier. If the average similarity is significant enough, we compute the weight for each classifier at $x$ by normalizing the similarity score. Finally we calculate the weighted sum of predictions from all base classifier and obtain the label $y$ for $x$.
 
 \begin{algorithm}[ht]
  \caption{Transfer Learning for Sensor Type Classification}
